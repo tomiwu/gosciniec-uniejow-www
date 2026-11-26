@@ -1,14 +1,18 @@
 # Overview
 
 ```
-src/app/            pages (App Router, static export)
+src/app/            pages (App Router, static export). One stub page for each route.
+src/components/     shared React components (StubPage, NapBlock, JsonLd)
+src/lib/routes.ts   typed list of all phase 1 routes (title, meta description)
+src/lib/seo-files.ts  robots.txt and sitemap.xml builders
 src/lib/nap.ts      name, address, phone, e-mail (single source)
 src/lib/schema/     JSON-LD builders (Hotel, FAQPage, Offer)
 src/redirects/      typed 301 map + .htaccess generator
 public/img/         pre-sized images
 public/api/contact.php  mail endpoint for the forms (webd.pl, PHP)
-scripts/            build helpers, precommit, start-loop
-e2e/                Playwright + axe tests
+scripts/            postbuild, check-redirects, check-schema (+ tests), precommit, start-loop
+e2e/                Playwright + axe tests (serve.json: static server config)
+.github/workflows/  ci.yml with the 9 required jobs
 docs/source/        text and image URLs of the old WordPress site (source material)
 .sandcastle/        loop orchestrator and agent prompts (host only)
 ```

@@ -1,0 +1,31 @@
+export type Redirect = { from: string; to: string };
+
+/** Old WordPress URLs. All redirects are 301. Targets are phase 1 routes or `/sitemap.xml`. */
+export const redirects: readonly Redirect[] = [
+  { from: '/ogrod/', to: '/' },
+  { from: '/wokol-hotelu/', to: '/atrakcje/' },
+  { from: '/atrakcje-w-okolicy/', to: '/atrakcje/' },
+  { from: '/pakiet-kobiecy-weekend/', to: '/pakiety/' },
+  { from: '/portfolio/swieta-w-goscincu/', to: '/pakiety/' },
+  { from: '/portfolio/swieta-w-goscincu-2/', to: '/pakiety/' },
+  { from: '/portfolio/swieta-w-goscincu-3/', to: '/pakiety/' },
+  { from: '/category/oferta/', to: '/pakiety/' },
+  { from: '/category/oferta_2/', to: '/pakiety/' },
+  { from: '/portfolio_category/oferty-specjalne/', to: '/pakiety/' },
+  { from: '/rezerwuj/', to: '/rezerwacja/' },
+  { from: '/wpa-stats-type/android/', to: '/' },
+  { from: '/wpa-stats-type/chrome/', to: '/' },
+  { from: '/wpa-stats-type/event/', to: '/' },
+  { from: '/wpa-stats-type/firefox/', to: '/' },
+  { from: '/wpa-stats-type/iphone/', to: '/' },
+  { from: '/wpa-stats-type/linux/', to: '/' },
+  { from: '/wpa-stats-type/macintosh/', to: '/' },
+  { from: '/wpa-stats-type/opera/', to: '/' },
+  { from: '/wpa-stats-type/safari/', to: '/' },
+  { from: '/wpa-stats-type/samsung-browser/', to: '/' },
+  { from: '/wpa-stats-type/unknown/', to: '/' },
+  { from: '/wpa-stats-type/view/', to: '/' },
+  { from: '/wpa-stats-type/windows/', to: '/' },
+  { from: '/feed/', to: '/' },
+  { from: '/wp-sitemap.xml', to: '/sitemap.xml' },
+];

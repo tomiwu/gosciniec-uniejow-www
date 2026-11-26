@@ -1,0 +1,9 @@
+out
+.next
+docs/source
+.sandcastle
+package-lock.json
+.lighthouseci
+# Agent rules and PRD. Agents must not reformat them.
+CLAUDE.md
+docs/PRD.md
