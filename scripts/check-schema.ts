@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { nap } from '../src/lib/nap';
@@ -75,12 +75,13 @@ function checkFaqPage(node: Node, where: string): string[] {
 function checkOffer(node: Node, where: string): string[] {
   const errors: string[] = [];
   const price = node['price'];
-  const numeric =
-    typeof price === 'number' ? price : typeof price === 'string' ? Number(price) : NaN;
-  if (!(typeof price === 'number' || (typeof price === 'string' && price.trim() !== ''))) {
+  if (typeof price === 'number' || (typeof price === 'string' && price.trim() !== '')) {
+    const numeric = Number(price);
+    if (!Number.isFinite(numeric) || numeric <= 0) {
+      errors.push(`${where}: Offer price must be a number greater than 0`);
+    }
+  } else {
     errors.push(`${where}: Offer needs a price`);
-  } else if (!Number.isFinite(numeric) || numeric <= 0) {
-    errors.push(`${where}: Offer price must be a number greater than 0`);
   }
   if (node['priceCurrency'] !== 'PLN') errors.push(`${where}: Offer priceCurrency must be PLN`);
   return errors;
@@ -128,13 +129,10 @@ export function checkHtml(html: string, file: string): string[] {
 }
 
 export function listHtmlFiles(dir: string): string[] {
-  const files: string[] = [];
-  for (const name of readdirSync(dir)) {
-    const full = join(dir, name);
-    if (statSync(full).isDirectory()) files.push(...listHtmlFiles(full));
-    else if (name.endsWith('.html')) files.push(full);
-  }
-  return files.sort();
+  return readdirSync(dir, { recursive: true, encoding: 'utf8' })
+    .filter((name) => name.endsWith('.html'))
+    .map((name) => join(dir, name))
+    .sort();
 }
 
 function main(): number {
