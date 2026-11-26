@@ -79,6 +79,8 @@ Out of scope (phase 2 and later): booking engine, Stripe, PostgreSQL, Scala 3 ba
 | D5 | Second phone 789 017 995 from the old package page is not used. Only +48 63 28 88 628. | One NAP. |
 | D6 | Sandcastle orchestrator package `@ai-hero/sandcastle` 0.12.0 (not 0.14.0). | 0.12.0 runs in the other loops on this box. Change later in a separate issue. |
 | D7 | Node.js 26 LTS in CI and in the loop image. | Newest LTS on 2026-11-26 (26.13.1). |
+| D9 | TypeScript 6.0.3 (not 7.x) and ESLint 9.39.5 (not 10.x). | typescript-eslint 8.74.0 needs TypeScript below 6.1. eslint-plugin-jsx-a11y 6.10.2 supports ESLint up to 9. |
+| D10 | Branch protection: GitHub returns 403 "Upgrade to GitHub Pro or make this repository public" for branch protection and rulesets on this private repository (checked 2026-11-26). Until Tomasz decides (GitHub Pro, about 4 USD per month, or keep it as is), these compensating controls apply: the loop never merges, the repository allows squash merge only, auto-merge is off, and the owner bot merges only after Tomasz's OK and only when all 9 CI checks are `success` (`gh pr merge --squash --match-head-commit`). Open item: issue "Enable branch protection on main". | Private repo on a free plan. |
 | D8 | Images: download from the old site once (`scripts/fetch-images.ts`), commit resized AVIF/WebP + JPEG fallback (max width 1600 px) in `public/img/`. | Pre-sized images are needed for LCP on static hosting. |
 
 ## 6. Test decisions
@@ -96,7 +98,8 @@ Out of scope (phase 2 and later): booking engine, Stripe, PostgreSQL, Scala 3 ba
 - Domain `gosciniecuniejow.pl` is paid until 2027-01-15. The registry still shows the old subscriber "Gościniec Nad Wartą" Teresa Krajewska. Risk: expiry or a transfer problem. Action for Tomasz: renew before 2027-01-15.
 - webd.pl shared hosting: no SSH below the "Extra" package, no Node, no Java. PHP and `.htaccess` (LiteSpeed) are available.
 - GitHub Actions minutes on a private repository are limited by the plan of `tomiwu`.
-- Branch protection on a private repository needs a paid GitHub plan or a rule set that the plan allows.
+- Branch protection and rulesets on a private repository need GitHub Pro (HTTP 403 on 2026-11-26). See D10.
+- GitHub Actions on a private repository on the free plan: 2000 minutes per month. Lighthouse and Playwright jobs use the most minutes.
 - The loop agent has an idle timeout. Issues contain exact tool versions, so the agent does not search the web.
 - Disk on the box is small (about 9 GB free on 2026-11-26). One loop image only.
 
