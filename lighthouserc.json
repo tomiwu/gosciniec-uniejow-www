@@ -1,0 +1,22 @@
+{
+  "ci": {
+    "collect": {
+      "staticDistDir": "./out",
+      "url": ["/", "/pokoje/"],
+      "numberOfRuns": 3
+    },
+    "assert": {
+      "assertions": {
+        "largest-contentful-paint": [
+          "error",
+          { "maxNumericValue": 2500, "aggregationMethod": "median-run" }
+        ],
+        "categories:accessibility": ["warn", { "minScore": 1 }]
+      }
+    },
+    "upload": {
+      "target": "filesystem",
+      "outputDir": ".lighthouseci"
+    }
+  }
+}
