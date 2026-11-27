@@ -1,0 +1,4 @@
+The font in this folder is a subset of:
+- Fraunces, Copyright 2018 The Fraunces Project Authors (https://github.com/undercasetype/Fraunces)
+It is licensed under the SIL Open Font License, Version 1.1: https://openfontlicense.org/open-font-license-official-text/
+The file is a static instance (opsz 144, wght 500, SOFT 0, WONK 0) with only the Latin and Polish glyphs.
