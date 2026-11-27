@@ -1,0 +1,81 @@
+# Visual review (issue #26). A REPORT, not a gate: every step may fail, the job still ends green.
+# It is NOT a required check. The Sandcastle loop waits for all runs of a commit, so this job must
+# never end in failure.
+name: Visual review
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: visual-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: 26
+
+jobs:
+  visual-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: pr
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: |
+            pr/package-lock.json
+            base/package-lock.json
+
+      - name: Build the base (main)
+        id: base
+        continue-on-error: true
+        working-directory: base
+        run: npm ci --no-audit --no-fund && npm run build
+
+      - name: Build the PR
+        id: pr
+        continue-on-error: true
+        working-directory: pr
+        run: |
+          npm ci --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          npm run build
+
+      - name: Shots of the base (baseline)
+        if: steps.base.outcome == 'success' && steps.pr.outcome == 'success'
+        continue-on-error: true
+        working-directory: pr
+        env:
+          VISUAL_SITE: ../base/out
+        run: npx playwright test -c playwright.visual.config.ts --update-snapshots=all
+
+      - name: Shots of the PR and pixel diff
+        if: steps.pr.outcome == 'success'
+        continue-on-error: true
+        working-directory: pr
+        run: npx playwright test -c playwright.visual.config.ts
+
+      - name: Report
+        if: steps.pr.outcome == 'success'
+        continue-on-error: true
+        working-directory: pr
+        run: npx tsx scripts/visual-report.ts
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: visual-review
+          path: pr/visual/
+          if-no-files-found: ignore
+          retention-days: 14
