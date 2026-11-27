@@ -25,3 +25,10 @@ describe('routes', () => {
     expect(routePaths).toContain('/kontakt/');
   });
 });
+
+describe('routes: package hub metadata', () => {
+  it('does not promise a weekend SPA package or the archived package', () => {
+    const text = routes.map((r) => `${r.metaTitle ?? ''} ${r.description}`).join(' ');
+    expect(text).not.toMatch(/weekend SPA|Kobiecy|719/i);
+  });
+});

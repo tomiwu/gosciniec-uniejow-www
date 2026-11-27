@@ -57,10 +57,13 @@ Source conflict (no visible TODO, the FAQ avoids the number; see also the sectio
 ## Prices and packages (`/ceny/`, `/pakiety/`)
 
 - TODO: Tomasz: give the "cena od" price for each room type. The old site has no room prices (PRD D3). `/ceny/` shows "Zapytaj recepcję" with a visible `TODO` marker. Set `priceFrom` in `src/lib/rooms.ts`. No `Offer` for a room until then.
-- TODO: Confirm that the package "Kobiecy Chill & Fun" is still valid at 719 zł / osoba. The old page is dated 2025-09-22 (`docs/source/pakiet-kobiecy-weekend.md`). The page shows "Aktualność oferty potwierdź w recepcji" and a `TODO` marker. Change `price` in `src/lib/offers.ts` if it differs. Set it to `null` if the package ends. The `Offer` JSON-LD then goes away.
-- TODO: Christmas offer "Święta w Gościńcu". The old page has only Lorem ipsum text, no details and no price (`docs/source/portfolio_swieta-w-goscincu.md`). `/pakiety/` has a short section "Zapytaj o ofertę świąteczną" and a `TODO` marker. In `offers.ts` its price is `null`, so it has no `Offer`.
-- TODO: The old package page has a second phone number (789 017 995) and a "\*" after the price. The new page uses the hotel phone only. Ask the owner what the "\*" means (for example a condition).
-  \
+- Owner decision (2026-11-27): there is no current package. The package "Kobiecy Chill & Fun" (719 zł) and the Christmas offer are NOT current. The old text stays only in `docs/source/pakiet-kobiecy-weekend.md` (archived).
+- TODO: Sample package. `/pakiety/` shows one sample package from `src/content/placeholders.ts` with the badge "Dane testowe". Replace it with real packages from the owner. Then remove the placeholder record. `npm run build:production` fails while a page uses placeholder data.
+- TODO: Sylwester 2026/2027 (`/pakiety/`). The page shows 740 zł per couple for the ball, the amount found in the promo text ("bal za 599 zł od pary zamiast 740 zł"). Ask the owner: is 740 zł the ongoing public price? If not, remove the amount from `src/lib/offers.ts` (no `Offer` then). The 599 zł Black Friday price ends on 2026-11-29 23:59 (Europe/Warsaw). The site never shows it.
+- TODO: Sylwester menu, overnight rate and what the ball price includes. The page says "na zapytanie". Do not invent them.
+- TODO: Owner consent to publish the DJ photo (Letsky). The page has the name in text only.
+- TODO: The page `/pakiety/` links to an in-page section for the ball. Issue #34 adds one URL for each offer. Then change the primary link of the card.
+- TODO: The old package page had a second phone number (789 017 995) and a "*" after the price. Not used on the new site.
 
 ## Attractions (`/atrakcje/`)
 

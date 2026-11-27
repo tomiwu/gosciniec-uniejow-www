@@ -1,38 +1,74 @@
 /**
- * Placeholder data (sample figures). The owner has not confirmed them yet.
+ * Placeholder data. This is the ONLY file for sample packages, sample room from-prices
+ * and ballroom placeholders. Nothing here is a fact from the owner.
  *
- * Rules (issue #11, owner decision 2026-11-27):
- * - This is the ONLY file for sample packages, sample room from-prices and ballroom figures.
- * - Each record has `isPlaceholder: true`.
- * - A page that shows a record also shows the badge `Dane testowe` (`PlaceholderBadge`).
- * - No `Offer` or `Event` JSON-LD for a record from this file.
- * - Do not copy an amount to `src/lib/offers.ts` or `src/lib/rooms.ts` as an owner fact.
- * - `scripts/check-placeholders.ts` fails a production build while a record is listed in
- *   `placeholders`. To ship, verify the figure with the owner, move it to a real source
- *   and delete the record here.
- *
- * Sample values below are NOT the numbers of the old site. The old site contradicts itself
- * ("3 sale" and "4 sale", "do 400" and "do 120 osób"), so no figure of the source is used.
+ * Rules (issue #33):
+ * - Every record has `isPlaceholder: true`.
+ * - A page that shows a record shows the badge `PLACEHOLDER_BADGE`.
+ * - No `Offer` or `Event` JSON-LD for a record. No OfferCatalog entry.
+ * - A production build (`PRODUCTION_BUILD=1`) fails while a page uses this file.
+ *   See `scripts/check-placeholders.ts`.
+ * - Do not copy a placeholder amount into `offers.ts` or `rooms.ts` as if it were an owner fact.
+ * - Ballroom and conference figures (issue #11): the old site contradicts itself ("3 sale" and
+ *   "4 sale", "do 400" and "do 120 osób"), so the sample values below are not its numbers.
  */
 
-/** Exact badge text. Pages and the check script use this one constant. */
-export const PLACEHOLDER_BADGE_TEXT = 'Dane testowe';
+/** Visible text of the badge. Polish copy. The exact words are fixed by the owner decision. */
+export const PLACEHOLDER_BADGE = 'Dane testowe';
+/** Same text. Name used by the venue pages (issue #11). */
+export const PLACEHOLDER_BADGE_TEXT = PLACEHOLDER_BADGE;
 
 export interface PlaceholderRecord {
   id: string;
   isPlaceholder: true;
+}
+
+export interface PlaceholderPackage extends PlaceholderRecord {
+  /** Polish name. */
+  name: string;
+  /** Polish, generic. Who the package is for. */
+  audience: string;
+  /** Polish list of sample inclusions. */
+  inclusions: readonly string[];
+  /** Polish text for the price. A sample has no number. */
+  priceText: string;
+  /** Site path of the primary link. */
+  path: '/rezerwacja/';
+  /** Polish label of the primary link. */
+  linkLabel: string;
+}
+
+export const placeholderPackages: readonly PlaceholderPackage[] = [
+  {
+    id: 'pakiet-testowy',
+    isPlaceholder: true,
+    name: 'Pakiet testowy: krótki pobyt w Uniejowie',
+    audience: 'Przykładowy opis pakietu dla gości, którzy planują krótki wypoczynek.',
+    inclusions: [
+      'przykładowy nocleg',
+      'przykładowe śniadanie',
+      'przykładowy dostęp do strefy wellness',
+    ],
+    priceText: 'Cena: zapytaj recepcję.',
+    path: '/rezerwacja/',
+    linkLabel: 'Zapytaj o pobyt',
+  },
+];
+
+/** A sample figure of the venue pages (issue #11). */
+export interface VenuePlaceholderRecord extends PlaceholderRecord {
   /** What the record stands for. English, for developers. */
   note: string;
-  /** Site paths of the pages that show the record. The build check reads this list. */
+  /** Site paths of the pages that show the record. */
   pages: readonly string[];
 }
 
-export interface BallroomPlaceholder extends PlaceholderRecord {
+export interface BallroomPlaceholder extends VenuePlaceholderRecord {
   /** Sample number of guests at a banquet. */
   sampleCapacity: number;
 }
 
-export interface ConferenceRoomsPlaceholder extends PlaceholderRecord {
+export interface ConferenceRoomsPlaceholder extends VenuePlaceholderRecord {
   /** Sample number of conference rooms. */
   sampleRoomCount: number;
   /** Sample number of participants in the largest room. */
@@ -56,8 +92,9 @@ export const conferenceRoomsPlaceholder: ConferenceRoomsPlaceholder = {
   sampleCapacity: 50,
 };
 
-/** Every placeholder that is in use. An empty list means that the site is ready for production. */
-export const placeholders: readonly PlaceholderRecord[] = [
+/** Every placeholder record of the site. Add new lists here. */
+export const allPlaceholders: readonly PlaceholderRecord[] = [
+  ...placeholderPackages,
   ballroomPlaceholder,
   conferenceRoomsPlaceholder,
 ];

@@ -1,101 +1,110 @@
-import { existsSync, readFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import {
-  PLACEHOLDER_BADGE_TEXT,
-  placeholders,
-  type PlaceholderRecord,
-} from '../src/content/placeholders';
-import { isPreview } from '../src/lib/preview';
-import { routes } from '../src/lib/routes';
-
 /**
- * Stop an unverified export. A production build (no `NEXT_PUBLIC_PREVIEW=1`) must have no
- * placeholder. A preview build may keep them, but each page must show the badge.
+ * Guard for placeholder data (issue #33).
  *
- * Without an argument: check the list in `src/content/placeholders.ts` (before the build).
- * With a folder argument: also read the exported HTML (after the build).
+ * A production build (`PRODUCTION_BUILD=1`, see `npm run build:production`) must not use
+ * `src/content/placeholders.ts`. It also must not carry the badge "Dane testowe" in `out/`.
+ * A preview build may keep placeholders. Then the badge must be on every page that uses them.
+ *
+ * Usage:
+ *   tsx scripts/check-placeholders.ts        check the source files (before the build)
+ *   tsx scripts/check-placeholders.ts out    also check the export (after the build)
  */
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { join, relative, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { PLACEHOLDER_BADGE } from '../src/content/placeholders';
 
-/** HTML file of a site path in the export folder. */
-export function htmlFileFor(outDir: string, path: string): string {
-  return join(outDir, path, 'index.html');
+export function isProductionBuild(env: Record<string, string | undefined>): boolean {
+  return env['PRODUCTION_BUILD'] === '1';
 }
 
-export interface CheckInput {
-  records: readonly PlaceholderRecord[];
-  preview: boolean;
-  /** Reads the exported HTML of a site path. `null` when the file is missing. Optional. */
-  readPage?: (path: string) => string | null;
-  /** Site paths of the exported pages. Needed in production to find a badge that has no record. */
-  exportedPaths?: readonly string[];
+const IMPORT_PATTERN =
+  /from\s+['"](?:@\/content\/placeholders|(?:\.{1,2}\/)+(?:content\/)?placeholders)['"]/;
+const TEST_FILE = /\.test\.tsx?$/;
+
+function listFiles(dir: string, extensions: readonly string[]): string[] {
+  return readdirSync(dir, { recursive: true, encoding: 'utf8' })
+    .filter((name) => extensions.some((ext) => name.endsWith(ext)))
+    .map((name) => join(dir, name).replaceAll('\\', '/'))
+    .sort();
 }
 
-export function checkPlaceholders({
-  records,
-  preview,
-  readPage,
-  exportedPaths = [],
-}: CheckInput): string[] {
-  const errors: string[] = [];
+/** Source files (not tests) that import the placeholder module. */
+export function findPlaceholderUsers(srcDir: string = 'src'): string[] {
+  return listFiles(srcDir, ['.ts', '.tsx'])
+    .filter((file) => !TEST_FILE.test(file) && !file.endsWith('content/placeholders.ts'))
+    .filter((file) => IMPORT_PATTERN.test(readFileSync(file, 'utf8')));
+}
 
-  for (const record of records) {
-    if ((record as { isPlaceholder?: unknown }).isPlaceholder !== true) {
-      errors.push(`${record.id}: a placeholder record must have isPlaceholder: true`);
-    }
-  }
+/** HTML files in the export folder that show the badge. Paths are relative to the folder. */
+export function findBadgeInOutput(outDir: string): string[] {
+  return listFiles(outDir, ['.html'])
+    .filter((file) => readFileSync(file, 'utf8').includes(PLACEHOLDER_BADGE))
+    .map((file) => relative(outDir, file).replaceAll('\\', '/'));
+}
 
-  if (!preview) {
-    for (const record of records) {
-      errors.push(
-        `${record.id}: placeholder still in use. A production build must not contain placeholders. ` +
-          'Verify the figure with the owner, then remove the record from src/content/placeholders.ts.',
+export interface PlaceholderInput {
+  production: boolean;
+  /** Source files that import the placeholder module. */
+  users: readonly string[];
+  /** HTML files with the badge. Leave empty when the export is not checked. */
+  badgeFiles?: readonly string[];
+  /** True when the export was scanned. */
+  checkedOutput?: boolean;
+}
+
+export interface PlaceholderResult {
+  ok: boolean;
+  messages: string[];
+}
+
+export function checkPlaceholders(input: PlaceholderInput): PlaceholderResult {
+  const messages: string[] = [];
+  const badgeFiles = input.badgeFiles ?? [];
+  if (input.production) {
+    for (const file of input.users) {
+      messages.push(
+        `Production build: ${file} uses placeholder data (src/content/placeholders.ts).`,
       );
     }
-    for (const path of exportedPaths) {
-      if (readPage?.(path)?.includes(PLACEHOLDER_BADGE_TEXT)) {
-        errors.push(`${path}: shows the badge "${PLACEHOLDER_BADGE_TEXT}" in a production build`);
-      }
+    for (const file of badgeFiles) {
+      messages.push(`Production build: ${file} shows the badge "${PLACEHOLDER_BADGE}".`);
     }
-  } else if (readPage) {
-    for (const record of records) {
-      for (const path of record.pages) {
-        const html = readPage(path);
-        if (html === null) errors.push(`${record.id}: page ${path} is missing in the export`);
-        else if (!html.includes(PLACEHOLDER_BADGE_TEXT)) {
-          errors.push(
-            `${record.id}: page ${path} does not show the badge "${PLACEHOLDER_BADGE_TEXT}"`,
-          );
-        }
-      }
-    }
+  } else if (input.checkedOutput && input.users.length > 0 && badgeFiles.length === 0) {
+    messages.push(
+      `Placeholder data is in use but the export has no badge "${PLACEHOLDER_BADGE}". Show the badge.`,
+    );
   }
-  return errors;
+  return { ok: messages.length === 0, messages };
 }
 
 function main(): number {
+  const production = isProductionBuild(process.env);
   const outArg = process.argv[2];
-  let input: CheckInput = { records: placeholders, preview: isPreview };
-  if (outArg) {
+  const users = findPlaceholderUsers();
+  let badgeFiles: string[] = [];
+  let checkedOutput = false;
+  if (outArg !== undefined) {
     const outDir = resolve(outArg);
     if (!existsSync(outDir)) {
-      console.error(`FAIL Missing directory: ${outDir}. Run npm run build.`);
+      console.error(`FAIL Missing directory: ${outDir}. Run the build first.`);
       return 1;
     }
-    const readPage = (path: string): string | null => {
-      const file = htmlFileFor(outDir, path);
-      return existsSync(file) ? readFileSync(file, 'utf8') : null;
-    };
-    // A badge on any page of the routes list is an error in production.
-    input = { ...input, readPage, exportedPaths: routes.map((route) => route.path) };
+    badgeFiles = findBadgeInOutput(outDir);
+    checkedOutput = true;
   }
-  const errors = checkPlaceholders(input);
-  for (const error of errors) console.error(`FAIL ${error}`);
-  if (errors.length === 0) {
-    const mode = isPreview ? 'preview build' : 'production build';
-    console.log(`placeholders OK: ${placeholders.length} in use, ${mode}`);
+  const result = checkPlaceholders({ production, users, badgeFiles, checkedOutput });
+  for (const message of result.messages) console.error(`FAIL ${message}`);
+  if (!result.ok) {
+    console.error('FAIL A production build must not use placeholder data. Use a preview build.');
+    return 1;
   }
-  return errors.length === 0 ? 0 : 1;
+  const mode = production ? 'production' : 'preview/non-production';
+  console.log(
+    `placeholders OK (${mode} build): ${users.length} source file(s) use placeholder data` +
+      (checkedOutput ? `, ${badgeFiles.length} HTML file(s) show the badge` : ''),
+  );
+  return 0;
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

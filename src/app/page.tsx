@@ -385,7 +385,11 @@ export default function Page() {
                 <li key={photo.slug}>
                   <figure className="gallery__item">
                     {/* Without JS the link opens the large photo. With JS it opens in a dialog. */}
-                    <a href={withBase(`/img/${photo.slug}-1600.jpg`)} data-lightbox>
+                    <a
+                      href={withBase(`/img/${photo.slug}-1600.jpg`)}
+                      aria-label={`Powiększ zdjęcie: ${photo.alt}`}
+                      data-lightbox
+                    >
                       <Picture slug={photo.slug} alt={photo.alt} sizes={gallerySizes} />
                     </a>
                     <figcaption>{photo.caption}</figcaption>

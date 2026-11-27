@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { placeholderPackages } from '../src/content/placeholders';
 import { rooms } from '../src/lib/rooms';
 import { buildHotelRoomsSchema, buildHotelSchema } from '../src/lib/schema/hotel';
 import { buildRestaurantSchema } from '../src/lib/schema/restaurant';
@@ -102,7 +103,7 @@ describe('checkHtml', () => {
 
   describe('Offer', () => {
     it('accepts a positive price in PLN', () => {
-      expect(checkHtml(page(hotel, offer({ price: 719, priceCurrency: 'PLN' })), 'a.html')).toEqual(
+      expect(checkHtml(page(hotel, offer({ price: 740, priceCurrency: 'PLN' })), 'a.html')).toEqual(
         [],
       );
     });
@@ -124,6 +125,19 @@ describe('checkHtml', () => {
     it('fails on a price that is not in offers.ts', () => {
       const errors = checkHtml(page(hotel, offer({ price: 123, priceCurrency: 'PLN' })), 'a.html');
       expect(errors.join('\n')).toContain('not in offers.ts');
+    });
+    it('fails on an Offer or Event of a placeholder record', () => {
+      const name = placeholderPackages[0]!.name;
+      for (const type of ['Offer', 'Event']) {
+        const node = {
+          '@context': 'https://schema.org',
+          '@type': type,
+          name,
+          price: 740,
+          priceCurrency: 'PLN',
+        };
+        expect(checkHtml(page(hotel, node), 'a.html').join('\n')).toContain('placeholder');
+      }
     });
     it('checks an Offer nested in another node', () => {
       const nested = { ...hotel, makesOffer: offer({ price: 0, priceCurrency: 'PLN' }) };

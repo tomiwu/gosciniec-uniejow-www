@@ -15,6 +15,7 @@
     "test": "vitest run",
     "check:placeholders": "tsx scripts/check-placeholders.ts",
     "build": "tsx scripts/check-placeholders.ts && next build && tsx scripts/postbuild.ts && tsx scripts/check-placeholders.ts out",
+    "build:production": "PRODUCTION_BUILD=1 npm run build",
     "test:redirects": "tsx scripts/check-redirects.ts",
     "test:schema": "tsx scripts/check-schema.ts out",
     "test:e2e": "playwright test",

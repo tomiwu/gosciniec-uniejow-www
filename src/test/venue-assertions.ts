@@ -1,6 +1,6 @@
 import { expect } from 'vitest';
 import { extractJsonLd } from '../../scripts/check-schema';
-import { PLACEHOLDER_BADGE_TEXT, placeholders } from '@/content/placeholders';
+import { allPlaceholders, PLACEHOLDER_BADGE_TEXT } from '@/content/placeholders';
 import { nap } from '@/lib/nap';
 import { salesEmail, sylwester } from '@/lib/venue';
 
@@ -67,7 +67,7 @@ export function expectVenueRules(html: string): void {
   }
   expect(types).toContain('FAQPage');
   const ld = extractJsonLd(html).join(' ');
-  for (const record of placeholders) {
+  for (const record of allPlaceholders) {
     for (const value of Object.values(record)) {
       if (typeof value === 'number') expect(ld).not.toMatch(new RegExp(`\\b${value}\\b`));
     }

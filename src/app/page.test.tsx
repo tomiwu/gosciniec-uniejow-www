@@ -58,7 +58,9 @@ describe('home page', () => {
     const items = [...html.matchAll(/<figure class="gallery__item">([\s\S]*?)<\/figure>/g)];
     expect(items.length).toBeGreaterThanOrEqual(6);
     for (const [, item] of items) {
-      expect(item).toMatch(/<a href="\/img\/[a-z0-9-]+-1600\.jpg" data-lightbox[^>]*>/);
+      expect(item).toMatch(
+        /<a href="\/img\/[a-z0-9-]+-1600\.jpg" aria-label="Powiększ zdjęcie: [^"]{10,}" data-lightbox/,
+      );
       expect(item).toMatch(/<figcaption>[^<]+<\/figcaption>/);
     }
   });

@@ -43,8 +43,8 @@ describe('buildOffersSchema', () => {
     expect(by.name).toBe(nap.name);
   });
 
-  it('builds the real list: one Offer with price 719', () => {
+  it('builds the real list: one Offer with price 740', () => {
     const list = buildOffersSchema(offers);
-    expect(list.map((o) => o.price)).toEqual([719]);
+    expect(list.map((o) => o.price)).toEqual([740]);
   });
 });

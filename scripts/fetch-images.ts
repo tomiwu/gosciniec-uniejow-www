@@ -21,6 +21,16 @@ import sharp from 'sharp';
 export const UPLOADS_PREFIX = 'https://gosciniecuniejow.pl/wp-content/uploads/';
 export const TARGET_WIDTHS = [480, 960, 1600] as const;
 export const QUALITY = { avif: 50, webp: 70, jpg: 75 } as const;
+/**
+ * Lower AVIF and WebP quality for LCP photos under a dark text overlay (the home hero). The
+ * overlay hides the small loss, and the file is about half the size (LCP on a slow phone).
+ */
+export const OVERLAY_QUALITY = { avif: 35, webp: 55, jpg: 75 } as const;
+export const OVERLAY_SLUGS: ReadonlySet<string> = new Set(['foto-7']);
+
+export function qualityFor(slug: string): typeof QUALITY | typeof OVERLAY_QUALITY {
+  return OVERLAY_SLUGS.has(slug) ? OVERLAY_QUALITY : QUALITY;
+}
 /** Files of other sites or badges. They are not photos of the hotel. */
 export const SKIP_NAME = /^rekomendacja_/i;
 
@@ -73,7 +83,7 @@ export function widthsFor(sourceWidth: number): number[] {
   return widths.length > 0 ? [...widths] : [sourceWidth];
 }
 
-async function collectUrls(): Promise<string[]> {
+export async function collectUrls(): Promise<string[]> {
   const files = (await readdir(SOURCE_DIR)).filter((f) => f.endsWith('.md')).sort();
   const all = new Set<string>();
   for (const file of files) {
@@ -83,13 +93,14 @@ async function collectUrls(): Promise<string[]> {
   return [...all].sort();
 }
 
-async function download(url: string): Promise<Buffer> {
+export async function download(url: string): Promise<Buffer> {
   const response = await fetch(url);
   if (!response.ok) throw new Error(`HTTP ${response.status} for ${url}`);
   return Buffer.from(await response.arrayBuffer());
 }
 
-async function processPhoto(slug: string, input: Buffer): Promise<ImageEntry> {
+export async function processPhoto(slug: string, input: Buffer): Promise<ImageEntry> {
+  const quality = qualityFor(slug);
   // Decode one time. rotate() applies the EXIF orientation.
   // Sharp drops all metadata (EXIF, XMP, IPTC, GPS) on output by default.
   const decoded = await sharp(input).rotate().raw().toBuffer({ resolveWithObject: true });
@@ -104,10 +115,10 @@ async function processPhoto(slug: string, input: Buffer): Promise<ImageEntry> {
     const [jpg, webp, avif] = await Promise.all([
       resized()
         .flatten({ background: '#ffffff' })
-        .jpeg({ quality: QUALITY.jpg, mozjpeg: true })
+        .jpeg({ quality: quality.jpg, mozjpeg: true })
         .toBuffer({ resolveWithObject: true }),
-      resized().webp({ quality: QUALITY.webp }).toBuffer(),
-      resized().avif({ quality: QUALITY.avif }).toBuffer(),
+      resized().webp({ quality: quality.webp }).toBuffer(),
+      resized().avif({ quality: quality.avif }).toBuffer(),
     ]);
     await Promise.all([
       writeFile(join(OUT_DIR, `${slug}-${target}.jpg`), jpg.data),
