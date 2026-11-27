@@ -2455,6 +2455,17 @@ a:hover > .arr,
   font-size: 1.25rem;
 }
 
+/* Reserved height limits CLS when fonts and offer images load (issue #43). */
+.home-offers--reserved {
+  min-height: 28rem;
+}
+
+@media (min-width: 48rem) {
+  .home-offers--reserved {
+    min-height: 24rem;
+  }
+}
+
 .home-offers__list {
   display: grid;
   gap: var(--space-5);

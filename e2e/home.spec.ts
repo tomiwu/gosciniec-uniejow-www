@@ -17,6 +17,19 @@ test('home page shows the h1, the hero CTA and the phone link', async ({ page })
   );
 });
 
+test('home page shows the crawlable offers strip after the hero', async ({ page }) => {
+  await page.goto('/');
+  const hero = page.locator('section.hero');
+  const offers = page.getByRole('heading', { name: 'Aktualne oferty', exact: true });
+  await expect(offers).toBeVisible();
+  const sylwesterCard = page.getByRole('heading', { name: /Sylwester 2026\/2027/ });
+  await expect(sylwesterCard).toBeVisible();
+  const heroBox = await hero.boundingBox();
+  const offersBox = await offers.boundingBox();
+  expect(heroBox && offersBox && offersBox.y > heroBox.y).toBe(true);
+  await expect(page.locator('section.home-offers time[datetime="2026-12-31"]')).toBeVisible();
+});
+
 test('home page links to the teaser targets', async ({ page }) => {
   await page.goto('/');
   const main = page.locator('main');

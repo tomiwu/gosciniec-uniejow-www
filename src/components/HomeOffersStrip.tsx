@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Picture } from '@/components/Picture';
 import { PlaceholderBadge } from '@/components/PlaceholderBadge';
 import { cheapestRoomFromPrice, placeholderPackages } from '@/content/placeholders';
+import { nap } from '@/lib/nap';
 import { cardPictureSizes } from '@/lib/picture-sizes';
 import { offers } from '@/lib/offers';
 import { sylwester } from '@/lib/venue';
@@ -14,7 +15,10 @@ export function HomeOffersStrip() {
     throw new Error('Home offers strip needs the Sylwester offer and one placeholder package.');
   }
   return (
-    <section className="section alt home-offers" aria-labelledby="home-offers-title">
+    <section
+      className="section alt home-offers home-offers--reserved"
+      aria-labelledby="home-offers-title"
+    >
       <div className="wrap">
         <div className="section-head reveal">
           <p className="eyebrow">Oferty</p>
@@ -28,18 +32,15 @@ export function HomeOffersStrip() {
           <li>
             <article className="home-offer card" aria-labelledby="home-offer-sylwester">
               <div className="card__media">
-                <Picture
-                  slug="dsc0e8152"
-                  alt="Odnowiona sala balowa hotelu z nakrytymi stołami – miejsce balu sylwestrowego"
-                  sizes={cardPictureSizes}
-                />
+                <Picture slug="dj-letsky" alt={sylwester.djPhotoAlt} sizes={cardPictureSizes} />
               </div>
               <div className="card__body">
                 <p className="eyebrow">Oferta sezonowa</p>
                 <h3 id="home-offer-sylwester">{sylwesterOffer.name}</h3>
                 <p>
-                  {sylwester.dateText}. Odnowiona sala balowa. Muzyka: {sylwester.dj}. Nocleg i
-                  menu: na zapytanie.
+                  <time dateTime={sylwester.dateIso}>{sylwester.dateText}</time>. {sylwester.place},{' '}
+                  {nap.street}, {nap.city}. Muzyka: {sylwester.dj}. Chcesz zostać na noc?
+                  Zapraszamy! Łatwy dojazd z autostrady A2 i drogi S8. Nocleg i menu: na zapytanie.
                 </p>
                 <p className="home-offer__price">
                   <strong>{sylwesterOffer.price} zł za parę</strong> (bal)

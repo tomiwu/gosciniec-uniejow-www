@@ -46,7 +46,7 @@ export default function Page() {
         <figure className="sylwester-dj">
           <Picture
             slug="dj-letsky"
-            alt="DJ Letsky przy konsoli – muzyka na balu sylwestrowym w Gościńcu Uniejów"
+            alt={sylwester.djPhotoAlt}
             sizes="(min-width: 48rem) 360px, 82vw"
           />
           <figcaption>Muzyka na balu: {sylwester.dj}.</figcaption>
