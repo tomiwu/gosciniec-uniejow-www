@@ -44,7 +44,6 @@ export const sylwester = {
   /** Page of the offer (issue #34). */
   path: '/pakiety/sylwester-2026-2027/',
   dateText: '31 grudnia 2026 (czwartek)',
-  /** ISO date for the ball night. Used in `<time datetime>`. */
   dateIso: '2026-12-31',
   place: 'odnowiona sala balowa w Gościńcu Uniejów',
   dj: 'DJ Letsky',

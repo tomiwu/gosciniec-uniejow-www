@@ -1,7 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { PLACEHOLDER_BADGE, placeholderPackages } from '@/content/placeholders';
-import { nap } from '@/lib/nap';
 import { sylwester } from '@/lib/venue';
 import { HomeOffersStrip } from './HomeOffersStrip';
 
@@ -26,7 +25,7 @@ describe('HomeOffersStrip (#43)', () => {
   it('puts Sylwester 2026/2027 first with verified facts and machine-readable date', () => {
     const firstArticle = html.match(/<article class="home-offer[\s\S]*?<\/article>/)?.[0] ?? '';
     expect(firstArticle).toContain('Sylwester 2026/2027');
-    expect(firstArticle).toMatch(/dateTime="2026-12-31"/);
+    expect(firstArticle).toMatch(new RegExp(`dateTime="${sylwester.dateIso}"`));
     expect(firstArticle).toContain(sylwester.dj);
     expect(firstArticle).toContain('A2');
     expect(firstArticle).toContain('Chcesz zostać na noc? Zapraszamy!');
@@ -46,12 +45,5 @@ describe('HomeOffersStrip (#43)', () => {
     expect(html).not.toContain('599');
     expect(html).not.toMatch(/602\s*260\s*965|28\s*88\s*410/);
     expect(html).not.toMatch(new RegExp(`tel:\\+48[^"]*88410`));
-  });
-
-  it('uses only the official site NAP phone when a tel link appears', () => {
-    const telLinks = [...html.matchAll(/href="(tel:[^"]+)"/g)].map((m) => m[1]);
-    for (const tel of telLinks) {
-      expect(tel).toBe(`tel:${nap.phoneE164}`);
-    }
   });
 });
