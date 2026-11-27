@@ -1,5 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
+import { attractions } from '@/lib/attractions';
 import Page, { metadata } from './page';
 
 const html = renderToStaticMarkup(<Page />);
@@ -50,6 +51,19 @@ describe('attractions page', () => {
     expect(text).toMatch(/Termy Uniejów to publiczny kompleks termalny/);
     expect(text).toMatch(/nie należy do hotelu/i);
     expect(text).toMatch(/Hotel ma własną strefę Wellness/);
+  });
+
+  it('gives every attraction 2 to 4 sentences, or 1 sentence with a TODO', () => {
+    const abbreviation = /(?<!abp|gen|św)[.!?]\s+(?=[A-ZĄĆĘŁŃÓŚŹŻ„])/;
+    for (const attraction of attractions) {
+      const sentences = attraction.paragraphs.flatMap((p) => p.split(abbreviation));
+      expect(sentences.length, attraction.name).toBeLessThanOrEqual(4);
+      expect(sentences.length, attraction.name).toBeGreaterThanOrEqual(attraction.todo ? 1 : 2);
+    }
+  });
+
+  it('does not promise a service of the reception that the source lacks', () => {
+    expect(text).not.toMatch(/w recepcji/i);
   });
 
   it('gives only the distance of the old site (3 km to Termy)', () => {

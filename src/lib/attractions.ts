@@ -25,9 +25,9 @@ export const attractions: readonly Attraction[] = [
     slug: 'termy-uniejow',
     name: 'Termy Uniejów',
     paragraphs: [
-      'Termy Uniejów to publiczny kompleks termalny i basenowy. Nie należy do hotelu. To osobny obiekt.',
-      'Uniejów jest pierwszym uzdrowiskiem termalnym w Polsce. Lecznicze właściwości ma woda geotermalna o temperaturze niemal 70°C, która wypływa z dwukilometrowej głębokości. Termy zapraszają gości w każdym wieku.',
-      'Hotel ma własną strefę Wellness z jacuzzi, sauną fińską i siłownią. W pakiecie „Kobiecy Chill & Fun” goście dostają karnety do Term Uniejów.',
+      'Termy Uniejów to publiczny kompleks termalny i basenowy. Nie należy do hotelu.',
+      'Uniejów jest pierwszym uzdrowiskiem termalnym w Polsce, a woda geotermalna ma niemal 70°C.',
+      'Hotel ma własną strefę Wellness z jacuzzi, sauną fińską i siłownią.',
     ],
     distance: 'około 3 km od hotelu',
     image: {
@@ -48,7 +48,7 @@ export const attractions: readonly Attraction[] = [
     slug: 'park-zamkowy',
     name: 'Park Zamkowy',
     paragraphs: [
-      'Park Zamkowy sąsiaduje z Termami i z zamkiem. Drzewostan parku jest bardzo różnorodny i należy do największych w Polsce. To dobre miejsce na spokojny spacer.',
+      'Park Zamkowy sąsiaduje z Termami i z zamkiem. Drzewostan parku jest bardzo różnorodny i należy do największych w Polsce.',
       'Na terenie parku jest 30 zbiorowisk roślin i 81 gatunków drzew i krzewów. Park należy do Uniejowskiego Obszaru Chronionego Krajobrazu i do sieci Natura 2000 Dolina Środkowej Warty.',
     ],
   },
@@ -108,7 +108,7 @@ export const attractions: readonly Attraction[] = [
     name: 'Kolegiata Wniebowzięcia NMP',
     paragraphs: [
       'Gotycka kolegiata z XIV wieku to architektoniczny klejnot Uniejowa. Prezbiterium pochodzi z 1349 roku i ma oryginalne sklepienie krzyżowo-żebrowe.',
-      'We wnętrzu stoi sarkofag świętego Bogumiła z czarnego marmuru. Ufundował go w 1666 roku abp Wacław Leszczyński. To drugi najstarszy taki zabytek w kraju, po konfesji św. Stanisława na Wawelu, a starszy od konfesji św. Wojciecha w Gnieźnie.',
+      'We wnętrzu stoi sarkofag świętego Bogumiła z czarnego marmuru, ufundowany w 1666 roku przez abp. Wacława Leszczyńskiego. To drugi najstarszy taki zabytek w kraju, po konfesji św. Stanisława na Wawelu, a starszy od konfesji św. Wojciecha w Gnieźnie.',
     ],
   },
   {
@@ -148,8 +148,8 @@ export const attractions: readonly Attraction[] = [
     slug: 'zoo-safari-borysew',
     name: 'Zoo Safari Borysew',
     paragraphs: [
-      'Zoo Safari Borysew to jedna z atrakcji regionu. Wymieniamy ją w ofercie konferencyjnej hotelu.',
-      'Zapytaj w recepcji o dojazd i warunki zwiedzania.',
+      'Zoo Safari Borysew to jedna z atrakcji regionu, które można odwiedzić podczas pobytu w Uniejowie.',
+      'Dojazd i warunki zwiedzania sprawdź u organizatora.',
     ],
     todo: 'TODO: odległość od hotelu i godziny – brak w źródle',
   },
