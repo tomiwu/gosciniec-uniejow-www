@@ -2,7 +2,7 @@
 # UX review of one PR (issue #26). It runs on the box, not in CI: it needs Claude Code and the
 # Claude token in .sandcastle/.env. The visual-review workflow must have run for the PR head.
 # Claude limit (issue #58): the script runs the same review with the local Cursor CLI (`agent`,
-# UX_REVIEW_CURSOR_MODEL, default grok-4.7) when CURSOR_API_KEY is set. Never Cursor cloud agents.
+# UX_REVIEW_CURSOR_MODEL, default grok-4.7-high) when CURSOR_API_KEY is set. Never Cursor cloud agents.
 #
 #   scripts/ux-review.sh <pr-number-or-url> [--force]
 #
@@ -29,7 +29,7 @@ if [[ -f "$ROOT/.sandcastle/.env" ]]; then
 fi
 export GH_TOKEN CLAUDE_CODE_OAUTH_TOKEN
 MODEL="${UX_REVIEW_MODEL:-${REVIEW_MODEL:-claude-sonnet-5-5}}"
-CURSOR_MODEL_UX="${UX_REVIEW_CURSOR_MODEL:-grok-4.7}"
+CURSOR_MODEL_UX="${UX_REVIEW_CURSOR_MODEL:-grok-4.7-high}"
 # Same limit words as CLAUDE_LIMIT in .sandcastle/loop-policy.mts.
 LIMIT_RE='hit your ([A-Za-z0-9-]+ )?limit|usage limit|limit reached|rate limit|out of (extra )?usage'
 
