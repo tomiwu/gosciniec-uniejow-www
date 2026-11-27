@@ -2,8 +2,13 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { faq } from '@/lib/faq';
 import { homeFaqIds } from '@/lib/home';
-import { cheapestRoomFromPrice, PLACEHOLDER_BADGE } from '@/content/placeholders';
+import {
+  cheapestRoomFromPrice,
+  PLACEHOLDER_BADGE,
+  placeholderPackages,
+} from '@/content/placeholders';
 import { nap } from '@/lib/nap';
+import { sylwester } from '@/lib/venue';
 import Page, { metadata } from './page';
 
 const html = renderToStaticMarkup(<Page />);
@@ -26,6 +31,7 @@ describe('home page', () => {
   it('has the sections of the PRD', () => {
     const h2s = [...html.matchAll(/<h2[^>]*>(.*?)<\/h2>/g)].map((m) => m[1]);
     expect(h2s).toEqual([
+      'Aktualne oferty',
       'Pokoje w Uniejowie',
       'Od porannej kawy do wieczoru w altanie',
       'SPA i wellness w hotelu',
@@ -79,7 +85,16 @@ describe('home page', () => {
     const hrefs = linkHrefs();
     expect(hrefs).toContain('/rezerwacja/');
     expect(hrefs).toContain(`tel:${nap.phoneE164}`);
-    for (const path of ['/pokoje/', '/spa/', '/restauracja/', '/atrakcje/', '/faq/']) {
+    for (const path of [
+      '/pakiety/',
+      '/ceny/',
+      sylwester.path,
+      '/pokoje/',
+      '/spa/',
+      '/restauracja/',
+      '/atrakcje/',
+      '/faq/',
+    ]) {
       expect(hrefs).toContain(path);
     }
     expect(html).toMatch(/<a [^>]*href="\/rezerwacja\/?"[^>]*>Rezerwuj<\/a>/);
@@ -130,11 +145,37 @@ describe('home page', () => {
     expect(metadata.alternates?.canonical).toBe('/');
   });
 
-  it('shows the sample from-price once, with the badge "Dane testowe", and no Offer JSON-LD', () => {
+  it('shows the offers strip after the hero: Sylwester first, sample package, then from-price with /ceny/', () => {
+    const heroEnd = html.indexOf('class="marquee"');
+    const strip = html.slice(html.indexOf('home-offers'), heroEnd);
+    expect(html.indexOf('home-offers')).toBeLessThan(heroEnd);
+    const cards = [...strip.matchAll(/<article class="home-offer[\s\S]*?<\/article>/g)].map(
+      (m) => m[0],
+    );
+    expect(cards).toHaveLength(2);
+    expect(cards[0]).toContain('Sylwester 2026/2027');
+    expect(cards[0]).toContain('740 zł za parę');
+    expect(cards[0]).toContain(`href="${sylwester.path.slice(0, -1)}"`);
+    expect(cards[0]).not.toContain(PLACEHOLDER_BADGE);
+    expect(cards[1]).toContain(placeholderPackages[0]!.name);
+    expect(cards[1]).toContain(PLACEHOLDER_BADGE);
+    expect(strip).not.toContain('599');
+    expect(strip).not.toMatch(/Kobiecy|719/i);
+    expect(strip).toMatch(/href="\/pakiety\/?"/);
+    expect(strip).toMatch(/href="\/ceny\/?"/);
+    const fromBlocks = [...strip.matchAll(/<p class="from-price[^"]*"[\s\S]*?<\/p>/g)].map(
+      (m) => m[0],
+    );
+    expect(fromBlocks).toHaveLength(1);
+    expect(fromBlocks[0]).toContain(`${cheapestRoomFromPrice.amount} zł`);
+    expect(fromBlocks[0]).toContain(PLACEHOLDER_BADGE);
+    const roomsBlock = html.slice(html.indexOf('id="rooms-title"'), html.indexOf('id="day-title"'));
+    expect(roomsBlock).not.toMatch(/class="from-price/);
+  });
+
+  it('shows the sample from-price once on the page and no Offer JSON-LD', () => {
     const blocks = [...html.matchAll(/<p class="from-price[^"]*"[\s\S]*?<\/p>/g)].map((m) => m[0]);
     expect(blocks).toHaveLength(1);
-    expect(blocks[0]).toContain(`${cheapestRoomFromPrice.amount} zł`);
-    expect(blocks[0]).toContain(PLACEHOLDER_BADGE);
     const ld = [...html.matchAll(/<script[^>]*ld\+json[^>]*>([\s\S]*?)<\/script>/g)].map(
       (m) => m[1],
     );
