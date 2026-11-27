@@ -253,6 +253,130 @@ summary:focus-visible,
   min-height: 24px;
 }
 
+/* Home page */
+.home {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4) 0;
+}
+
+.home h1 {
+  margin: 0 0 var(--space-4);
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+.home h2 {
+  margin: 0 0 var(--space-3);
+  font-size: 1.5rem;
+  line-height: 1.25;
+}
+
+.hero {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.hero__lead {
+  margin: 0 0 var(--space-3);
+  font-size: 1.125rem;
+}
+
+.hero__former {
+  margin: 0 0 var(--space-5);
+  color: var(--color-text-muted);
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-5);
+}
+
+.hero__image img,
+.teaser__image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  object-fit: cover;
+}
+
+.hero__image img {
+  aspect-ratio: 16 / 9;
+}
+
+.teaser__image img {
+  aspect-ratio: 3 / 2;
+}
+
+/* Small screens: only the hero photo loads. Lazy images in a hidden box are not fetched.
+   Each extra photo before the LCP adds about 100 ms in the mobile lab (simulated 1.6 Mbps). */
+.teaser__image {
+  display: none;
+}
+
+.teaser {
+  display: grid;
+  gap: var(--space-4);
+  margin-top: var(--space-7);
+}
+
+.teaser__text p {
+  margin: 0 0 var(--space-3);
+}
+
+.location {
+  margin-top: var(--space-7);
+  padding: var(--space-5);
+  background: var(--color-bg-alt);
+  border-radius: var(--radius);
+}
+
+.location__list {
+  margin: 0 0 var(--space-3);
+  padding-left: var(--space-5);
+}
+
+.location__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-5);
+  margin: 0;
+}
+
+.location__links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target-min);
+}
+
+@media (min-width: 48rem) {
+  .teaser__image {
+    display: block;
+  }
+
+  .hero {
+    align-items: center;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .hero__image img {
+    aspect-ratio: 4 / 3;
+  }
+
+  .teaser {
+    align-items: center;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+  }
+
+  .teaser--reverse .teaser__image {
+    order: -1;
+  }
+}
+
 /* Forms */
 .visually-hidden {
   position: absolute;
