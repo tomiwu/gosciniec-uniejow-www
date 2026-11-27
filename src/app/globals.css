@@ -1,11 +1,38 @@
+/* Design tokens. Text colours have at least 4.5:1 contrast on their backgrounds. */
 :root {
   color-scheme: light;
-  --text: #1a1a1a;
-  --bg: #ffffff;
-  --link: #0b4f8a;
-  --button-bg: #0b4f8a;
-  --button-text: #ffffff;
-  --focus: #b30000;
+
+  /* Colours (contrast on --color-bg: text 17.4, muted 7.0, link 8.6) */
+  --color-text: #1a1a1a;
+  --color-text-muted: #595959;
+  --color-bg: #ffffff;
+  --color-bg-alt: #f4f1ea;
+  --color-border: #c9c4b8;
+  --color-link: #0b4f8a;
+  --color-primary: #0b4f8a;
+  --color-on-primary: #ffffff;
+  --color-focus: #b30000;
+
+  /* Spacing scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+
+  /* Interaction */
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 2px;
+  --target-min: 44px; /* WCAG 2.5.8 asks for 24 px. We use more. */
+  --radius: 4px;
+
+  /* Type: system font stack. No font request. */
+  --font-body:
+    system-ui, -apple-system, 'Segoe UI', Roboto, Arial, 'Noto Sans', 'Helvetica Neue', sans-serif;
+  --content-width: 72rem;
 }
 
 * {
@@ -14,50 +41,215 @@
 
 body {
   margin: 0;
-  font-family:
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    Roboto,
-    Arial,
-    sans-serif;
+  font-family: var(--font-body);
   line-height: 1.5;
-  color: var(--text);
-  background: var(--bg);
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+main:focus {
+  outline: none;
+}
+
+a {
+  color: var(--color-link);
+}
+
+/* One visible focus ring on every interactive element. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: var(--focus-ring-offset);
 }
 
 .page {
   max-width: 40rem;
   margin: 0 auto;
-  padding: 1.5rem 1rem;
+  padding: var(--space-5) var(--space-4);
 }
 
-a {
-  color: var(--link);
+/* Skip link: hidden until it gets focus. */
+.skip-link {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 100;
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+  border-radius: var(--radius);
+  transform: translateY(-200%);
 }
 
-a:focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 2px;
+.skip-link:focus-visible {
+  transform: none;
+}
+
+/* Buttons and button-like links */
+.button,
+.menu-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--target-min);
+  min-height: var(--target-min);
+  padding: var(--space-2) var(--space-5);
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+  border: 0;
+  border-radius: var(--radius);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.menu-button {
+  padding: var(--space-2) var(--space-4);
+}
+
+/* Header */
+.site-header {
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.site-header__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-5);
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: var(--space-3) var(--space-4);
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target-min);
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.site-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-5);
+}
+
+.phone-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target-min);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Main navigation: a toggle on small screens, an open row on wide screens. */
+.main-nav {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 0 var(--space-4) var(--space-3);
+}
+
+.main-nav__list {
+  display: none;
+  flex-direction: column;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.main-nav__list[data-open='true'] {
+  display: flex;
+}
+
+.main-nav__list a {
+  display: flex;
+  align-items: center;
+  min-height: var(--target-min);
+  padding: 0 var(--space-3);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.main-nav__list a:hover {
+  text-decoration: underline;
+}
+
+.main-nav__list a[aria-current='page'] {
+  font-weight: 700;
+  box-shadow: inset 3px 0 0 var(--color-primary);
+}
+
+@media (min-width: 64rem) {
+  .menu-button {
+    display: none;
+  }
+
+  .main-nav__list,
+  .main-nav__list[data-open='false'] {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0 var(--space-1);
+    margin: 0;
+  }
+
+  .main-nav__list a[aria-current='page'] {
+    box-shadow: inset 0 -3px 0 var(--color-primary);
+  }
+}
+
+/* Footer */
+.site-footer {
+  margin-top: var(--space-7);
+  background: var(--color-bg-alt);
+  border-top: 1px solid var(--color-border);
+}
+
+.site-footer__inner {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4);
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.footer-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target-min);
+}
+
+.site-footer__copy {
+  margin: var(--space-3) 0 0;
+  color: var(--color-text-muted);
 }
 
 .nap {
   font-style: normal;
-  margin: 1rem 0;
+  margin: 0 0 var(--space-3);
 }
 
-.button {
+.nap a {
   display: inline-block;
-  min-width: 44px;
-  min-height: 44px;
-  padding: 0.6rem 1.2rem;
-  color: var(--button-text);
-  background: var(--button-bg);
-  border-radius: 4px;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.button:focus-visible {
-  outline-color: var(--focus);
+  min-height: 24px;
 }
