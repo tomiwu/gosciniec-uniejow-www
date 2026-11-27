@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { nap } from '../nap';
-import { buildHotelSchema } from './hotel';
+import { rooms } from '../rooms';
+import { buildHotelRoomsSchema, buildHotelSchema } from './hotel';
 
 describe('buildHotelSchema', () => {
   const schema = buildHotelSchema();
@@ -29,5 +30,31 @@ describe('buildHotelSchema', () => {
     expect(keys).not.toContain('aggregateRating');
     expect(keys).not.toContain('review');
     expect(keys).not.toContain('priceRange');
+  });
+});
+
+describe('buildHotelRoomsSchema', () => {
+  const schema = buildHotelRoomsSchema(rooms);
+
+  it('is the same Hotel entity as the site block', () => {
+    expect(schema['@type']).toBe('Hotel');
+    expect(schema['@id']).toBe(buildHotelSchema()['@id']);
+    expect(schema.name).toBe(nap.name);
+  });
+
+  it('lists one HotelRoom with name and description for each room', () => {
+    const places = schema.containsPlace as { '@type': string; name: string; description: string }[];
+    expect(places).toHaveLength(rooms.length);
+    places.forEach((place, index) => {
+      expect(place['@type']).toBe('HotelRoom');
+      expect(place.name).toBe(rooms[index]?.name);
+      expect(place.description).toBe(rooms[index]?.shortDescription);
+    });
+  });
+
+  it('has no Offer and no price', () => {
+    const json = JSON.stringify(schema);
+    expect(json).not.toContain('Offer');
+    expect(json).not.toContain('price');
   });
 });
