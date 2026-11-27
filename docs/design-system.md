@@ -13,6 +13,8 @@ Status: approved by Tomasz on 2026-11-27 (issue #25).
 1. Use the tokens in `src/app/globals.css` (`--paper`, `--surface`, `--card`, `--ink`, `--muted`,
    `--gold`, `--gold-text`, `--link`, `--line`, `--control`). Do not write hex colours in
    components. Both themes must pass axe (see `e2e/theme.spec.ts`).
+   The old names (`--space-1` … `--space-8`, `--color-*`, `--radius`) are aliases of the new
+   tokens, so they follow the theme too. Use the spacing scale `--space-*` freely.
 2. Gold (`--gold`) is a fill colour for buttons and lines. Do not use it for text on a light
    background. Use `--gold-text` for gold text.
 3. Building blocks: `.wrap`, `.section`, `.alt`, `.night` (dark band in both themes),

@@ -2,7 +2,16 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
 const AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
-const KEY_ROUTES = ['/', '/pokoje/', '/kontakt/', '/rezerwacja/', '/faq/', '/atrakcje/'];
+const KEY_ROUTES = [
+  '/',
+  '/pokoje/',
+  '/kontakt/',
+  '/rezerwacja/',
+  '/faq/',
+  '/atrakcje/',
+  '/ceny/',
+  '/pakiety/',
+];
 
 test.describe('theme follows the system setting', () => {
   test.use({ colorScheme: 'dark' });

@@ -53,6 +53,24 @@
   --header-h: 68px;
   --bar-h: 68px;
   --target-min: 44px;
+
+  /* Old token names (before the design of issue #25). Pages written with them still follow
+     the theme. Use the new names in new code. */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --radius: var(--r-md);
+  --color-text: var(--ink);
+  --color-text-muted: var(--muted);
+  --color-bg: var(--paper);
+  --color-bg-alt: var(--surface);
+  --color-border: var(--line);
+  --color-link: var(--link);
 }
 
 :root[data-theme='dark'] {
