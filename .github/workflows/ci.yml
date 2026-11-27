@@ -69,7 +69,12 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
       - run: npm ci --no-audit --no-fund
+      # The CI export is a test artifact. It is never deployed. It still has sample data
+      # (src/content/placeholders.ts), so it is a preview build. A production build fails
+      # while a placeholder is in use (scripts/check-placeholders.ts).
       - run: npm run build
+        env:
+          NEXT_PUBLIC_PREVIEW: '1'
       - uses: actions/upload-artifact@v4
         with:
           name: out

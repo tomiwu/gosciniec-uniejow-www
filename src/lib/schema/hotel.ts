@@ -9,7 +9,7 @@ import type { Room } from '../rooms';
 export type HotelSchema = Exclude<WithContext<Hotel>, string>;
 
 /** Same `@id` on every page. Search engines merge the blocks of one page into one entity. */
-const HOTEL_ID = `${nap.siteUrl}/#hotel`;
+export const HOTEL_ID = `${nap.siteUrl}/#hotel`;
 
 export function buildHotelSchema(): HotelSchema {
   return {

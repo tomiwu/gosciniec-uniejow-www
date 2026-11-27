@@ -169,3 +169,48 @@ describe('checkHtml with HotelRoom items', () => {
     expect(checkHtml(page(broken), 'a.html').join('\n')).toContain('HotelRoom needs a name');
   });
 });
+
+describe('venue schema', () => {
+  const q = [{ '@type': 'Question', name: 'Q?', acceptedAnswer: { '@type': 'Answer', text: 'A' } }];
+  const room = (fields: Record<string, unknown> = {}) => ({
+    '@context': 'https://schema.org',
+    '@type': 'MeetingRoom',
+    name: 'Sale testowe',
+    ...fields,
+  });
+  const venue = (fields: Record<string, unknown> = {}) => ({
+    '@context': 'https://schema.org',
+    '@type': 'EventVenue',
+    name: 'Sala testowa',
+    ...fields,
+  });
+
+  it('requires FAQPage and the venue type on the two pages', () => {
+    expect(requiredTypesFor('konferencje/index.html')).toEqual(['FAQPage', 'MeetingRoom']);
+    expect(requiredTypesFor('przyjecia/index.html')).toEqual(['FAQPage', 'EventVenue']);
+  });
+
+  it('passes a MeetingRoom and an EventVenue without figures', () => {
+    expect(checkHtml(page(hotel, room(), faq(q)), 'konferencje/index.html')).toEqual([]);
+    expect(checkHtml(page(hotel, venue(), faq(q)), 'przyjecia/index.html')).toEqual([]);
+  });
+
+  it('fails on a capacity, a room count or an Offer in a venue', () => {
+    for (const fields of [
+      { maximumAttendeeCapacity: 100 },
+      { numberOfRooms: 2 },
+      { offers: { '@type': 'Offer' } },
+    ]) {
+      const errors = checkHtml(page(hotel, venue(fields), faq(q)), 'przyjecia/index.html');
+      expect(errors.join('\n')).toContain('is not confirmed');
+    }
+  });
+
+  it('fails when JSON-LD carries the placeholder badge text', () => {
+    const errors = checkHtml(
+      page(hotel, faq([{ ...q[0], name: 'Dane testowe?' }])),
+      'faq/index.html',
+    );
+    expect(errors.join('\n')).toContain('placeholder text');
+  });
+});

@@ -1,5 +1,6 @@
 import type { FAQPage, WithContext } from 'schema-dts';
 import { nap } from './nap';
+import { salesEmail } from './venue';
 
 /**
  * FAQ list. One source of truth for the visible page and the FAQPage JSON-LD.
@@ -88,8 +89,8 @@ export const faq: readonly FaqItem[] = [
   {
     id: 'przyjecia-konferencje',
     question: 'Czy hotel organizuje przyjęcia i konferencje?',
-    answer:
-      'Tak. Organizujemy chrzciny, jubileusze, spotkania firmowe i wesela. Do przyjęć służy sześć sal różnej wielkości. Wesele może mieć 300 osób. Konferencje, szkolenia i warsztaty odbywają się w salach z pełnym wyposażeniem multimedialnym. Największe sale mieszczą do 400 uczestników.',
+    answer: `Tak. Organizujemy wesela, chrzciny, jubileusze i spotkania firmowe. Hotel ma odnowioną salę balową i sale konferencyjne z wyposażeniem multimedialnym. Na Sylwestra 2026/2027 zapraszamy na bal w sali balowej. Liczby miejsc w salach jeszcze nie podajemy, bo nie są potwierdzone. ${reception}. Zapytania o wydarzenia: ${salesEmail}.`,
+    todo: true,
     link: { href: '/konferencje/', label: 'Konferencje' },
   },
   {
@@ -102,12 +103,12 @@ export const faq: readonly FaqItem[] = [
 
 export type FaqSchema = Exclude<WithContext<FAQPage>, string>;
 
-/** JSON-LD for the FAQ page. Built from the same list as the visible page. */
-export function buildFaqSchema(): FaqSchema {
+/** JSON-LD for a FAQ list. Built from the same list as the visible page. */
+export function buildFaqSchema(items: readonly FaqItem[] = faq): FaqSchema {
   return {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: faq.map((item) => ({
+    mainEntity: items.map((item) => ({
       '@type': 'Question',
       name: item.question,
       acceptedAnswer: { '@type': 'Answer', text: item.answer },

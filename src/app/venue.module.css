@@ -1,0 +1,38 @@
+/* Venue pages: /konferencje/ and /przyjecia/. A module, so the other pages do not load it. */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 12px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gallery img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--r-md);
+}
+
+.facts {
+  margin: 0 0 1em;
+}
+
+.facts > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  padding-block: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.facts dt {
+  min-width: 16rem;
+  color: var(--muted);
+}
+
+.facts dd {
+  margin: 0;
+  font-weight: 650;
+}

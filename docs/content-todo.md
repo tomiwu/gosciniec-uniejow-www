@@ -2,6 +2,20 @@
 
 Open facts and assets. Each item has a visible `TODO` marker in the copy where it applies.
 
+## Conferences, parties and ballroom (`/konferencje/`, `/przyjecia/`)
+
+Owner decisions of 2026-11-27: use sample data for the ballroom now, verify it later.
+Sample figures live only in `src/content/placeholders.ts`. Each record has `isPlaceholder: true`. The pages show the badge `Dane testowe` and a visible `TODO` marker. No `Offer` or `Event` JSON-LD is emitted for them. `npm run build` fails for a production build (no `NEXT_PUBLIC_PREVIEW=1`) while any record is in the file.
+
+- TODO (owner): number of conference rooms. `docs/source/konferencje.md` says "4 sale", `docs/source/home.md` says "3 sale", `docs/source/przyjecia.md` says "sześć sal". No page states a number. The sample value is `conferenceRoomsPlaceholder.sampleRoomCount`.
+- TODO (owner): capacity of the conference rooms and of the ballroom. The old site says "do 400 osób" and the wedding text says "300 osób". No page states a figure. Sample values: `sampleCapacity` in `placeholders.ts`.
+- TODO (owner): area in m², ceiling height, seat counts per layout, prices of room hire and catering. The old site has none. The pages give none.
+- TODO (owner): confirm the qualitative description of the ballroom. `/workspace/plakat/sala/opis-sali.md` (foyer, parquet, window wing) was not available to the worker. The pages say only "odnowiona sala balowa".
+- TODO (#34): the Sylwester offer page `/pakiety/sylwester-2026-2027/` does not exist yet. Both pages link to it. The URL is in `src/lib/venue.ts`. Change it there if #34 uses another URL.
+- TODO (owner): the amount for the Sylwester ball. The pages show no amount. The promo price 599 zł ended on 2026-11-29. Do not show it later without the owner.
+- TODO (owner): consent of the DJ for a public photo. The pages show the name "DJ Letsky" in text only.
+- Removed on purpose: the MojeKonferencje badge, the sales contact name, the 719 zł package and the promo phone numbers.
+
 ## Photos
 
 - TODO: Two photos of the old site are not in `public/img/`. They are HEIC files. The prebuilt `sharp` has no HEVC decoder. Ask the owner for JPEG copies, then run `scripts/fetch-images.ts` again or add them by hand.
@@ -21,7 +35,7 @@ The old site has no answer to these questions. The page shows a visible `TODO` m
 - TODO: Payment methods and prepayment rules.
 - TODO: Access to the wellness zone for guests of standard rooms. The old site says the access is included for Superior, Deluxe and the Family Apartment (`docs/source/pokoje.md`). It is silent about standard rooms.
 
-Source conflict (no visible TODO, the FAQ avoids the number): `docs/source/home.md` says "3 sale konferencyjne". `docs/source/konferencje.md` says "4 nowoczesne sale konferencyjne". Ask the owner for the right number before a page states it.
+Source conflict (no visible TODO, the FAQ avoids the number; see also the section "Conferences, parties and ballroom"): `docs/source/home.md` says "3 sale konferencyjne". `docs/source/konferencje.md` says "4 nowoczesne sale konferencyjne". Ask the owner for the right number before a page states it.
 
 ## Rooms (`/pokoje/`)
 

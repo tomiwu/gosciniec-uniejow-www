@@ -236,7 +236,9 @@ for (const path of ['/kontakt/dziekujemy/', '/rezerwacja/dziekujemy/']) {
       const response = await page.goto(path);
       expect(response?.status()).toBe(200);
       await expect(page.locator('h1')).toHaveCount(1);
-      await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+      // The preview build adds a second noindex tag in the layout. At least one must exist.
+      const noindex = page.locator('meta[name="robots"][content*="noindex"]');
+      expect(await noindex.count()).toBeGreaterThan(0);
       const results = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
       expect(results.violations).toEqual([]);
     });
