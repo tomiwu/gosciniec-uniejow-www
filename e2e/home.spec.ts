@@ -45,3 +45,17 @@ test('home page has no horizontal scroll', async ({ page }) => {
   );
   expect(overflow).toBeLessThanOrEqual(0);
 });
+
+test('a gallery photo opens in a dialog and Escape closes it', async ({ page }) => {
+  await page.goto('/');
+  const link = page.locator('a[data-lightbox]').first();
+  await link.scrollIntoViewIfNeeded();
+  const alt = await link.locator('img').getAttribute('alt');
+  await link.click();
+  const dialog = page.getByRole('dialog', { name: 'Powiększone zdjęcie' });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator('img')).toHaveAttribute('alt', alt ?? '');
+  await expect(page).toHaveURL(/\/$/);
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+});

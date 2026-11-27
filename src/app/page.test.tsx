@@ -29,7 +29,9 @@ describe('home page', () => {
       'Wesela, przyjęcia i konferencje w Uniejowie',
       'Restauracja',
       'Ogród',
+      'Zajrzyj do środka',
       'Lokalizacja',
+      'Najczęstsze pytania',
     ]);
   });
 
@@ -48,6 +50,22 @@ describe('home page', () => {
     // Capacities only from the old site (docs/source/przyjecia.md, konferencje.md).
     expect(html).toContain('300');
     expect(html).toContain('400');
+  });
+
+  it('has a gallery: each photo links to its large file and has a caption', () => {
+    const items = [...html.matchAll(/<figure class="gallery__item">([\s\S]*?)<\/figure>/g)];
+    expect(items.length).toBeGreaterThanOrEqual(6);
+    for (const [, item] of items) {
+      expect(item).toMatch(/<a href="\/img\/[a-z0-9-]+-1600\.jpg" data-lightbox[^>]*>/);
+      expect(item).toMatch(/<figcaption>[^<]+<\/figcaption>/);
+    }
+  });
+
+  it('has an FAQ teaser with confirmed answers only, and a link to all questions', () => {
+    const teaser = html.slice(html.indexOf('id="faq-title"'));
+    expect(teaser.match(/<details/g)?.length).toBeGreaterThanOrEqual(3);
+    expect(teaser).not.toContain('recepcj');
+    expect(teaser).toMatch(/href="\/faq\/?"/);
   });
 
   it('links to booking, phone, rooms, SPA, restaurant, attractions and FAQ', () => {
@@ -88,7 +106,7 @@ describe('home page', () => {
     expect(html).toContain('150 km od Warszawy');
     expect(html).toContain('12 km od autostrady A2');
     expect(html).toMatch(/3 km od centrum/);
-    const km = [...html.matchAll(/(\d+)\s*km/g)].map((m) => m[1]).sort();
+    const km = [...new Set([...html.matchAll(/(\d+)\s*km/g)].map((m) => m[1]))].sort();
     expect(km).toEqual(['12', '150', '3', '50']);
   });
 

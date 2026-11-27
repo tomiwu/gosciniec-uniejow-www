@@ -10,6 +10,9 @@ async function settle(page: Page): Promise<void> {
   await page.evaluate(() => document.fonts.ready);
   // font-display: optional uses a font only when it is in the cache at first paint.
   await page.reload({ waitUntil: 'networkidle' });
+  // A full-page shot does not scroll: Chrome would skip the paint of `content-visibility: auto`
+  // blocks below the screen (for example room cards 3 and 4 on /pokoje/). Render them all.
+  await page.addStyleTag({ content: '* { content-visibility: visible !important; }' });
   // Load lazy images now. A full-page shot does not scroll, so they would stay empty.
   await page.evaluate(() => {
     for (const img of document.querySelectorAll('img[loading="lazy"]')) {
