@@ -178,7 +178,7 @@ function checkVenue(node: Node, where: string, type: string): string[] {
 const REQUIRED_TYPES: Record<string, string[]> = {
   'faq/index.html': ['FAQPage'],
   'restauracja/index.html': ['Restaurant'],
-  'pakiety/index.html': ['Offer'],
+  'pakiety/sylwester-2026-2027/index.html': ['Offer'],
   'konferencje/index.html': ['FAQPage', 'MeetingRoom'],
   'przyjecia/index.html': ['FAQPage', 'EventVenue'],
 };
