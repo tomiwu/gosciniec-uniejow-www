@@ -18,6 +18,8 @@ export function buildHotelSchema(): HotelSchema {
     '@id': HOTEL_ID,
     name: nap.name,
     url: nap.siteUrl,
+    // Logo of the old site (issue #44), as PNG on a white background.
+    logo: `${nap.siteUrl}/logo.png`,
     telephone: nap.phoneE164,
     email: nap.email,
     address: {

@@ -69,4 +69,20 @@ Source conflict (no visible TODO, the FAQ avoids the number; see also the sectio
 - TODO: Opening hours, ticket prices and organizers. The old site gives none. The page shows a visible `TODO` marker for these attractions: zamek (hours, tickets), tężnie (place, access), Zagroda Młynarska (bread workshops), spływ kajakowy (organizer, route, price), ścieżka "Zieleń" (route, length), spacer z zielarką (organizer, dates), Spycimierz and Zoo Safari Borysew (distance, hours).
 - TODO: Photos of attractions. `public/img/` has only the Termy photo (`termy`). Ask the owner for photos of the castle, the bulwary and the Zagroda, or for the right to use photos of the city.
 
-> > > > > > > origin/main
+## SPA (`/spa/`)
+
+- TODO: List of massages and treatments, prices and hours. The old site says only "szeroki wybór masaży i zabiegów" (`docs/source/spa.md`, `docs/source/home.md`). The page shows a visible `TODO` marker.
+- TODO: Access to the wellness zone for guests of standard rooms. Same open question as in the FAQ. The page lists Superior, Deluxe and Rodzinny Apartament (source: `docs/source/pokoje.md`) and shows a visible `TODO` marker for "standard".
+- TODO: Rules for people who do not sleep in the hotel (can they use the wellness zone?). The old site is silent. The page says nothing about it.
+
+## Restaurant (`/restauracja/`)
+
+- TODO (Tomasz): Send the current menu as text or PDF. The old site has no menu. The page has the section "Menu" with the visible note "Aktualne menu wkrótce" and a `TODO` marker. Then add the dishes as `h2`/`h3` sections with name and description. Add a price only when Tomasz gives it. Add `hasMenu` to the `Restaurant` JSON-LD only after that.
+- TODO: Opening hours of the restaurant. The old site gives none. The page shows a visible `TODO` marker. The `Restaurant` JSON-LD has no `openingHoursSpecification`. `check-schema` fails when a `Restaurant` has `openingHours`, `priceRange`, `aggregateRating` or `review`. Remove a key from the forbidden list only with real data.
+- The photo `IMG_7522.heic` of the old page is missing (see "Photos" above).
+
+## Family page (`/dla-dzieci/`)
+
+- TODO: Family rules. The old site has no word about cots, high chairs, discounts for children or age limits. The page shows a visible `TODO` marker and gives no number.
+- TODO: Playground facts (age range, opening, supervision) and the dates of the "ekologiczne warsztaty". The old site gives none.
+- The warm-water tub ("balia") is a summer attraction in the old text. It has no photo on the old family page. The page shows no photo of it.

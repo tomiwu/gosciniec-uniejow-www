@@ -77,3 +77,50 @@ export const venue = {
     'Układ sali teatralny, szkoleniowy, w podkowę lub warsztatowy. Noclegi, przerwy kawowe i bankiety na miejscu.',
   equipment: ['rzutnik i ekran', 'nagłośnienie', 'flipchart', 'Wi-Fi', 'klimatyzacja'],
 } as const;
+
+/** Home gallery: photos of the old site (`public/img`). The alt texts describe what each photo shows. */
+export const gallery: readonly { slug: ImageSlug; alt: string; caption: string }[] = [
+  {
+    slug: 'foto-10',
+    alt: 'Drewniana altana grillowa w ogrodzie hotelu z girlandą lampek',
+    caption: 'Altana w ogrodzie',
+  },
+  {
+    slug: 'dsc08221',
+    alt: 'Pokój hotelowy z dwoma łóżkami, stołem i dużym oknem',
+    caption: 'Pokój',
+  },
+  {
+    slug: 'dsc0e0185',
+    alt: 'Biała kiełbasa z kapustą i chrzanem, z gałązką rozmarynu',
+    caption: 'Kuchnia',
+  },
+  {
+    slug: 'foto-6',
+    alt: 'Oczko wodne z kamieniami i irysami w ogrodzie hotelu',
+    caption: 'Oczko wodne',
+  },
+  {
+    slug: 'foto-2-1',
+    alt: 'Siłownia w hotelu: atlas, bieżnia i rowerek treningowy',
+    caption: 'Siłownia',
+  },
+  {
+    slug: 'img-2002',
+    alt: 'Sala przygotowana na przyjęcie: długi stół i balony',
+    caption: 'Przyjęcia',
+  },
+  {
+    slug: 'foto-14',
+    alt: 'Plac zabaw z dmuchanym zamkiem w ogrodzie przed hotelem',
+    caption: 'Plac zabaw',
+  },
+  {
+    slug: 'foto-2',
+    alt: 'Ogród hotelu zimą, pod śniegiem',
+    caption: 'Ogród zimą',
+  },
+];
+
+/** FAQ teaser on the home page: only questions with a confirmed answer (no `todo`). */
+export const homeFaqIds = ['termy', 'rodzinne', 'rezerwacja', 'dojazd'] as const;

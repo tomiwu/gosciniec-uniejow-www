@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { nap } from '@/lib/nap';
-import { LogoMark } from './LogoMark';
+import { Logo } from './Logo';
 import { MainNav } from './MainNav';
 import { ThemeToggle } from './ThemeToggle';
 
@@ -9,11 +9,8 @@ export function SiteHeader() {
     <header className="site-header">
       <div className="site-header__bar">
         <Link href="/" className="logo">
-          <LogoMark />
-          {/* Accessible name = visible text = "Gościniec Uniejów" (nap.name). */}
-          <span className="logo__text">
-            Gościniec <small>Uniejów</small>
-          </span>
+          {/* Accessible name = "Gościniec Uniejów" (nap.name), from the logo. */}
+          <Logo className="logo__img" width={112} height={56} />
         </Link>
         <div className="site-header__actions">
           <a className="phone-link site-header__wide" href={`tel:${nap.phoneE164}`}>

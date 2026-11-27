@@ -31,6 +31,22 @@ test.describe('/pokoje/ content', () => {
     }
   });
 
+  test('renders every room card when a guest scrolls to it', async ({ page }) => {
+    await page.goto('/pokoje/');
+    const rooms = page.locator('article');
+    for (let i = 0; i < 4; i += 1) {
+      const room = rooms.nth(i);
+      await room.scrollIntoViewIfNeeded();
+      await expect(room.getByRole('heading', { level: 2 })).toBeVisible();
+      await expect(room.getByRole('link', { name: /Zapytaj o termin/ })).toBeVisible();
+      const img = room.locator('picture img');
+      await expect(img).toBeVisible();
+      await expect
+        .poll(() => img.evaluate((el) => (el as HTMLImageElement).naturalWidth))
+        .toBeGreaterThan(0);
+    }
+  });
+
   test('loads only the first photo with priority (LCP)', async ({ page }) => {
     await page.goto('/pokoje/');
     const images = page.locator('article img');

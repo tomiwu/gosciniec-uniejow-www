@@ -1,6 +1,7 @@
 /** Single source of truth for name, address, phone and e-mail. Do not copy these values. */
 export const nap = {
   name: 'Gościniec Uniejów',
+  restaurantName: 'Restauracja Gościniec Uniejów',
   street: 'ul. Sienkiewicza 137',
   postalCode: '99-210',
   city: 'Uniejów',

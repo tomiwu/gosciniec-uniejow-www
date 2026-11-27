@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { rooms } from '../src/lib/rooms';
 import { buildHotelRoomsSchema, buildHotelSchema } from '../src/lib/schema/hotel';
+import { buildRestaurantSchema } from '../src/lib/schema/restaurant';
 import { checkHtml, extractJsonLd, requiredTypesFor } from './check-schema';
 
 const page = (...blocks: unknown[]): string =>
@@ -212,5 +213,37 @@ describe('venue schema', () => {
       'faq/index.html',
     );
     expect(errors.join('\n')).toContain('placeholder text');
+  });
+});
+
+describe('Restaurant', () => {
+  const restaurant = buildRestaurantSchema();
+
+  it('accepts the Restaurant block built from nap.ts', () => {
+    expect(checkHtml(page(hotel, restaurant), 'restauracja/index.html')).toEqual([]);
+  });
+
+  it('requires a Restaurant block on /restauracja/', () => {
+    expect(requiredTypesFor('restauracja/index.html')).toEqual(['Restaurant']);
+    const errors = checkHtml(page(hotel), 'restauracja/index.html');
+    expect(errors.join('\n')).toContain('no Restaurant JSON-LD found');
+  });
+
+  it('fails when name, telephone or address differ from nap.ts', () => {
+    const bad = (fields: Record<string, unknown>) =>
+      checkHtml(page(hotel, { ...restaurant, ...fields }), 'a.html').join('\n');
+    expect(bad({ name: 'Inna restauracja' })).toContain('Restaurant name');
+    expect(bad({ telephone: '+48000000000' })).toContain('Restaurant telephone');
+    expect(bad({ address: undefined })).toContain('Restaurant address is missing');
+    expect(bad({ address: { ...(restaurant.address as object), postalCode: '00-000' } })).toContain(
+      'Restaurant address.postalCode',
+    );
+  });
+
+  it('fails on data that the old site does not give', () => {
+    for (const field of ['aggregateRating', 'review', 'priceRange', 'openingHours']) {
+      const errors = checkHtml(page(hotel, { ...restaurant, [field]: 'x' }), 'a.html');
+      expect(errors.join('\n'), field).toContain(`Restaurant must not have ${field}`);
+    }
   });
 });
