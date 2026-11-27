@@ -18,4 +18,5 @@ docs/source/        text and image URLs of the old WordPress site (source materi
 ```
 
 Build: `npm run build` writes `out/` (HTML, CSS, JS, images, `.htaccess`, `api/contact.php`, `robots.txt`, `sitemap.xml`).
+Placeholder data (sample packages) lives in `src/content/placeholders.ts`. Every page that shows it carries the badge "Dane testowe". `npm run build` (CI, preview) keeps it. The build for webd.pl MUST use `npm run build:production`: it fails while any page uses placeholder data.
 Deploy (later, issue with label needs-validation): upload `out/` to a test directory on webd.pl.

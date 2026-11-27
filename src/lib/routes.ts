@@ -29,14 +29,14 @@ export const routes: readonly Route[] = [
     title: 'Ceny',
     metaTitle: 'Ceny noclegów w Uniejowie',
     description:
-      'Ceny noclegów w hotelu Gościniec Uniejów. Sprawdź, jak poznać cenę pokoju w Uniejowie, zapytaj recepcję o ofertę i zobacz ceny pakietów pobytowych.',
+      'Ceny noclegów w hotelu Gościniec Uniejów. Sprawdź, jak poznać cenę pokoju w Uniejowie, zapytaj recepcję o ofertę i zobacz aktualne oferty sezonowe.',
   },
   {
     path: '/pakiety/',
     title: 'Pakiety',
-    metaTitle: 'Pakiety SPA i weekend w Uniejowie',
+    metaTitle: 'Pakiety i oferty w Uniejowie – Sylwester 2026',
     description:
-      'Pakiety pobytowe w hotelu Gościniec Uniejów: weekend SPA w Uniejowie z noclegiem i strefą wellness. Zobacz aktualne pakiety i zarezerwuj wybrany pobyt.',
+      'Oferty hotelu Gościniec Uniejów: bal sylwestrowy 31.12.2026 w odnowionej sali balowej i pakiety pobytowe. Zobacz opisy ofert i zapytaj o termin.',
   },
   {
     path: '/spa/',

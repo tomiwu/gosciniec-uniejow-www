@@ -2427,16 +2427,41 @@ a:hover > .arr,
   background: var(--color-bg-alt);
 }
 
-/* Packages page. */
-.package img {
-  display: block;
-  width: 100%;
-  height: auto;
+/* Packages hub: a list of cards. Structure only. The visual style is a separate task. */
+.package-list {
+  display: grid;
+  gap: var(--space-5);
+  margin: var(--space-6) 0;
+  padding: 0;
+  list-style: none;
+}
+
+.package-card {
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius);
 }
 
-.package__price {
+.package-card h2 {
+  margin-top: 0;
+}
+
+.package-card__tag {
+  margin: 0;
+  font-weight: 650;
+}
+
+.package-card__price {
   font-size: 1.25rem;
+}
+
+/* Badge "Dane testowe". Always visible on a page that shows placeholder data. */
+.test-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border: 2px dashed currentColor;
+  border-radius: var(--r-sm);
+  font-weight: 700;
 }
 
 /* Attractions page: a list of sections. A photo sits next to the text from 48 rem. */

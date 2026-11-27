@@ -1,14 +1,11 @@
 import Link from 'next/link';
 import { routeMetadata } from '@/lib/metadata';
 import { nap } from '@/lib/nap';
-import { offers } from '@/lib/offers';
 import { rooms } from '@/lib/rooms';
 
 const path = '/ceny/';
 
 export const metadata = routeMetadata(path);
-
-const packageOffer = offers.find((offer) => offer.id === 'kobiecy-chill-fun');
 
 export default function Page() {
   return (
@@ -55,14 +52,9 @@ export default function Page() {
       </p>
 
       <h2>Pakiety pobytowe</h2>
-      {packageOffer?.price != null ? (
-        <p>
-          Szukasz weekendu SPA w Uniejowie? Zobacz pakiet „{packageOffer.name}”:{' '}
-          {packageOffer.price} zł / osoba. Aktualność oferty potwierdź w recepcji.
-        </p>
-      ) : null}
       <p>
-        <Link href="/pakiety/">Zobacz pakiety</Link>
+        Szukasz oferty na Sylwestra albo na krótki pobyt? Zobacz{' '}
+        <Link href="/pakiety/">pakiety i oferty</Link>.
       </p>
     </div>
   );
