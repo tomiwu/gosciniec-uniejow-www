@@ -46,7 +46,7 @@ export function findBadgeInOutput(outDir: string): string[] {
 }
 
 const NON_VISIBLE_BLOCKS = /<!--[\s\S]*?-->|<(script|style)\b[\s\S]*?<\/\1\s*>/gi;
-const TAGS = /<[^>]*>/g;
+const TAGS = /<(?:[^>"']|"[^"]*"|'[^']*')*>/g;
 const TODO_MARKER = /\bTODO\b/;
 
 /** True when the HTML shows the word TODO as text. Scripts, styles, comments and tags do not count. */

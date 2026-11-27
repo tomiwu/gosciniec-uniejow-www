@@ -114,6 +114,12 @@ describe('findTodoInOutput', () => {
     );
     expect(findTodoInOutput(dir)).toEqual([]);
   });
+
+  it('ignores a TODO after a ">" inside a quoted attribute', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'todo-'));
+    writeFileSync(join(dir, 'index.html'), `<a title="a > TODO" data-x='b > TODO'>Link</a>`);
+    expect(findTodoInOutput(dir)).toEqual([]);
+  });
 });
 
 describe('findPlaceholderUsers', () => {
