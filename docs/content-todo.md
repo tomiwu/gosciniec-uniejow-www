@@ -46,3 +46,13 @@ Source conflict (no visible TODO, the FAQ avoids the number): `docs/source/home.
 - TODO: Confirm that the package "Kobiecy Chill & Fun" is still valid at 719 zł / osoba. The old page is dated 2025-09-22 (`docs/source/pakiet-kobiecy-weekend.md`). The page shows "Aktualność oferty potwierdź w recepcji" and a `TODO` marker. Change `price` in `src/lib/offers.ts` if it differs. Set it to `null` if the package ends. The `Offer` JSON-LD then goes away.
 - TODO: Christmas offer "Święta w Gościńcu". The old page has only Lorem ipsum text, no details and no price (`docs/source/portfolio_swieta-w-goscincu.md`). `/pakiety/` has a short section "Zapytaj o ofertę świąteczną" and a `TODO` marker. In `offers.ts` its price is `null`, so it has no `Offer`.
 - TODO: The old package page has a second phone number (789 017 995) and a "\*" after the price. The new page uses the hotel phone only. Ask the owner what the "\*" means (for example a condition).
+  \
+
+## Attractions (`/atrakcje/`)
+
+- TODO: Links to official sites. The old site text has no URL for any attraction. The page has no external link. Add the URLs that the owner confirms.
+- TODO: Distances from the hotel. Only "3 km to Termy Uniejów" is in the old site (`docs/source/home.md`). Add other distances only from a source.
+- TODO: Opening hours, ticket prices and organizers. The old site gives none. The page shows a visible `TODO` marker for these attractions: zamek (hours, tickets), tężnie (place, access), Zagroda Młynarska (bread workshops), spływ kajakowy (organizer, route, price), ścieżka "Zieleń" (route, length), spacer z zielarką (organizer, dates), Spycimierz and Zoo Safari Borysew (distance, hours).
+- TODO: Photos of attractions. `public/img/` has only the Termy photo (`termy`). Ask the owner for photos of the castle, the bulwary and the Zagroda, or for the right to use photos of the city.
+
+> > > > > > > origin/main

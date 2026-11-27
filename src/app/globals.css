@@ -631,3 +631,39 @@ summary:focus-visible,
 .package__price {
   font-size: 1.25rem;
 }
+
+/* Attractions page: a list of sections. A photo sits next to the text from 48 rem. */
+.attractions {
+  margin-top: var(--space-6);
+}
+
+.attraction {
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.attraction h2 {
+  margin-top: 0;
+}
+
+.attraction__image img {
+  display: block;
+  width: 100%;
+  max-width: 268px;
+  height: auto;
+  border-radius: var(--radius);
+}
+
+.attraction__distance {
+  font-weight: 600;
+}
+
+@media (min-width: 48rem) {
+  .attraction:has(.attraction__image) {
+    display: grid;
+    grid-template-columns: 268px 1fr;
+    gap: var(--space-5);
+    align-items: start;
+  }
+}
