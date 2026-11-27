@@ -36,7 +36,9 @@ log "PR #$PR, head ${SHA:0:7}, model $MODEL"
 EXISTING_ID="$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
   --jq '.[] | select(.body | startswith("<!-- ux-review -->")) | .id' | tail -n 1)"
 if [[ -n "$EXISTING_ID" && "$FORCE" != "--force" ]]; then
-  if gh api "repos/$REPO/issues/comments/$EXISTING_ID" --jq .body | grep -q "ux-review-sha: $SHA"; then
+  # A review with verdict "error" (for example a usage limit) does not count: run again.
+  EXISTING_BODY="$(gh api "repos/$REPO/issues/comments/$EXISTING_ID" --jq .body)"
+  if grep -q "ux-review-sha: $SHA" <<<"$EXISTING_BODY" && ! grep -q '^## UX review: .* error$' <<<"$EXISTING_BODY"; then
     log "commit ${SHA:0:7} already has a review. Use --force to run again."
     exit 0
   fi
@@ -77,7 +79,12 @@ sed "s/{{PR}}/$PR/g" "$ROOT/.sandcastle/ux-review-prompt.md" >"$WORK/prompt.md"
     timeout 1500 claude -p "$(cat prompt.md)" --model "$MODEL" \
       --allowedTools "Read" "Glob" "Grep" "Edit(./review.json)" \
       --output-format text >"$WORK/agent.log" 2>&1
-) || log "the reviewer agent ended with an error (see $WORK/agent.log)."
+) || {
+  log "the reviewer agent ended with an error (see $WORK/agent.log)."
+  # Last line of the agent output (for example "You've hit your limit"), without token-like words.
+  UX_AGENT_ERROR="$(tail -n 1 "$WORK/agent.log" | cut -c1-160 | sed -E 's/[A-Za-z0-9_-]{32,}/[hidden]/g')"
+  export UX_AGENT_ERROR
+}
 
 # 4. Post or update the comment, set or remove the label.
 node --no-warnings "$ROOT/scripts/ux-review-format.ts" "$WORK/review.json" "$SHA" >"$WORK/comment.md"

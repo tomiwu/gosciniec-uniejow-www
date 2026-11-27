@@ -30,7 +30,7 @@ supervisor reads the comment. With the label `ux-regression` it asks Tomasz firs
 ## Run by hand
 
 ```bash
-scripts/ux-review.sh 42            # skips a commit that already has a review
+scripts/ux-review.sh 42            # skips a commit that already has a review (not an "error" one)
 scripts/ux-review.sh 42 --force    # run again
 VISUAL_SITE=out npx playwright test -c playwright.visual.config.ts --update-snapshots=all  # local baseline
 ```

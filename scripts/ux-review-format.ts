@@ -132,7 +132,12 @@ function main(): void {
   } catch {
     raw = '';
   }
-  process.stdout.write(toComment(parseReview(raw), sha));
+  const review = parseReview(raw);
+  const agentError = process.env['UX_AGENT_ERROR']?.trim();
+  if (review.verdict === 'error' && agentError) {
+    review.summary = `${review.summary} Agent output: "${agentError}". Run \`scripts/ux-review.sh <pr>\` again later.`;
+  }
+  process.stdout.write(toComment(review, sha));
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) main();
