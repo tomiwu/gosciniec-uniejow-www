@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { dismissConsentBar } from './helpers/consent';
 
 const AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 const KEY_ROUTES = [
@@ -29,6 +30,7 @@ test.describe('theme follows the system setting', () => {
     test(`${path} has no axe violations in the dark theme`, async ({ page }) => {
       await page.goto(path);
       await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+      await dismissConsentBar(page);
       const results = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
       expect(results.violations).toEqual([]);
     });

@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
+import { dismissConsentBar } from './helpers/consent';
 
 const AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 const ENDPOINT = '**/api/contact.php';
@@ -135,6 +136,7 @@ test.describe('/rezerwacja/', () => {
   test('shows a general error when the endpoint is not available', async ({ page }) => {
     await page.route(ENDPOINT, (route) => route.abort());
     await page.goto('/rezerwacja/');
+    await dismissConsentBar(page);
     await page.getByLabel('Data przyjazdu').fill('2027-03-10');
     await page.getByLabel('Data wyjazdu').fill('2027-03-12');
     await fillGuest(page);
