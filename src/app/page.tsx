@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { Picture } from '@/components/Picture';
+import { PlaceholderBadge } from '@/components/PlaceholderBadge';
+import { cheapestRoomFromPrice } from '@/content/placeholders';
 import { nap } from '@/lib/nap';
 import { routeMetadata } from '@/lib/metadata';
 import { withBase } from '@/lib/preview';
@@ -133,6 +135,10 @@ export default function Page() {
             </ul>
             <div className="dots" aria-hidden="true" />
           </div>
+          <p className="from-price reveal">
+            Nocleg już od <strong>{cheapestRoomFromPrice.amount} zł za noc</strong>{' '}
+            <PlaceholderBadge />
+          </p>
           <p className="reveal">
             <Link className="text-link" href="/pokoje/">
               Wszystkie pokoje i wyposażenie <span aria-hidden="true">→</span>

@@ -2534,3 +2534,8 @@ a:hover > .arr,
   font-size: 1.125rem;
   font-weight: 600;
 }
+
+/* From-price line ("Nocleg już od ..."). The badge "Dane testowe" sits in the same paragraph. */
+.from-price {
+  font-size: 1.125rem;
+}

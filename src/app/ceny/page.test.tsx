@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { extractJsonLd } from '../../../scripts/check-schema';
+import { cheapestRoomFromPrice, PLACEHOLDER_BADGE } from '@/content/placeholders';
 import { nap } from '@/lib/nap';
 import { rooms } from '@/lib/rooms';
 import Page, { metadata } from './page';
@@ -36,5 +37,20 @@ describe('/ceny/ page', () => {
 
   it('has no Offer in the JSON-LD (no real room price)', () => {
     expect(extractJsonLd(html).join('')).not.toContain('Offer');
+  });
+
+  it('shows the sample from-price with the badge "Dane testowe" next to it', () => {
+    const block = body.match(/<p class="from-price"[\s\S]*?<\/p>/)?.[0] ?? '';
+    expect(block).toContain(`${cheapestRoomFromPrice.amount} zł`);
+    expect(block).toContain(PLACEHOLDER_BADGE);
+  });
+
+  it('shows the sample amount only inside that block', () => {
+    const rest = body.replace(/<p class="from-price"[\s\S]*?<\/p>/, '');
+    expect(rest).not.toContain(`${cheapestRoomFromPrice.amount} zł`);
+  });
+
+  it('does not put the sample amount in the JSON-LD', () => {
+    expect(extractJsonLd(html).join('')).not.toContain(`${cheapestRoomFromPrice.amount}`);
   });
 });

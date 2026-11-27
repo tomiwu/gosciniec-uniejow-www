@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { allPlaceholders, PLACEHOLDER_BADGE, placeholderPackages } from './placeholders';
+import {
+  allPlaceholders,
+  cheapestRoomFromPrice,
+  PLACEHOLDER_BADGE,
+  placeholderPackages,
+} from './placeholders';
+import { offers } from '@/lib/offers';
+import { rooms } from '@/lib/rooms';
 
 describe('placeholder records', () => {
   it('uses the exact badge text "Dane testowe"', () => {
@@ -24,5 +31,23 @@ describe('placeholder records', () => {
     const text = JSON.stringify(allPlaceholders);
     expect(text).not.toContain('719');
     expect(text).not.toMatch(/Kobiecy/i);
+  });
+
+  describe('sample from-price of the cheapest room (issue #35)', () => {
+    it('is a placeholder record in PLN and is listed in allPlaceholders', () => {
+      expect(cheapestRoomFromPrice.isPlaceholder).toBe(true);
+      expect(cheapestRoomFromPrice.currency).toBe('PLN');
+      expect(cheapestRoomFromPrice.amount).toBeGreaterThan(0);
+      expect(allPlaceholders).toContain(cheapestRoomFromPrice);
+    });
+
+    it('names a real room type', () => {
+      expect(rooms.map((room) => room.slug)).toContain(cheapestRoomFromPrice.roomSlug);
+    });
+
+    it('does not leak into real owner data', () => {
+      for (const room of rooms) expect(room.priceFrom).toBeNull();
+      expect(offers.map((offer) => offer.price)).not.toContain(cheapestRoomFromPrice.amount);
+    });
   });
 });
