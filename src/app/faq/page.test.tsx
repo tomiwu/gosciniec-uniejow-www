@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { extractJsonLd } from '../../../scripts/check-schema';
 import { faq } from '@/lib/faq';
 import { nap } from '@/lib/nap';
+import { expectOfferFaqVisible } from '@/test/venue-assertions';
 import Page, { metadata } from './page';
 
 const html = renderToStaticMarkup(<Page />);
@@ -50,5 +51,16 @@ describe('FAQ page', () => {
 
   it('has Polish metadata', () => {
     expect(metadata.title).toBeTruthy();
+  });
+
+  it('shows the offer questions with the same answers as /pakiety/ (issue #36)', () => {
+    expectOfferFaqVisible(html);
+  });
+
+  it('keeps the placeholder badge and the Black Friday price out of the JSON-LD', () => {
+    for (const block of extractJsonLd(html)) {
+      expect(block).not.toContain('Dane testowe');
+      expect(block).not.toContain('599');
+    }
   });
 });

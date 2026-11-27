@@ -1,6 +1,10 @@
 import Link from 'next/link';
+import { FaqList } from '@/components/FaqList';
+import { JsonLd } from '@/components/JsonLd';
 import { PLACEHOLDER_BADGE, placeholderPackages } from '@/content/placeholders';
 import { routeMetadata } from '@/lib/metadata';
+import { buildFaqSchema } from '@/lib/faq';
+import { offerFaq } from '@/lib/offer-faq';
 import { offers } from '@/lib/offers';
 import { sylwester as sylwesterFacts } from '@/lib/venue';
 
@@ -16,6 +20,7 @@ export default function Page() {
   }
   return (
     <div className="page packages">
+      <JsonLd data={buildFaqSchema(offerFaq)} />
       <h1>Pakiety i oferty w Uniejowie</h1>
       <p className="lead">
         Aktualne oferty hotelu Gościniec Uniejów: bal sylwestrowy i pakiety pobytowe. Przy każdej
@@ -69,6 +74,11 @@ export default function Page() {
           </li>
         ))}
       </ul>
+
+      <section className="page-section" aria-labelledby="pakiety-pytania">
+        <h2 id="pakiety-pytania">Pytania o pakiety i oferty</h2>
+        <FaqList items={offerFaq} />
+      </section>
 
       <section className="page-section" aria-labelledby="pakiety-wiecej">
         <h2 id="pakiety-wiecej">Zobacz też</h2>

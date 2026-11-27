@@ -1,7 +1,10 @@
 import Link from 'next/link';
+import { FaqList } from '@/components/FaqList';
 import { JsonLd } from '@/components/JsonLd';
+import { buildFaqSchema } from '@/lib/faq';
 import { routeMetadata } from '@/lib/metadata';
 import { nap } from '@/lib/nap';
+import { offerFaq } from '@/lib/offer-faq';
 import { offers } from '@/lib/offers';
 import { buildOffersSchema } from '@/lib/schema/offers';
 import { contact, sylwester } from '@/lib/venue';
@@ -76,6 +79,11 @@ export default function Page() {
         </p>
       </section>
 
+      <section className="page-section" aria-labelledby="sylwester-pytania">
+        <h2 id="sylwester-pytania">Pytania o bal i oferty</h2>
+        <FaqList items={offerFaq} />
+      </section>
+
       <section className="page-section" aria-labelledby="sylwester-wiecej">
         <h2 id="sylwester-wiecej">Zobacz też</h2>
         <ul>
@@ -93,6 +101,7 @@ export default function Page() {
         </ul>
       </section>
 
+      <JsonLd data={buildFaqSchema(offerFaq)} />
       {schema.map((node, index) => (
         <JsonLd key={index} data={node} />
       ))}

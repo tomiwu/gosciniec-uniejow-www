@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { extractJsonLd } from '../../../scripts/check-schema';
 import { PLACEHOLDER_BADGE, placeholderPackages } from '@/content/placeholders';
 import { sylwester } from '@/lib/venue';
+import { expectOfferFaqSchema, expectOfferFaqVisible } from '@/test/venue-assertions';
 import Page, { metadata } from './page';
 
 const html = renderToStaticMarkup(<Page />);
@@ -101,5 +102,13 @@ describe('/pakiety/ hub', () => {
 
   it('makes no claim of thermal pools in the hotel', () => {
     expect(body).not.toMatch(/basen(y)? hotel/i);
+  });
+
+  it('shows the offer questions with the same answers as /faq/ (issue #36)', () => {
+    expectOfferFaqVisible(html);
+  });
+
+  it('has one FAQPage JSON-LD with the offer questions and no placeholder claim', () => {
+    expectOfferFaqSchema(html);
   });
 });

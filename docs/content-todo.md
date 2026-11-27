@@ -12,6 +12,8 @@ Sample figures live only in `src/content/placeholders.ts`. Each record has `isPl
 - TODO (owner): area in m², ceiling height, seat counts per layout, prices of room hire and catering. The old site has none. The pages give none.
 - TODO (owner): confirm the qualitative description of the ballroom. `/workspace/plakat/sala/opis-sali.md` (foyer, parquet, window wing) was not available to the worker. The pages say only "odnowiona sala balowa".
 - Done (#34): the Sylwester offer page `/pakiety/sylwester-2026-2027/` exists. Both pages link to it. The URL is in `src/lib/venue.ts`.
+- Done (#36): the offer questions (booking, date, price, overnight, Termy) are in `src/lib/offer-faq.ts`. They show on `/pakiety/`, on the offer page and on `/faq/`, with the same answers and in `FAQPage` JSON-LD. They use only the Sylwester facts of the owner decision (2026-11-27). No sample package is in the FAQ. A FAQ item about a sample package needs `isPlaceholder: true`: it shows the badge and stays out of the JSON-LD.
+- TODO: When the owner confirms the Sylwester menu, the overnight rate or the inclusions, update `src/lib/offer-faq.ts` and the offer page together. When the amount 740 zł is not the public price, change `offers.ts` first. The FAQ then follows.
 - The pages show no amount. The offer page shows 740 zł per couple (see "Prices and packages").
 - The DJ gave consent for a public photo (owner decision of 2026-11-27, issue #34). See "Prices and packages" for the missing file.
 - Removed on purpose: the MojeKonferencje badge, the sales contact name, the 719 zł package and the promo phone numbers.
