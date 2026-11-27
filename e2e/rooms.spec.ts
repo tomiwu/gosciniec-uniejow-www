@@ -12,7 +12,7 @@ test.describe('/pokoje/ content', () => {
   test('has one h1 and one h2 for each room type', async ({ page }) => {
     await page.goto('/pokoje/');
     await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
-    await expect(page.getByRole('heading', { level: 2 })).toHaveText(NAMES);
+    await expect(page.locator('article').getByRole('heading', { level: 2 })).toHaveText(NAMES);
   });
 
   test('shows a photo, a feature list and a CTA for each room', async ({ page }) => {
