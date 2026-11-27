@@ -852,15 +852,20 @@ p {
 }
 
 @media (max-width: 1023.98px) {
+  /* The fixed action bar covers the bottom of the screen: keep the chips above it. */
   .hero__text {
-    padding-bottom: 32px;
+    padding-bottom: calc(var(--bar-h) + 24px);
   }
 }
 
 .hero .eyebrow {
+  /* Dark pill: the kicker stays readable on the bright sky of the photo. */
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgb(14 26 34 / 0.62);
   font-size: 14px;
   color: #f6de9a;
-  text-shadow: 0 1px 8px rgb(0 0 0 / 0.45);
 }
 
 .hero h1 {
@@ -1814,21 +1819,22 @@ a:hover > .arr,
 
 /* Rooms page: card grid as in the design demo */
 .page-hero {
-  padding-block: 48px 8px;
+  padding-block: 40px 0;
 }
 
 .page-hero .lead {
   max-width: 60ch;
+  margin-bottom: 0;
 }
 
-.rooms-page > .wrap {
+.rooms-page > .wrap:not(.page-hero) {
   padding-bottom: 64px;
 }
 
 .rooms {
   display: grid;
   gap: 20px;
-  margin-top: 32px;
+  margin-top: 24px;
 }
 
 .room {
@@ -1836,13 +1842,25 @@ a:hover > .arr,
   flex-direction: column;
 }
 
-/* Skip layout and paint of cards below the first one. Their lazy photos then do not load
-   before the LCP photo is painted (they compete with it for bandwidth in Lighthouse). */
+/* Skip layout and paint of cards below the first one until they come near the screen. Their lazy
+   photos then do not load before the LCP photo is painted (they compete with it for bandwidth in
+   Lighthouse). The placeholder is taller than the real card, so cards 3 and 4 stay out of the
+   lazy-load distance. Print and screenshots: see `.room` in the print block. */
 .room + .room {
   content-visibility: auto;
-  /* Taller than the real card (about 49 rem): the photos of cards 3 and 4 then stay out of the
-     lazy-load distance until the LCP photo is painted. */
   contain-intrinsic-size: auto 70rem;
+}
+
+@media (min-width: 768px) {
+  .room + .room {
+    contain-intrinsic-size: auto 56rem;
+  }
+}
+
+@media print {
+  .room + .room {
+    content-visibility: visible;
+  }
 }
 
 .room__body {
@@ -1897,10 +1915,6 @@ a:hover > .arr,
 @media (min-width: 768px) {
   .rooms {
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .room + .room {
-    contain-intrinsic-size: auto 56rem;
   }
 }
 
