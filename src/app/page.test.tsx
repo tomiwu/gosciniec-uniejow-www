@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { faq } from '@/lib/faq';
 import { homeFaqIds } from '@/lib/home';
+import { cheapestRoomFromPrice, PLACEHOLDER_BADGE } from '@/content/placeholders';
 import { nap } from '@/lib/nap';
 import Page, { metadata } from './page';
 
@@ -127,5 +128,17 @@ describe('home page', () => {
 
   it('uses the route metadata', () => {
     expect(metadata.alternates?.canonical).toBe('/');
+  });
+
+  it('shows the sample from-price once, with the badge "Dane testowe", and no Offer JSON-LD', () => {
+    const blocks = [...html.matchAll(/<p class="from-price[^"]*"[\s\S]*?<\/p>/g)].map((m) => m[0]);
+    expect(blocks).toHaveLength(1);
+    expect(blocks[0]).toContain(`${cheapestRoomFromPrice.amount} zł`);
+    expect(blocks[0]).toContain(PLACEHOLDER_BADGE);
+    const ld = [...html.matchAll(/<script[^>]*ld\+json[^>]*>([\s\S]*?)<\/script>/g)].map(
+      (m) => m[1],
+    );
+    expect(ld.join('')).not.toContain(`${cheapestRoomFromPrice.amount}`);
+    expect(ld.join('')).not.toContain('"Offer"');
   });
 });

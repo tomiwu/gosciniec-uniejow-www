@@ -55,6 +55,32 @@ export const placeholderPackages: readonly PlaceholderPackage[] = [
   },
 ];
 
+/**
+ * Sample from-price ("cena od") of the cheapest room (issue #35). The owner gave no amount yet.
+ * The amount is invented. It is NOT a fact. Real room records keep `priceFrom: null`.
+ * Pages show it only with the badge. No `Offer` or Hotel price schema uses it.
+ * When the owner gives the real amount: set `priceFrom` in `rooms.ts`, delete this record,
+ * drop the badge, then emit schema that matches the HTML.
+ */
+export interface RoomFromPricePlaceholder extends PlaceholderRecord {
+  /** Slug of the room type that the sample price stands for. */
+  roomSlug: string;
+  /** Sample price per night. */
+  amount: number;
+  currency: 'PLN';
+  /** Site paths of the pages that show the record. */
+  pages: readonly string[];
+}
+
+export const cheapestRoomFromPrice: RoomFromPricePlaceholder = {
+  id: 'cena-od-najtanszy-pokoj',
+  isPlaceholder: true,
+  roomSlug: 'standard',
+  amount: 199,
+  currency: 'PLN',
+  pages: ['/ceny/', '/'],
+};
+
 /** A sample figure of the venue pages (issue #11). */
 export interface VenuePlaceholderRecord extends PlaceholderRecord {
   /** What the record stands for. English, for developers. */
@@ -95,6 +121,7 @@ export const conferenceRoomsPlaceholder: ConferenceRoomsPlaceholder = {
 /** Every placeholder record of the site. Add new lists here. */
 export const allPlaceholders: readonly PlaceholderRecord[] = [
   ...placeholderPackages,
+  cheapestRoomFromPrice,
   ballroomPlaceholder,
   conferenceRoomsPlaceholder,
 ];

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { placeholderPackages } from '../src/content/placeholders';
+import { cheapestRoomFromPrice, placeholderPackages } from '../src/content/placeholders';
 import { rooms } from '../src/lib/rooms';
 import { buildHotelRoomsSchema, buildHotelSchema } from '../src/lib/schema/hotel';
 import { buildRestaurantSchema } from '../src/lib/schema/restaurant';
@@ -137,6 +137,19 @@ describe('checkHtml', () => {
           priceCurrency: 'PLN',
         };
         expect(checkHtml(page(hotel, node), 'a.html').join('\n')).toContain('placeholder');
+      }
+    });
+    it('fails on the sample from-price amount in any node, in any price field', () => {
+      const amount = cheapestRoomFromPrice.amount;
+      const nodes = [
+        offer({ price: amount, priceCurrency: 'PLN' }),
+        offer({ price: String(amount), priceCurrency: 'PLN' }),
+        { '@type': 'AggregateOffer', lowPrice: amount, priceCurrency: 'PLN' },
+        { ...hotel, makesOffer: { '@type': 'Offer', price: amount, priceCurrency: 'PLN' } },
+      ];
+      for (const node of nodes) {
+        const errors = checkHtml(page(hotel, node), 'a.html').join('\n');
+        expect(errors).toContain('placeholder from-price');
       }
     });
     it('checks an Offer nested in another node', () => {

@@ -1,7 +1,11 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PLACEHOLDER_BADGE_TEXT, placeholderPackages } from '../src/content/placeholders';
+import {
+  cheapestRoomFromPrice,
+  PLACEHOLDER_BADGE_TEXT,
+  placeholderPackages,
+} from '../src/content/placeholders';
 import { nap } from '../src/lib/nap';
 import { offers } from '../src/lib/offers';
 
@@ -115,6 +119,23 @@ function checkNotPlaceholder(node: Node, where: string): string[] {
   return [];
 }
 
+const PRICE_FIELDS = ['price', 'lowPrice', 'highPrice', 'minPrice', 'maxPrice'];
+
+/** The sample from-price amount must not be in any price field of any node (issue #35). */
+function checkNotPlaceholderAmount(node: Node, where: string): string[] {
+  for (const field of PRICE_FIELDS) {
+    const value = node[field];
+    if (
+      (typeof value === 'number' || typeof value === 'string') &&
+      value !== '' &&
+      Number(value) === cheapestRoomFromPrice.amount
+    ) {
+      return [`${where}: JSON-LD ${field} has the placeholder from-price amount`];
+    }
+  }
+  return [];
+}
+
 function checkOffer(node: Node, where: string): string[] {
   const errors: string[] = [];
   const price = node['price'];
@@ -202,6 +223,7 @@ export function checkHtml(html: string, file: string): string[] {
           hotelCount += 1;
           errors.push(...checkHotel(node, where));
         }
+        errors.push(...checkNotPlaceholderAmount(node, where));
         if (types.includes('Restaurant')) errors.push(...checkRestaurant(node, where));
         if (types.includes('HotelRoom')) errors.push(...checkHotelRoom(node, where));
         if (types.includes('FAQPage')) errors.push(...checkFaqPage(node, where));
