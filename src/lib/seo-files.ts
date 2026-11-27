@@ -29,7 +29,6 @@ export function buildRobotsTxt(preview: boolean = isPreview): string {
 
 export function buildLlmsTxt(): string {
   const sylwester = offers.find((o) => o.id === 'sylwester-2026');
-  const routeTitles = new Map(routes.map((route) => [route.path, route.title]));
 
   const lines: string[] = [
     `# ${nap.name}`,
@@ -49,7 +48,7 @@ export function buildLlmsTxt(): string {
     '## Główne strony',
     '',
     ...LLMS_MAIN_PATHS.map((path) => {
-      const title = routeTitles.get(path) ?? path;
+      const title = routes.find((route) => route.path === path)?.title ?? path;
       return `- ${title}: ${nap.siteUrl}${path}`;
     }),
     '',

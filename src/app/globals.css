@@ -2474,6 +2474,11 @@ a:hover > .arr,
   margin: var(--space-3) 0;
 }
 
+.home-offers__from {
+  margin-top: var(--space-6);
+  min-height: 2.75rem;
+}
+
 .sylwester-dj {
   margin: var(--space-5) 0 0;
   max-width: 28rem;

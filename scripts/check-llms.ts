@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { nap } from '../src/lib/nap';
 
 /** Returns error messages. An empty array means the file is valid. */
@@ -37,4 +38,6 @@ function main(): void {
   console.log(`check-llms: OK (${filePath})`);
 }
 
-if (process.argv[1]?.includes('check-llms')) main();
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main();
+}

@@ -85,7 +85,16 @@ describe('home page', () => {
     const hrefs = linkHrefs();
     expect(hrefs).toContain('/rezerwacja/');
     expect(hrefs).toContain(`tel:${nap.phoneE164}`);
-    for (const path of ['/pokoje/', '/spa/', '/restauracja/', '/atrakcje/', '/faq/']) {
+    for (const path of [
+      '/pakiety/',
+      '/ceny/',
+      sylwester.path,
+      '/pokoje/',
+      '/spa/',
+      '/restauracja/',
+      '/atrakcje/',
+      '/faq/',
+    ]) {
       expect(hrefs).toContain(path);
     }
     expect(html).toMatch(/<a [^>]*href="\/rezerwacja\/?"[^>]*>Rezerwuj<\/a>/);
@@ -136,11 +145,10 @@ describe('home page', () => {
     expect(metadata.alternates?.canonical).toBe('/');
   });
 
-  it('shows the offers strip: Sylwester first at 740 zł, then the sample package with a badge', () => {
-    const strip = html.slice(
-      html.indexOf('id="home-offers-title"'),
-      html.indexOf('class="marquee"'),
-    );
+  it('shows the offers strip after the hero: Sylwester first, sample package, then from-price with /ceny/', () => {
+    const heroEnd = html.indexOf('class="marquee"');
+    const strip = html.slice(html.indexOf('id="home-offers-title"'), heroEnd);
+    expect(html.indexOf('home-offers')).toBeLessThan(heroEnd);
     const cards = [...strip.matchAll(/<article class="home-offer[\s\S]*?<\/article>/g)].map(
       (m) => m[0],
     );
@@ -153,6 +161,14 @@ describe('home page', () => {
     expect(cards[1]).toContain(PLACEHOLDER_BADGE);
     expect(strip).not.toContain('599');
     expect(strip).not.toMatch(/Kobiecy|719/i);
+    expect(strip).toMatch(/href="\/pakiety\/?"/);
+    expect(strip).toMatch(/href="\/ceny\/?"/);
+    const fromBlocks = [...strip.matchAll(/<p class="from-price[^"]*"[\s\S]*?<\/p>/g)].map(
+      (m) => m[0],
+    );
+    expect(fromBlocks).toHaveLength(1);
+    expect(fromBlocks[0]).toContain(`${cheapestRoomFromPrice.amount} zł`);
+    expect(fromBlocks[0]).toContain(PLACEHOLDER_BADGE);
   });
 
   it('shows the sample from-price once, with the badge "Dane testowe", and no Offer JSON-LD', () => {
@@ -160,6 +176,8 @@ describe('home page', () => {
     expect(blocks).toHaveLength(1);
     expect(blocks[0]).toContain(`${cheapestRoomFromPrice.amount} zł`);
     expect(blocks[0]).toContain(PLACEHOLDER_BADGE);
+    const roomsBlock = html.slice(html.indexOf('id="rooms-title"'), html.indexOf('id="day-title"'));
+    expect(roomsBlock).not.toMatch(/class="from-price/);
     const ld = [...html.matchAll(/<script[^>]*ld\+json[^>]*>([\s\S]*?)<\/script>/g)].map(
       (m) => m[1],
     );

@@ -20,7 +20,16 @@ test('home page shows the h1, the hero CTA and the phone link', async ({ page })
 test('home page links to the teaser targets', async ({ page }) => {
   await page.goto('/');
   const main = page.locator('main');
-  for (const href of ['/pokoje/', '/spa/', '/restauracja/', '/atrakcje/', '/faq/']) {
+  for (const href of [
+    '/pakiety/',
+    '/ceny/',
+    '/pakiety/sylwester-2026-2027/',
+    '/pokoje/',
+    '/spa/',
+    '/restauracja/',
+    '/atrakcje/',
+    '/faq/',
+  ]) {
     await expect(main.locator(`a[href="${href}"]`)).toHaveCount(1);
   }
 });
