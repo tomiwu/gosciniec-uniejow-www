@@ -15,11 +15,11 @@ describe('image manifest', () => {
     expect(new Set(slugs).size).toBe(slugs.length);
   });
 
-  it('lists only widths from 480, 960 and 1600, in ascending order', () => {
+  it('lists widths in ascending order and never above the intrinsic width', () => {
     for (const image of images) {
       expect(image.widths.length).toBeGreaterThan(0);
       expect([...image.widths].sort((a, b) => a - b)).toEqual([...image.widths]);
-      // No upscale: the largest width is the intrinsic width.
+      // No upscale: the largest listed width is the intrinsic width of the entry.
       expect(image.widths.at(-1)).toBe(image.width);
     }
   });
