@@ -17,3 +17,8 @@ next-env.d.ts
 .sandcastle/worktrees/
 .sandcastle/context/
 .sandcastle/node_modules/
+
+# Visual review output (issue #26)
+/visual/
+# node_modules can be a symlink in a git worktree
+/node_modules

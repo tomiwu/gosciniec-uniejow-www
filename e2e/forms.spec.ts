@@ -26,7 +26,8 @@ test.describe('/rezerwacja/', () => {
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(
       'Rezerwacja – zapytanie o pobyt',
     );
-    await expect(page.getByRole('link', { name: /Zadzwoń/ })).toHaveAttribute(
+    // The mobile action bar in the header has its own "Zadzwoń" link. Check the page link.
+    await expect(page.locator('main').getByRole('link', { name: /Zadzwoń/ })).toHaveAttribute(
       'href',
       'tel:+48632888628',
     );

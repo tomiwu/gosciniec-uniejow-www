@@ -10,6 +10,10 @@ export default defineConfig({
   reporter: process.env['CI'] ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: {
     baseURL: `http://localhost:${port}`,
+    // Scroll-driven reveal animations leave text half transparent while it enters the
+    // viewport. That is not a real contrast problem, but axe reports it. Tests check the
+    // final state. e2e/motion.spec.ts checks the motion path on its own.
+    reducedMotion: 'reduce',
   },
   webServer: {
     command: `npx serve out -l ${port} -c ../serve.json`,

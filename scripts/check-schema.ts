@@ -2,6 +2,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { nap } from '../src/lib/nap';
+import { offers } from '../src/lib/offers';
 
 type Json = unknown;
 type Node = Record<string, Json>;
@@ -111,6 +112,9 @@ function checkOffer(node: Node, where: string): string[] {
     const numeric = Number(price);
     if (!Number.isFinite(numeric) || numeric <= 0) {
       errors.push(`${where}: Offer price must be a number greater than 0`);
+    } else if (!offers.some((offer) => offer.price === numeric)) {
+      // An Offer may only carry a real price: one that is in offers.ts (PRD D3).
+      errors.push(`${where}: Offer price ${String(price)} is not in offers.ts`);
     }
   } else {
     errors.push(`${where}: Offer needs a price`);
@@ -123,6 +127,7 @@ function checkOffer(node: Node, where: string): string[] {
 const REQUIRED_TYPES: Record<string, string[]> = {
   'faq/index.html': ['FAQPage'],
   'restauracja/index.html': ['Restaurant'],
+  'pakiety/index.html': ['Offer'],
 };
 
 export function requiredTypesFor(file: string): string[] {

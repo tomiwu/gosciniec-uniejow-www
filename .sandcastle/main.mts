@@ -35,8 +35,8 @@
 
 import * as sandcastle from "@ai-hero/sandcastle";
 import { podman } from "@ai-hero/sandcastle/sandboxes/podman";
-import { execFileSync, spawnSync } from "node:child_process";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { execFileSync, spawn, spawnSync } from "node:child_process";
+import { copyFileSync, mkdirSync, openSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import {
   CLAUDE_LIMIT,
@@ -493,6 +493,33 @@ function openSandcastleCount(): number {
   ).length;
 }
 
+// ---------------------------------------------------------------------------
+// UX review (issue #26, 2026-11-27). When a PR is green, scripts/ux-review.sh runs in the
+// background: it reads the visual-review artifact and the Lighthouse reports, asks a reviewer
+// agent, and posts one PR comment. It is a report, not a gate, and it never stops the loop.
+// The script skips a commit that already has a review. UX_REVIEW=0 turns it off.
+// ---------------------------------------------------------------------------
+function startUxReview(url: string): void {
+  if (process.env.UX_REVIEW === "0") return;
+  try {
+    mkdirSync(".sandcastle/logs", { recursive: true });
+    const pr = url.split("/").pop() ?? "pr";
+    // Run a copy: the loop checks out other commits in this work tree while the review runs.
+    const copy = `/tmp/gosciniec-ux-review-${pr}.sh`;
+    copyFileSync("scripts/ux-review.sh", copy);
+    const out = openSync(`.sandcastle/logs/ux-review-${pr}.log`, "a");
+    const child = spawn("bash", [copy, url], {
+      detached: true,
+      stdio: ["ignore", out, out],
+      env: { ...process.env, UX_REVIEW_ROOT: process.cwd() },
+    });
+    child.unref();
+    console.log(`UX review started for ${url}.`);
+  } catch (e) {
+    console.log(`UX review not started: ${`${e}`.slice(0, 200)}`);
+  }
+}
+
 function markWaiting(url: string, issueNumber: number, comment: boolean): void {
   spawnSync("gh", ["pr", "edit", url, "--add-label", "needs-validation"], {
     stdio: "inherit",
@@ -506,6 +533,7 @@ function markWaiting(url: string, issueNumber: number, comment: boolean): void {
       "Sandcastle finished the local checks and all CI checks are green. The loop does not merge. Tomasz must give his OK before the merge.",
     ]);
   console.log(`PR ${url} for #${issueNumber} waits for Tomasz.`);
+  startUxReview(url);
 }
 
 // waiting: PR is green and waits for Tomasz. failed: the loop cannot finish it.
