@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { rooms } from '../src/lib/rooms';
 import { buildHotelRoomsSchema, buildHotelSchema } from '../src/lib/schema/hotel';
-import { checkHtml, extractJsonLd } from './check-schema';
+import { checkHtml, extractJsonLd, requiredTypesFor } from './check-schema';
 
 const page = (...blocks: unknown[]): string =>
   `<html><head>${blocks
@@ -124,6 +124,28 @@ describe('checkHtml', () => {
       const nested = { ...hotel, makesOffer: offer({ price: 0, priceCurrency: 'PLN' }) };
       expect(checkHtml(page(nested), 'a.html').join('\n')).toContain('greater than 0');
     });
+  });
+});
+
+describe('required types per page', () => {
+  const q = [{ '@type': 'Question', name: 'Q?', acceptedAnswer: { '@type': 'Answer', text: 'A' } }];
+
+  it('requires FAQPage on /faq/', () => {
+    expect(requiredTypesFor('faq/index.html')).toEqual(['FAQPage']);
+    expect(requiredTypesFor('pokoje/index.html')).toEqual([]);
+  });
+
+  it('fails on /faq/ without a FAQPage block', () => {
+    const errors = checkHtml(page(hotel), 'faq/index.html');
+    expect(errors.join('\n')).toContain('no FAQPage JSON-LD found');
+  });
+
+  it('passes on /faq/ with a FAQPage block', () => {
+    expect(checkHtml(page(hotel, faq(q)), 'faq/index.html')).toEqual([]);
+  });
+
+  it('does not require FAQPage on other pages', () => {
+    expect(checkHtml(page(hotel), 'index.html')).toEqual([]);
   });
 });
 

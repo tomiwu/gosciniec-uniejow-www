@@ -96,10 +96,20 @@ function checkOffer(node: Node, where: string): string[] {
   return errors;
 }
 
+/** Pages that must carry a given JSON-LD type. Key: HTML path in the export folder. */
+const REQUIRED_TYPES: Record<string, string[]> = {
+  'faq/index.html': ['FAQPage'],
+};
+
+export function requiredTypesFor(file: string): string[] {
+  return REQUIRED_TYPES[file.replaceAll('\\', '/')] ?? [];
+}
+
 /** Check one HTML document. Returns error messages. */
 export function checkHtml(html: string, file: string): string[] {
   const errors: string[] = [];
   const blocks = extractJsonLd(html);
+  const seen = new Set<string>();
   let hotelCount = 0;
 
   blocks.forEach((raw, index) => {
@@ -120,6 +130,7 @@ export function checkHtml(html: string, file: string): string[] {
       if (root['@context'] === undefined) errors.push(`${where}: missing @context`);
       walk(root, (node) => {
         const types = typesOf(node);
+        for (const type of types) seen.add(type);
         if (node === root && types.length === 0 && !Array.isArray(root['@graph'])) {
           errors.push(`${where}: missing @type`);
         }
@@ -135,6 +146,9 @@ export function checkHtml(html: string, file: string): string[] {
   });
 
   if (hotelCount === 0) errors.push(`${file}: no Hotel JSON-LD found`);
+  for (const type of requiredTypesFor(file)) {
+    if (!seen.has(type)) errors.push(`${file}: no ${type} JSON-LD found`);
+  }
   return errors;
 }
 
