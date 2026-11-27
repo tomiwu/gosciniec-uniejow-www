@@ -76,6 +76,8 @@ type RunOptions = Omit<Parameters<sandcastle.Sandbox["run"]>[0], "agent">;
 
 const STALL =
   /usage limit|rate limit|limit reached|hit your (?:[\w-]+ )?limit|quota|credit balance|overloaded|not logged in|authentication required/i;
+const CONTAINER_BROKEN =
+  /crun: error|OCI runtime|no such container|container .* is not running|ExecError: Command failed \(exit 127\)/i;
 const MODELS = [
   CLAUDE_MODEL,
   ...(CLAUDE_FALLBACK_MODEL && CLAUDE_FALLBACK_MODEL !== CLAUDE_MODEL
@@ -174,6 +176,9 @@ async function runPhase(
       if (result.commits.length || !STALL.test(logTail(name))) return result;
       failure = `stall text in the agent log: ${logTail(name).slice(-300)}`;
     } catch (error) {
+      // A broken container runtime is not a Claude limit. Do not pause and retry in the same
+      // sandbox: crash, so that loop_crashed is sent and a restart creates a new sandbox.
+      if (CONTAINER_BROKEN.test(`${error}`)) throw error;
       failure = `${error} ${logTail(name).slice(-600)}`;
       if (!STALL.test(failure)) throw error;
     } finally {
