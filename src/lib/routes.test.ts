@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { routePaths, routes } from './routes';
 
 describe('routes', () => {
-  it('lists the 16 phase 1 routes', () => {
-    expect(routes).toHaveLength(16);
+  it('lists the 17 routes', () => {
+    expect(routes).toHaveLength(17);
   });
 
   it('uses unique paths with leading and trailing slash', () => {
@@ -23,6 +23,16 @@ describe('routes', () => {
   it('includes the booking and contact pages', () => {
     expect(routePaths).toContain('/rezerwacja/');
     expect(routePaths).toContain('/kontakt/');
+  });
+});
+
+describe('routes: Sylwester offer', () => {
+  it('has the offer URL, so the sitemap lists it', () => {
+    expect(routePaths).toContain('/pakiety/sylwester-2026-2027/');
+  });
+
+  it('has no URL for the archived 719 zł package', () => {
+    expect(routePaths.some((path) => /kobiec|weekend/.test(path))).toBe(false);
   });
 });
 

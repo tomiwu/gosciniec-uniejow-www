@@ -2,8 +2,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { extractJsonLd } from '../../../scripts/check-schema';
 import { PLACEHOLDER_BADGE, placeholderPackages } from '@/content/placeholders';
-import { nap } from '@/lib/nap';
-import { offers } from '@/lib/offers';
+import { sylwester } from '@/lib/venue';
 import Page, { metadata } from './page';
 
 const html = renderToStaticMarkup(<Page />);
@@ -54,17 +53,16 @@ describe('/pakiety/ hub', () => {
     expect(card).toContain('740 zł');
     expect(card).toMatch(/za parę/);
     expect(card).toMatch(/nocleg i menu[^.]*na zapytanie/i);
-    expect(body).toContain('odnowiona sala balowa');
-    expect(body).toContain('DJ Letsky');
-    expect(body).toContain('A2');
-    expect(body).toContain('S8');
+    expect(card).toContain('odnowiona sala balowa');
+    expect(card).toContain('DJ Letsky');
   });
 
-  it('does not show the Black Friday price or the 1 January Termy visit as included', () => {
+  it('links the Sylwester card to its own page', () => {
+    expect(cards()[0]).toContain(`href="${sylwester.path.slice(0, -1)}"`);
+  });
+
+  it('does not show the Black Friday price', () => {
     expect(body).not.toContain('599');
-    const termy = body.match(/<p>1 stycznia[\s\S]*?<\/p>/)?.[0] ?? '';
-    expect(termy).toMatch(/Term(y|ach) Uniejów/);
-    expect(termy).toMatch(/nie jest w cenie/);
   });
 
   it('does not show the archived package "Kobiecy Chill & Fun" or 719 zł', () => {
@@ -85,30 +83,14 @@ describe('/pakiety/ hub', () => {
     for (const record of placeholderPackages) expect(ld).not.toContain(record.name);
   });
 
-  it('has one Offer: Sylwester, 740 PLN, with the Hotel as offeredBy', () => {
-    const nodes = jsonLdNodes('Offer');
-    expect(nodes).toHaveLength(1);
-    expect(nodes[0]).toMatchObject({ price: 740, priceCurrency: 'PLN' });
-    expect((nodes[0]!['offeredBy'] as { name: string }).name).toBe(nap.name);
-    expect(nodes[0]!['name']).toContain('Sylwester');
+  it('leaves the Offer JSON-LD to the offer page', () => {
+    expect(jsonLdNodes('Offer')).toHaveLength(0);
   });
 
-  it('only emits an Offer price that is in offers.ts', () => {
-    const real = new Set(offers.map((o) => o.price).filter((p): p is number => p !== null));
-    for (const node of jsonLdNodes('Offer')) expect(real.has(node['price'] as number)).toBe(true);
-  });
-
-  it('shows the official NAP and no promo phone number or person name', () => {
-    expect(html).toContain(`href="tel:${nap.phoneE164}"`);
-    expect(html).toContain(`mailto:${nap.email}`);
+  it('shows no promo phone number', () => {
     expect(html).not.toMatch(/63\s?28\s?88\s?410/);
     expect(html).not.toMatch(/602\s?260\s?965/);
     expect(html).not.toMatch(/789\s?017\s?995/);
-  });
-
-  it('does not use the DJ photo', () => {
-    expect(html).not.toMatch(/letsky[^"'\s]*\.(jpg|png|webp|avif)/i);
-    expect(html).not.toContain('<img');
   });
 
   it('links to the related pages', () => {

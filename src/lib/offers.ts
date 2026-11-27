@@ -27,6 +27,6 @@ export const offers: readonly OfferItem[] = [
     // The 599 zł Black Friday price ends on 2026-11-29 23:59 (Europe/Warsaw). The site never shows it.
     price: 740,
     priceCurrency: 'PLN',
-    path: '/pakiety/',
+    path: '/pakiety/sylwester-2026-2027/',
   },
 ];

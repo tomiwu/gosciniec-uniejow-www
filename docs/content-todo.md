@@ -11,9 +11,9 @@ Sample figures live only in `src/content/placeholders.ts`. Each record has `isPl
 - TODO (owner): capacity of the conference rooms and of the ballroom. The old site says "do 400 osób" and the wedding text says "300 osób". No page states a figure. Sample values: `sampleCapacity` in `placeholders.ts`.
 - TODO (owner): area in m², ceiling height, seat counts per layout, prices of room hire and catering. The old site has none. The pages give none.
 - TODO (owner): confirm the qualitative description of the ballroom. `/workspace/plakat/sala/opis-sali.md` (foyer, parquet, window wing) was not available to the worker. The pages say only "odnowiona sala balowa".
-- TODO (#34): the Sylwester offer page `/pakiety/sylwester-2026-2027/` does not exist yet. Both pages link to it. The URL is in `src/lib/venue.ts`. Change it there if #34 uses another URL.
-- TODO (owner): the amount for the Sylwester ball. The pages show no amount. The promo price 599 zł ended on 2026-11-29. Do not show it later without the owner.
-- TODO (owner): consent of the DJ for a public photo. The pages show the name "DJ Letsky" in text only.
+- Done (#34): the Sylwester offer page `/pakiety/sylwester-2026-2027/` exists. Both pages link to it. The URL is in `src/lib/venue.ts`.
+- The pages show no amount. The offer page shows 740 zł per couple (see "Prices and packages").
+- The DJ gave consent for a public photo (owner decision of 2026-11-27, issue #34). See "Prices and packages" for the missing file.
 - Removed on purpose: the MojeKonferencje badge, the sales contact name, the 719 zł package and the promo phone numbers.
 
 ## Photos
@@ -60,9 +60,10 @@ Source conflict (no visible TODO, the FAQ avoids the number; see also the sectio
 - Owner decision (2026-11-27): there is no current package. The package "Kobiecy Chill & Fun" (719 zł) and the Christmas offer are NOT current. The old text stays only in `docs/source/pakiet-kobiecy-weekend.md` (archived).
 - TODO: Sample package. `/pakiety/` shows one sample package from `src/content/placeholders.ts` with the badge "Dane testowe". Replace it with real packages from the owner. Then remove the placeholder record. `npm run build:production` fails while a page uses placeholder data.
 - TODO: Sylwester 2026/2027 (`/pakiety/`). The page shows 740 zł per couple for the ball, the amount found in the promo text ("bal za 599 zł od pary zamiast 740 zł"). Ask the owner: is 740 zł the ongoing public price? If not, remove the amount from `src/lib/offers.ts` (no `Offer` then). The 599 zł Black Friday price ends on 2026-11-29 23:59 (Europe/Warsaw). The site never shows it.
+- Owner decision (2026-11-27 13:06): from 2026-11-29 23:59 the ball price is 740 zł per couple. The 599 zł Black Friday price is valid until 2026-11-29 only. The site never shows 599 zł, because a static page cannot hide it after the date. If the owner wants the promo on the page, add it with a client component that checks the date.
 - TODO: Sylwester menu, overnight rate and what the ball price includes. The page says "na zapytanie". Do not invent them.
-- TODO: Owner consent to publish the DJ photo (Letsky). The page has the name in text only.
-- TODO: The page `/pakiety/` links to an in-page section for the ball. Issue #34 adds one URL for each offer. Then change the primary link of the card.
+- TODO: DJ photo (Letsky). The owner consented on 2026-11-27 (issue #34). The poster layer V06.1-DJ-B (`/workspace/fb/nye-clean/warstwy/sylwetki/`) was not available to the worker. Add an optimized image (width and height, alt text, not the LCP element) to `/pakiety/sylwester-2026-2027/` after the file is in `public/img/`.
+- Done (#34): Sylwester has its own URL `/pakiety/sylwester-2026-2027/` with the `Offer` JSON-LD (740 PLN). The hub `/pakiety/` links to it and has no `Offer` block. The sample package has no own URL. The 719 zł package has no URL.
 - TODO: The old package page had a second phone number (789 017 995) and a "*" after the price. Not used on the new site.
 
 ## Attractions (`/atrakcje/`)

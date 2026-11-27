@@ -39,6 +39,13 @@ export const routes: readonly Route[] = [
       'Oferty hotelu Gościniec Uniejów: bal sylwestrowy 31.12.2026 w odnowionej sali balowej i pakiety pobytowe. Zobacz opisy ofert i zapytaj o termin.',
   },
   {
+    path: '/pakiety/sylwester-2026-2027/',
+    title: 'Bal Sylwestrowy – Sylwester 2026/2027',
+    metaTitle: 'Sylwester 2026/2027 w Uniejowie – bal',
+    description:
+      'Bal Sylwestrowy 31.12.2026 w odnowionej sali balowej hotelu Gościniec Uniejów. Bal 740 zł za parę, muzyka DJ Letsky. Nocleg i menu na zapytanie.',
+  },
+  {
     path: '/spa/',
     title: 'SPA i wellness',
     metaTitle: 'Hotel SPA w Uniejowie – strefa wellness',
