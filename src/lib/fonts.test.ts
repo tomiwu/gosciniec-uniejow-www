@@ -14,8 +14,8 @@ describe('fonts', () => {
     expect(fontFaceCss('/repo')).toContain('url(/repo/fonts/monasans-plx.woff2)');
   });
 
-  it('never blocks the text and preloads only the Latin files', () => {
+  it('never blocks the text and preloads the Latin and the Polish files', () => {
     expect(fontFaceCss().match(/font-display:optional/g)).toHaveLength(4);
-    expect(preloadFonts).toEqual(['fraunces-pl', 'monasans-pl']);
+    expect(preloadFonts).toEqual(['fraunces-pl', 'fraunces-plx', 'monasans-pl', 'monasans-plx']);
   });
 });

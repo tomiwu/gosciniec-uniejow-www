@@ -21,8 +21,12 @@ export function fontUrl(file: string, base?: string): string {
   return withBase(`/fonts/${file}.woff2`, base);
 }
 
-/** Files to preload: the Latin files are on every page. */
-export const preloadFonts = ['fraunces-pl', 'monasans-pl'] as const;
+/**
+ * Preload all four files. Polish text needs the `-plx` files on every page. Without a preload
+ * `font-display: optional` can use the fallback font for ą, ę, ś... and the main font for the
+ * other letters in the same word. The `-plx` files are small (about 4 kB each).
+ */
+export const preloadFonts = faces.map((face) => face.file);
 
 export function fontFaceCss(base?: string): string {
   return faces
