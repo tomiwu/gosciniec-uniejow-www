@@ -93,3 +93,9 @@ Source conflict (no visible TODO, the FAQ avoids the number; see also the sectio
 - TODO: Family rules. The old site has no word about cots, high chairs, discounts for children or age limits. The page shows a visible `TODO` marker and gives no number.
 - TODO: Playground facts (age range, opening, supervision) and the dates of the "ekologiczne warsztaty". The old site gives none.
 - The warm-water tub ("balia") is a summer attraction in the old text. It has no photo on the old family page. The page shows no photo of it.
+
+## Contact page (`/kontakt/`, issue #37)
+
+- TODO: Parking. Is it on site, free or paid, how many spaces? `/kontakt/` shows a visible `TODO` marker. No placeholder block, no schema. Write the facts in `src/app/kontakt/page.tsx` after the owner confirms.
+- TODO: Reception, check-in and check-out hours. Same marker. Add them to `src/lib/faq.ts` too.
+- Owner decisions (2026-11-27): no person name, no promo phones (63 28 88 410, 602 260 965), no MojeKonferencje badge. `sprzedaz@gosciniecuniejow.pl` is allowed as a sales address.

@@ -1,7 +1,9 @@
+import Link from 'next/link';
 import { RequestForm } from '@/components/form/RequestForm';
 import { NapBlock } from '@/components/NapBlock';
 import { routeMetadata } from '@/lib/metadata';
 import { nap } from '@/lib/nap';
+import { salesEmail } from '@/lib/venue';
 
 const path = '/kontakt/';
 
@@ -23,6 +25,15 @@ export default function Page() {
             Zadzwoń: {nap.phoneDisplay}
           </a>
         </p>
+        <p>
+          Zapytania o wydarzenia, konferencje i przyjęcia:{' '}
+          <a href={`mailto:${salesEmail}`}>{salesEmail}</a>
+        </p>
+        <p>
+          Chcesz zapytać o pobyt? <Link href="/rezerwacja/">Przejdź do rezerwacji</Link>. Zobacz też{' '}
+          <Link href="/pakiety/">pakiety</Link>, <Link href="/konferencje/">konferencje</Link> i{' '}
+          <Link href="/przyjecia/">przyjęcia</Link>.
+        </p>
       </section>
 
       <section aria-labelledby="dojazd">
@@ -33,6 +44,24 @@ export default function Page() {
         </p>
         <p>
           <a href={mapsUrl}>Otwórz w Mapach Google</a>
+        </p>
+      </section>
+
+      <section aria-labelledby="parking-i-recepcja">
+        <h2 id="parking-i-recepcja">Parking i godziny recepcji</h2>
+        <p>
+          <span className="todo">
+            TODO: parking (miejsca, opłaty, lokalizacja) – dane od właściciela
+          </span>
+        </p>
+        <p>
+          <span className="todo">
+            TODO: godziny recepcji oraz zameldowania i wymeldowania – dane od właściciela
+          </span>
+        </p>
+        <p>
+          Do czasu potwierdzenia tych informacji zadzwoń do recepcji:{' '}
+          <a href={`tel:${nap.phoneE164}`}>{nap.phoneDisplay}</a>.
         </p>
       </section>
 
