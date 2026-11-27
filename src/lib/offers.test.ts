@@ -7,14 +7,19 @@ describe('offers list', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('has the one real price of the old site: 719 PLN for the package', () => {
-    const pkg = offers.find((o) => o.id === 'kobiecy-chill-fun');
-    expect(pkg?.price).toBe(719);
-    expect(pkg?.priceCurrency).toBe('PLN');
+  it('has the Sylwester 2026/2027 ball at 740 PLN, the amount from the promo text', () => {
+    const sylwester = offers.find((o) => o.id === 'sylwester-2026');
+    expect(sylwester?.price).toBe(740);
+    expect(sylwester?.priceCurrency).toBe('PLN');
   });
 
-  it('has a null price for the Christmas offer', () => {
-    expect(offers.find((o) => o.id === 'swieta')?.price).toBeNull();
+  it('does not list the archived package "Kobiecy Chill & Fun" or its 719 PLN price', () => {
+    expect(offers.some((o) => /Kobiecy/i.test(o.name))).toBe(false);
+    expect(offers.some((o) => o.price === 719)).toBe(false);
+  });
+
+  it('does not list the Black Friday price', () => {
+    expect(offers.some((o) => o.price === 599)).toBe(false);
   });
 
   it('has only null or positive prices', () => {

@@ -24,9 +24,9 @@ export const faq: readonly FaqItem[] = [
   {
     id: 'sniadanie',
     question: 'Czy w cenie jest śniadanie?',
-    answer: `Śniadania w formie bufetu są częścią pakietu „Kobiecy Chill & Fun”. Nie mamy potwierdzonej informacji, czy śniadanie jest w cenie zwykłego noclegu. ${reception}.`,
+    answer: `Nie mamy potwierdzonej informacji, czy śniadanie jest w cenie noclegu. ${reception}.`,
     todo: true,
-    link: { href: '/pakiety/', label: 'Zobacz pakiety' },
+    link: { href: '/pakiety/', label: 'Zobacz pakiety i oferty' },
   },
   {
     id: 'zameldowanie',

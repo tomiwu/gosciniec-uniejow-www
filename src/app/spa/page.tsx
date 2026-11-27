@@ -88,8 +88,7 @@ export default function Page() {
         </p>
         <p>
           Zobacz <Link href="/pokoje/">pokoje hotelu</Link> albo{' '}
-          <Link href="/pakiety/">pakiety pobytowe</Link>. Strefa wellness jest też częścią pakietu
-          „Kobiecy Chill &amp; Fun”.
+          <Link href="/pakiety/">pakiety i oferty</Link>.
         </p>
       </section>
 
