@@ -4,8 +4,7 @@
  * with the same cases (`fixtures.ts`). Change both files together.
  */
 
-export const FORM_KINDS = ['kontakt', 'rezerwacja'] as const;
-export type FormKind = (typeof FORM_KINDS)[number];
+export type FormKind = 'kontakt' | 'rezerwacja';
 
 /** Maximum lengths in characters (code points). */
 export const LIMITS = {

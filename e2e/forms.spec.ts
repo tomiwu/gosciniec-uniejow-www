@@ -51,12 +51,23 @@ test.describe('/rezerwacja/', () => {
     );
   });
 
-  test('works as a normal POST without JavaScript', async ({ page }) => {
+  test('works as a normal POST without JavaScript', async ({ browser }) => {
+    const context = await browser.newContext({ javaScriptEnabled: false });
+    const page = await context.newPage();
+    let posted: URLSearchParams | undefined;
+    await page.route(ENDPOINT, async (route) => {
+      posted = new URLSearchParams(route.request().postData() ?? '');
+      await route.fulfill({ status: 303, headers: { Location: '/rezerwacja/dziekujemy/' } });
+    });
     await page.goto('/rezerwacja/');
-    const form = page.locator('form.request-form');
-    await expect(form).toHaveAttribute('method', 'post');
-    await expect(form).toHaveAttribute('action', '/api/contact.php');
-    await expect(form.locator('input[name="form"]')).toHaveValue('rezerwacja');
+    await page.getByLabel('Data przyjazdu').fill('2027-03-10');
+    await page.getByLabel('Data wyjazdu').fill('2027-03-12');
+    await fillGuest(page);
+    await page.getByRole('button', { name: 'Wyślij zapytanie' }).click();
+    await expect(page).toHaveURL(/\/rezerwacja\/dziekujemy\/$/);
+    expect(posted?.get('form')).toBe('rezerwacja');
+    expect(posted?.get('email')).toBe('jan.testowy@example.com');
+    await context.close();
   });
 
   test('shows errors next to the fields and moves focus to the first error', async ({ page }) => {
@@ -143,11 +154,9 @@ test.describe('/rezerwacja/', () => {
     await expect(trap).toHaveAttribute('autocomplete', 'off');
     await expect(trap.locator('xpath=ancestor::div[@aria-hidden="true"]')).toHaveCount(1);
     const box = await trap.boundingBox();
-    const viewport = page.viewportSize();
     expect(box).not.toBeNull();
     // Outside the screen: left of the viewport and not scrollable into view.
     expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(0);
-    expect(viewport).not.toBeNull();
     // Tab through the whole form: the honeypot never gets focus.
     await page.getByLabel('Data przyjazdu').focus();
     for (let i = 0; i < 20; i += 1) {
