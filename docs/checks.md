@@ -1,0 +1,18 @@
+# Checks: local loop, GitHub CI and deploy
+
+## GitHub CI (required)
+
+Branch protection requires 9 jobs: `format`, `lint`, `typecheck`, `test`, `build`, `redirects`, `schema`, `e2e-a11y`, `lighthouse` (PRD PS6). `build` runs `npm run build`. This is a non-production build: it may use sample data (`src/content/placeholders.ts`) when each page that shows it has the badge "Dane testowe". `lighthouse` runs Lighthouse CI on that export (`lighthouserc.json`: mobile preset, 3 runs, median LCP ≤ 2500 ms on `/` and `/pokoje/`).
+
+## Local loop checks (`.sandcastle/checks.json`)
+
+The Sandcastle loop runs these commands in its container before it opens a PR. They are the same commands as the GitHub jobs, so the loop does not fail on a check that CI passes.
+
+- `build` is `npm run build`, as in CI. It is not a production build (see below), so sample data does not stop the loop.
+- There is no local Lighthouse check. The local run used the same method as CI (`lighthouserc.json`: 3 runs, median), but the container is slower and noisier. On the same `main` commit it measured 3.0–3.2 s on `/` and about 2.5 s on `/pokoje/`, while CI measured about 0.9 s and 2.3–2.4 s. A second method cannot fix a hardware difference. The required GitHub `lighthouse` job is the gate: when it fails, the loop gets the CI log (`ci_failed`) and its fixer works on it.
+
+The loop reads `checks.json` one time, when the process starts (`CONFIG` in `.sandcastle/main.mts`). Each iteration checks out `origin/main`, but the commands stay the ones of the start. A change takes effect at the next loop start (`scripts/start-loop.sh`).
+
+## Deploy gate (production, webd.pl)
+
+Deploy only an export of `npm run build:production` (`PRODUCTION_BUILD=1`). `scripts/check-placeholders.ts` runs before and after `next build`. In a production build it fails when a source file uses `src/content/placeholders.ts` or when an exported page shows the badge "Dane testowe". Remove a placeholder only after the owner confirms the real value (issue #14).

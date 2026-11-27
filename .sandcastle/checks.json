@@ -8,8 +8,7 @@
     ["build", "npm run build"],
     ["redirects", "npm run test:redirects"],
     ["schema", "npm run test:schema"],
-    ["e2e-a11y", "npm run test:e2e"],
-    ["lighthouse", "npm run lighthouse"]
+    ["e2e-a11y", "npm run test:e2e"]
   ],
   "earlyHostCheck": ""
 }

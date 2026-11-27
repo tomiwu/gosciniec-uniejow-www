@@ -21,7 +21,8 @@
 - Follow `docs/design-system.md` (light theme A, dark theme B, tokens, building blocks, motion rules). New UI must pass axe in both themes.
 
 ## Commands (all must pass before a commit; run `scripts/precommit.sh`)
-- `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`, `npm run test:redirects`, `npm run test:schema`, `npm run test:e2e`, `npm run lighthouse`.
+- `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`, `npm run test:redirects`, `npm run test:schema`, `npm run test:e2e`.
+- Lighthouse: the GitHub `lighthouse` job is the gate. A local `npm run lighthouse` is slower and noisier than CI; use it only to compare two builds on the same machine (`docs/checks.md`).
 - Use the formatter (`npm run format`). Do not format by hand.
 
 ## Tests
