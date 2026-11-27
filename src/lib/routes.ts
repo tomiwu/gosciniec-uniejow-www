@@ -3,33 +3,124 @@ export type Route = {
   path: string;
   /** Polish page title. Also the `h1` text of the stub. */
   title: string;
-  /** Placeholder meta description (Polish). A later issue replaces it. */
+  /** Polish page part of the `<title>` tag. `metadata.ts` adds the site suffix. */
+  metaTitle: string;
+  /** Polish meta description. 140 to 160 characters. A unit test checks this. */
   description: string;
 };
 
-const placeholder = (topic: string): string =>
-  `Gościniec Uniejów: ${topic}. Treść strony w przygotowaniu.`;
-
 export const routes: readonly Route[] = [
-  { path: '/', title: 'Gościniec Uniejów', description: placeholder('hotel w Uniejowie') },
-  { path: '/pokoje/', title: 'Pokoje', description: placeholder('pokoje w Uniejowie') },
-  { path: '/ceny/', title: 'Ceny', description: placeholder('ceny noclegów w Uniejowie') },
-  { path: '/pakiety/', title: 'Pakiety', description: placeholder('pakiety pobytowe') },
-  { path: '/spa/', title: 'SPA i wellness', description: placeholder('strefa wellness') },
-  { path: '/restauracja/', title: 'Restauracja', description: placeholder('restauracja') },
-  { path: '/konferencje/', title: 'Konferencje', description: placeholder('sale konferencyjne') },
-  { path: '/przyjecia/', title: 'Przyjęcia', description: placeholder('wesela i przyjęcia') },
-  { path: '/dla-dzieci/', title: 'Dla dzieci', description: placeholder('oferta dla rodzin') },
-  { path: '/atrakcje/', title: 'Atrakcje', description: placeholder('atrakcje w okolicy') },
-  { path: '/faq/', title: 'Najczęstsze pytania', description: placeholder('najczęstsze pytania') },
-  { path: '/blog/', title: 'Blog', description: placeholder('blog') },
-  { path: '/kontakt/', title: 'Kontakt', description: placeholder('dane kontaktowe') },
-  { path: '/rezerwacja/', title: 'Rezerwacja', description: placeholder('rezerwacja pobytu') },
-  { path: '/regulamin/', title: 'Regulamin', description: placeholder('regulamin') },
+  {
+    path: '/',
+    title: 'Gościniec Uniejów',
+    metaTitle: 'Hotel Uniejów – noclegi i SPA',
+    description:
+      'Gościniec Uniejów to hotel w Uniejowie z pokojami, strefą SPA i restauracją. Sprawdź noclegi w Uniejowie, zaplanuj pobyt i zarezerwuj pokój przez telefon.',
+  },
+  {
+    path: '/pokoje/',
+    title: 'Pokoje',
+    metaTitle: 'Pokoje w Uniejowie',
+    description:
+      'Pokoje w hotelu Gościniec Uniejów: standard, superior, deluxe 3* i apartament rodzinny. Poznaj wyposażenie i wybierz pokój rodzinny lub apartament w Uniejowie.',
+  },
+  {
+    path: '/ceny/',
+    title: 'Ceny',
+    metaTitle: 'Ceny noclegów w Uniejowie',
+    description:
+      'Ceny noclegów w hotelu Gościniec Uniejów. Sprawdź, jak poznać cenę pokoju w Uniejowie, zapytaj recepcję o ofertę i zobacz ceny pakietów pobytowych.',
+  },
+  {
+    path: '/pakiety/',
+    title: 'Pakiety',
+    metaTitle: 'Pakiety SPA i weekend w Uniejowie',
+    description:
+      'Pakiety pobytowe w hotelu Gościniec Uniejów: weekend SPA w Uniejowie z noclegiem i strefą wellness. Zobacz aktualne pakiety i zarezerwuj wybrany pobyt.',
+  },
+  {
+    path: '/spa/',
+    title: 'SPA i wellness',
+    metaTitle: 'Hotel SPA w Uniejowie – strefa wellness',
+    description:
+      'Strefa wellness w hotelu Gościniec Uniejów: jacuzzi, sauna fińska i siłownia. Kameralny relaks. Termy Uniejów to osobny kompleks, ok. 3 km od hotelu.',
+  },
+  {
+    path: '/restauracja/',
+    title: 'Restauracja',
+    metaTitle: 'Restauracja w Uniejowie',
+    description:
+      'Restauracja w hotelu Gościniec Uniejów: lokalne dania, domowe wypieki i sala z wyjściem do ogrodu. Zjedz obiad w Uniejowie lub zorganizuj przyjęcie rodzinne.',
+  },
+  {
+    path: '/konferencje/',
+    title: 'Konferencje',
+    metaTitle: 'Konferencje i szkolenia w Uniejowie',
+    description:
+      'Konferencje w Uniejowie: sale konferencyjne i szkoleniowe, noclegi, kuchnia i strefa wellness w jednym hotelu. Blisko autostrady A2, w centrum Polski.',
+  },
+  {
+    path: '/przyjecia/',
+    title: 'Przyjęcia',
+    metaTitle: 'Sala weselna i przyjęcia w Uniejowie',
+    description:
+      'Sala weselna w Uniejowie i przyjęcia okolicznościowe: wesela, chrzciny, jubileusze i spotkania firmowe w hotelu Gościniec Uniejów z ogrodem. Zapytaj o termin.',
+  },
+  {
+    path: '/dla-dzieci/',
+    title: 'Dla dzieci',
+    metaTitle: 'Uniejów z dziećmi',
+    description:
+      'Uniejów z dziećmi: hotel Gościniec Uniejów z placem zabaw w ogrodzie, spokojną okolicą i apartamentem rodzinnym. Sprawdź ofertę dla rodzin z dziećmi.',
+  },
+  {
+    path: '/atrakcje/',
+    title: 'Atrakcje',
+    metaTitle: 'Atrakcje w Uniejowie – zamek, termy, tężnia',
+    description:
+      'Atrakcje w Uniejowie i okolicy: zamek, Termy Uniejów, tężnia, bulwary nad Wartą i trasy rowerowe. Zobacz, co zwiedzić podczas pobytu w Gościńcu Uniejów.',
+  },
+  {
+    path: '/faq/',
+    title: 'Najczęstsze pytania',
+    metaTitle: 'FAQ – najczęstsze pytania o hotel',
+    description:
+      'Najczęstsze pytania o hotel Gościniec Uniejów w Uniejowie: śniadanie, parking, zameldowanie i kontakt z recepcją. Sprawdź odpowiedzi przed rezerwacją pobytu.',
+  },
+  {
+    path: '/blog/',
+    title: 'Blog',
+    metaTitle: 'Blog – Uniejów i okolice',
+    description:
+      'Blog hotelu Gościniec Uniejów: pomysły na weekend w Uniejowie, atrakcje okolicy i nowości z hotelu. Pierwsze artykuły pojawią się wkrótce na tej stronie.',
+  },
+  {
+    path: '/kontakt/',
+    title: 'Kontakt',
+    metaTitle: 'Kontakt – hotel w Uniejowie',
+    description:
+      'Kontakt z hotelem Gościniec Uniejów: telefon, e-mail i adres w Uniejowie. Zadzwoń lub napisz, a pomożemy zaplanować pobyt, konferencję albo przyjęcie.',
+  },
+  {
+    path: '/rezerwacja/',
+    title: 'Rezerwacja',
+    metaTitle: 'Rezerwacja hotelu w Uniejowie',
+    description:
+      'Rezerwacja hotelu w Uniejowie: wyślij zapytanie przez formularz lub zadzwoń do recepcji Gościńca Uniejów. Zapytaj o dostępność pokoi i warunki pobytu.',
+  },
+  {
+    path: '/regulamin/',
+    title: 'Regulamin',
+    metaTitle: 'Regulamin hotelu',
+    description:
+      'Regulamin hotelu Gościniec Uniejów: zasady rezerwacji, pobytu i korzystania z usług hotelu. Pełny tekst regulaminu pojawi się wkrótce na tej stronie.',
+  },
   {
     path: '/polityka-prywatnosci/',
     title: 'Polityka prywatności',
-    description: placeholder('polityka prywatności'),
+    metaTitle: 'Polityka prywatności',
+    description:
+      'Polityka prywatności hotelu Gościniec Uniejów: jak przetwarzamy dane osobowe z formularzy i plików cookie. Pełny tekst pojawi się wkrótce na tej stronie.',
   },
 ];
 
