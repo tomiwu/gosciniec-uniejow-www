@@ -5,6 +5,21 @@ import { nap } from '@/lib/nap';
 import { offerFaq } from '@/lib/offer-faq';
 import { salesEmail, sylwester } from '@/lib/venue';
 
+/** JSON-LD nodes of a given `@type` in the page markup. */
+export function jsonLdOfType(html: string, type: string): Record<string, unknown>[] {
+  const found: Record<string, unknown>[] = [];
+  const visit = (value: unknown): void => {
+    if (Array.isArray(value)) value.forEach(visit);
+    else if (typeof value === 'object' && value !== null) {
+      const node = value as Record<string, unknown>;
+      if (node['@type'] === type) found.push(node);
+      Object.values(node).forEach(visit);
+    }
+  };
+  for (const block of extractJsonLd(html)) visit(JSON.parse(block));
+  return found;
+}
+
 /** Shared checks for the venue pages. `html` is the static markup of the page. */
 export function jsonLdNodes(html: string): Record<string, unknown>[] {
   const found: Record<string, unknown>[] = [];

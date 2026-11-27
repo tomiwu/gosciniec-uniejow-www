@@ -16,11 +16,6 @@ export const metadata = routeMetadata(path);
 
 const offer = offers.find((item) => item.id === 'sylwester-2026');
 
-/**
- * Offer page of the New Year's Eve ball (issue #34).
- * Facts only: no menu, no inclusions, no overnight rate. The Offer JSON-LD has the visible amount.
- * The 599 zł Black Friday price is not shown. It ends on 2026-11-29 and a static page cannot hide it.
- */
 export default function Page() {
   if (!offer || offer.price === null || offer.path !== path) {
     throw new Error('offers.ts needs the Sylwester offer with a price and this path.');

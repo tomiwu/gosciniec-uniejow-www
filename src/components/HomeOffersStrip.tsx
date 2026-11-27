@@ -2,19 +2,14 @@ import Link from 'next/link';
 import { Picture } from '@/components/Picture';
 import { PlaceholderBadge } from '@/components/PlaceholderBadge';
 import { placeholderPackages } from '@/content/placeholders';
+import { cardPictureSizes } from '@/lib/picture-sizes';
 import { offers } from '@/lib/offers';
 import { sylwester } from '@/lib/venue';
 
-const offerSizes = '(min-width: 64rem) 370px, (min-width: 48rem) 44vw, 82vw';
-
-/**
- * Home offers strip (issue #43). The Sylwester ball is the first card when it has a real price.
- * A sample package may follow under the placeholder rule. No Offer JSON-LD here.
- */
 export function HomeOffersStrip() {
   const ball = offers.find((item) => item.id === 'sylwester-2026');
-  const sample = placeholderPackages[0];
-  if (!ball || ball.price === null || !sample) {
+  const [sample] = placeholderPackages;
+  if (!ball?.price || !sample) {
     throw new Error('Home offers strip needs the Sylwester offer and one placeholder package.');
   }
   return (
@@ -35,7 +30,7 @@ export function HomeOffersStrip() {
                 <Picture
                   slug="dsc0e8152"
                   alt="Odnowiona sala balowa hotelu z nakrytymi stołami – miejsce balu sylwestrowego"
-                  sizes={offerSizes}
+                  sizes={cardPictureSizes}
                 />
               </div>
               <div className="card__body">
