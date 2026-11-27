@@ -1,7 +1,9 @@
 import { nap } from './nap';
+import { isPreview } from './preview';
 import { routes } from './routes';
 
-export function buildRobotsTxt(): string {
+export function buildRobotsTxt(preview: boolean = isPreview): string {
+  if (preview) return ['User-agent: *', 'Disallow: /', ''].join('\n');
   return ['User-agent: *', 'Allow: /', '', `Sitemap: ${nap.siteUrl}/sitemap.xml`, ''].join('\n');
 }
 

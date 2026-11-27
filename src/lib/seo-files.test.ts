@@ -20,3 +20,9 @@ describe('buildSitemapXml', () => {
     }
   });
 });
+
+describe('buildRobotsTxt in the preview build', () => {
+  it('blocks all crawlers', () => {
+    expect(buildRobotsTxt(true)).toBe('User-agent: *\nDisallow: /\n');
+  });
+});

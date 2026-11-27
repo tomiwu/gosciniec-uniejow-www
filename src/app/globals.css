@@ -559,3 +559,13 @@ summary:focus-visible,
   height: 1px;
   overflow: hidden;
 }
+
+/* Preview build only (GitHub Pages) */
+.preview-banner {
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+  background: #7a1f00;
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+}
