@@ -4,12 +4,14 @@ import { nap } from '@/lib/nap';
 import { routeMetadata } from '@/lib/metadata';
 import { withBase } from '@/lib/preview';
 import { rooms } from '@/lib/rooms';
-import { amenities, dayStory, venue } from '@/lib/home';
+import { faq } from '@/lib/faq';
+import { amenities, dayStory, gallery, homeFaqIds, venue } from '@/lib/home';
 
 const path = '/';
 const splitSizes = '(min-width: 64rem) 560px, 100vw';
 const roomCardSizes = '(min-width: 64rem) 370px, (min-width: 48rem) 44vw, 82vw';
 const storySizes = '(min-width: 56rem) 560px, 100vw';
+const gallerySizes = '(min-width: 64rem) 370px, (min-width: 48rem) 44vw, 82vw';
 const spaCardSizes = '(min-width: 64rem) 370px, (min-width: 44rem) 50vw, 100vw';
 
 export const metadata = routeMetadata(path);
@@ -66,6 +68,8 @@ export default function Page() {
         </div>
         <span className="scroll-cue" aria-hidden="true" />
       </section>
+
+      {/* Offers strip (issue #43) goes here, between the hero and the amenities. */}
 
       {/* Amenities: the list is plain HTML. The moving copy is decoration only. */}
       <div className="marquee">
@@ -366,7 +370,43 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="section" aria-labelledby="location-title">
+      <section className="section" aria-labelledby="gallery-title">
+        <div className="wrap">
+          <div className="section-head section-head--row reveal">
+            <div>
+              <p className="eyebrow">Galeria</p>
+              <h2 id="gallery-title">Zajrzyj do środka</h2>
+            </div>
+            <CarouselButtons label="Galeria" />
+          </div>
+          <div className="carousel gallery" data-carousel>
+            <ul className="track" aria-label="Zdjęcia hotelu">
+              {gallery.map((photo) => (
+                <li key={photo.slug}>
+                  <figure className="gallery__item">
+                    {/* Without JS the link opens the large photo. With JS it opens in a dialog. */}
+                    <a href={withBase(`/img/${photo.slug}-1600.jpg`)} data-lightbox>
+                      <Picture slug={photo.slug} alt={photo.alt} sizes={gallerySizes} />
+                    </a>
+                    <figcaption>{photo.caption}</figcaption>
+                  </figure>
+                </li>
+              ))}
+            </ul>
+            <div className="dots" aria-hidden="true" />
+          </div>
+          {/* The script puts the large photo into this dialog. */}
+          <dialog className="lightbox" aria-label="Powiększone zdjęcie">
+            <form method="dialog">
+              <button className="lightbox__close" type="submit" aria-label="Zamknij zdjęcie">
+                <span aria-hidden="true">×</span>
+              </button>
+            </form>
+          </dialog>
+        </div>
+      </section>
+
+      <section className="section alt" aria-labelledby="location-title">
         <div className="wrap">
           <div className="section-head reveal">
             <p className="eyebrow">Dojazd</p>
@@ -386,8 +426,33 @@ export default function Page() {
             <Link className="text-link" href="/atrakcje/">
               Atrakcje w Uniejowie i okolicy <span aria-hidden="true">→</span>
             </Link>
+          </p>
+        </div>
+      </section>
+
+      <section className="section" aria-labelledby="faq-title">
+        <div className="wrap faq-teaser">
+          <div className="section-head reveal">
+            <p className="eyebrow">FAQ</p>
+            <h2 id="faq-title">Najczęstsze pytania</h2>
+          </div>
+          <div className="faq__list reveal">
+            {homeFaqIds.map((id) => {
+              const item = faq.find((entry) => entry.id === id);
+              if (!item) return null;
+              return (
+                <details key={id} className="faq__item">
+                  <summary>{item.question}</summary>
+                  <div className="faq__answer">
+                    <p>{item.answer}</p>
+                  </div>
+                </details>
+              );
+            })}
+          </div>
+          <p className="reveal">
             <Link className="text-link" href="/faq/">
-              Najczęstsze pytania <span aria-hidden="true">→</span>
+              Wszystkie pytania i odpowiedzi <span aria-hidden="true">→</span>
             </Link>
           </p>
         </div>

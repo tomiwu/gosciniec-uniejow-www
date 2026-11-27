@@ -11,6 +11,8 @@ import { useEffect } from 'react';
  * - Time-of-day story (`[data-story]`): the sticky photo follows the step in the middle of the screen.
  * - Marquee pause button (WCAG 2.2.2).
  * - Count-up of numbers (`[data-count]`). The HTML has the final value.
+ * - Gallery lightbox: `a[data-lightbox]` opens the large photo in `dialog.lightbox`. Without JS the
+ *   link opens the photo file.
  */
 export function SiteEffects() {
   const pathname = usePathname();
@@ -63,6 +65,9 @@ export function SiteEffects() {
       button.addEventListener('click', onClick);
       cleanups.push(() => button.removeEventListener('click', onClick));
     });
+
+    const lightbox = document.querySelector<HTMLDialogElement>('dialog.lightbox');
+    if (lightbox) cleanups.push(setUpLightbox(lightbox));
 
     if (!calm) {
       const counter = new IntersectionObserver(
@@ -121,6 +126,29 @@ function setUpCarousel(carousel: HTMLElement, calm: boolean): () => void {
     next?.removeEventListener('click', onNext);
     track.removeEventListener('scroll', onScroll);
     window.removeEventListener('resize', onScroll);
+  };
+}
+
+function setUpLightbox(dialog: HTMLDialogElement): () => void {
+  const big = dialog.querySelector('img') ?? document.createElement('img');
+  if (!big.isConnected) dialog.prepend(big);
+  const onClick = (event: MouseEvent) => {
+    const link = (event.target as Element).closest<HTMLAnchorElement>('a[data-lightbox]');
+    if (!link || event.metaKey || event.ctrlKey || event.shiftKey) return;
+    event.preventDefault();
+    big.src = link.href;
+    big.alt = link.querySelector('img')?.alt ?? '';
+    dialog.showModal();
+  };
+  // A click on the dark backdrop (the dialog itself, not the photo) closes the dialog.
+  const onBackdrop = (event: MouseEvent) => {
+    if (event.target === dialog) dialog.close();
+  };
+  document.addEventListener('click', onClick);
+  dialog.addEventListener('click', onBackdrop);
+  return () => {
+    document.removeEventListener('click', onClick);
+    dialog.removeEventListener('click', onBackdrop);
   };
 }
 
