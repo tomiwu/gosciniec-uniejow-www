@@ -58,6 +58,15 @@ function checkHotel(node: Node, where: string): string[] {
   return errors;
 }
 
+function checkHotelRoom(node: Node, where: string): string[] {
+  const errors: string[] = [];
+  if (!nonEmptyString(node['name'])) errors.push(`${where}: HotelRoom needs a name`);
+  if (!nonEmptyString(node['description'])) {
+    errors.push(`${where}: HotelRoom needs a description`);
+  }
+  return errors;
+}
+
 function checkFaqPage(node: Node, where: string): string[] {
   const entities = node['mainEntity'];
   const list = Array.isArray(entities) ? entities : entities === undefined ? [] : [entities];
@@ -129,6 +138,7 @@ export function checkHtml(html: string, file: string): string[] {
           hotelCount += 1;
           errors.push(...checkHotel(node, where));
         }
+        if (types.includes('HotelRoom')) errors.push(...checkHotelRoom(node, where));
         if (types.includes('FAQPage')) errors.push(...checkFaqPage(node, where));
         if (types.includes('Offer')) errors.push(...checkOffer(node, where));
       });

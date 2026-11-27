@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { buildHotelSchema } from '../src/lib/schema/hotel';
+import { rooms } from '../src/lib/rooms';
+import { buildHotelRoomsSchema, buildHotelSchema } from '../src/lib/schema/hotel';
 import { checkHtml, extractJsonLd, requiredTypesFor } from './check-schema';
 
 const page = (...blocks: unknown[]): string =>
@@ -145,5 +146,21 @@ describe('required types per page', () => {
 
   it('does not require FAQPage on other pages', () => {
     expect(checkHtml(page(hotel), 'index.html')).toEqual([]);
+  });
+});
+
+describe('checkHtml with HotelRoom items', () => {
+  it('accepts the Hotel block with containsPlace', () => {
+    expect(checkHtml(page(buildHotelRoomsSchema(rooms)), 'pokoje.html')).toEqual([]);
+  });
+
+  it('fails on a HotelRoom without a description', () => {
+    const broken = { ...hotel, containsPlace: [{ '@type': 'HotelRoom', name: 'Pokój testowy' }] };
+    expect(checkHtml(page(broken), 'a.html').join('\n')).toContain('HotelRoom needs a description');
+  });
+
+  it('fails on a HotelRoom without a name', () => {
+    const broken = { ...hotel, containsPlace: [{ '@type': 'HotelRoom', description: 'Opis.' }] };
+    expect(checkHtml(page(broken), 'a.html').join('\n')).toContain('HotelRoom needs a name');
   });
 });

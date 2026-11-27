@@ -12,8 +12,9 @@ import {
   type FormKind,
 } from '@/lib/form/validate';
 import { nap } from '@/lib/nap';
+import { isPreview, withBase } from '@/lib/preview';
 
-const ENDPOINT = '/api/contact.php';
+const ENDPOINT = withBase('/api/contact.php');
 const THANKS_PATH: Record<FormKind, string> = {
   kontakt: '/kontakt/dziekujemy/',
   rezerwacja: '/rezerwacja/dziekujemy/',
@@ -125,7 +126,7 @@ export function RequestForm({ kind }: { kind: FormKind }) {
       });
       const answer: { ok?: boolean; errors?: FormErrors } = await response.json().catch(() => ({}));
       if (response.ok && answer.ok) {
-        window.location.assign(THANKS_PATH[kind]);
+        window.location.assign(withBase(THANKS_PATH[kind]));
         return;
       }
       setSending(false);
@@ -271,7 +272,7 @@ export function RequestForm({ kind }: { kind: FormKind }) {
           <label htmlFor="field-consent">
             Wyrażam zgodę na przetwarzanie moich danych osobowych w celu odpowiedzi na to{' '}
             {isBooking ? 'zapytanie' : 'pytanie'}. Szczegóły w{' '}
-            <a href="/polityka-prywatnosci/">polityce prywatności</a>.
+            <a href={withBase('/polityka-prywatnosci/')}>polityce prywatności</a>.
             <span aria-hidden="true"> *</span>
           </label>
         </div>
@@ -288,6 +289,13 @@ export function RequestForm({ kind }: { kind: FormKind }) {
         <label htmlFor="field-website">Nie wypełniaj tego pola</label>
         <input id="field-website" name="website" type="text" tabIndex={-1} autoComplete="off" />
       </div>
+
+      {isPreview ? (
+        <p className="form-note" role="note">
+          Podgląd: ten formularz nie wysyła wiadomości. Zadzwoń: {nap.phoneDisplay} lub napisz:{' '}
+          {nap.email}.
+        </p>
+      ) : null}
 
       <button type="submit" className="button" aria-disabled={sending || undefined}>
         {sending ? 'Wysyłanie…' : isBooking ? 'Wyślij zapytanie' : 'Wyślij wiadomość'}

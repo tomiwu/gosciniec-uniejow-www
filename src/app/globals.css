@@ -73,6 +73,82 @@ summary:focus-visible,
   padding: var(--space-5) var(--space-4);
 }
 
+.page--wide {
+  max-width: var(--content-width);
+}
+
+.lead {
+  font-size: 1.125rem;
+}
+
+/* Visible marker for a fact that is still missing. See docs/content-todo.md. */
+.todo {
+  display: inline-block;
+  padding: 0 var(--space-2);
+  color: var(--color-text);
+  background: var(--color-bg-alt);
+  border: 1px dashed var(--color-text-muted);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+}
+
+/* Rooms page: one card for each room type. One column on mobile, two from 48 rem. */
+.rooms {
+  display: grid;
+  gap: var(--space-6);
+  margin-top: var(--space-6);
+}
+
+.room {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+/* Skip layout and paint of cards below the first one. Their lazy photos then do not compete
+   with the LCP photo for bandwidth. */
+.room + .room {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 70rem; /* About the card height on a phone. */
+}
+
+.room__image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.room__body {
+  padding: var(--space-4) var(--space-5) var(--space-5);
+}
+
+.room__body h2 {
+  margin-top: 0;
+}
+
+.room__features {
+  padding-left: var(--space-5);
+}
+
+.room__price {
+  color: var(--color-text-muted);
+}
+
+@media (min-width: 48rem) {
+  .rooms {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .room + .room {
+    contain-intrinsic-size: auto 42rem;
+  }
+}
+
 /* Skip link: hidden until it gets focus. */
 .skip-link {
   position: absolute;
@@ -508,4 +584,14 @@ summary:focus-visible,
 .faq__todo {
   font-weight: 600;
   color: var(--color-text-muted);
+}
+
+/* Preview build only (GitHub Pages) */
+.preview-banner {
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+  background: #7a1f00;
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
 }
