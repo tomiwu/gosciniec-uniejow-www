@@ -631,3 +631,38 @@ summary:focus-visible,
     align-items: start;
   }
 }
+
+/* Photo gallery (SPA, restaurant and family pages). Fixed ratio, so the photos line up. */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--space-4);
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gallery img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+
+/* Text sections of the SPA, restaurant and family pages. */
+.page-section {
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.page-section h2 {
+  margin-top: 0;
+}
+
+.menu-note {
+  font-size: 1.125rem;
+  font-weight: 600;
+}

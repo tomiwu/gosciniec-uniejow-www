@@ -4,6 +4,7 @@ import { nap } from './nap';
 describe('nap', () => {
   it('holds the product facts', () => {
     expect(nap.name).toBe('Gościniec Uniejów');
+    expect(nap.restaurantName).toBe('Restauracja Gościniec Uniejów');
     expect(nap.street).toBe('ul. Sienkiewicza 137');
     expect(nap.postalCode).toBe('99-210');
     expect(nap.city).toBe('Uniejów');

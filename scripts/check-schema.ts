@@ -35,15 +35,16 @@ function walk(value: Json, visit: (node: Node) => void): void {
 const nonEmptyString = (value: Json): value is string =>
   typeof value === 'string' && value.trim().length > 0;
 
-function checkHotel(node: Node, where: string): string[] {
+/** Check name, telephone and address of a place against `nap.ts`. `label` is the type name. */
+function checkPlace(node: Node, where: string, label: string, name: string): string[] {
   const errors: string[] = [];
-  if (node['name'] !== nap.name) errors.push(`${where}: Hotel name differs from nap.ts`);
+  if (node['name'] !== name) errors.push(`${where}: ${label} name differs from nap.ts`);
   if (node['telephone'] !== nap.phoneE164) {
-    errors.push(`${where}: Hotel telephone differs from nap.ts`);
+    errors.push(`${where}: ${label} telephone differs from nap.ts`);
   }
   const address = node['address'];
   if (!isNode(address)) {
-    errors.push(`${where}: Hotel address is missing`);
+    errors.push(`${where}: ${label} address is missing`);
   } else {
     const expected: Record<string, string> = {
       streetAddress: nap.street,
@@ -52,8 +53,30 @@ function checkHotel(node: Node, where: string): string[] {
       addressCountry: nap.country,
     };
     for (const [key, value] of Object.entries(expected)) {
-      if (address[key] !== value) errors.push(`${where}: Hotel address.${key} differs from nap.ts`);
+      if (address[key] !== value) {
+        errors.push(`${where}: ${label} address.${key} differs from nap.ts`);
+      }
     }
+  }
+  return errors;
+}
+
+const checkHotel = (node: Node, where: string): string[] =>
+  checkPlace(node, where, 'Hotel', nap.name);
+
+/** The old site gives no rating, review, price range or opening hours. Do not invent them. */
+const RESTAURANT_FORBIDDEN = [
+  'aggregateRating',
+  'review',
+  'priceRange',
+  'openingHours',
+  'openingHoursSpecification',
+] as const;
+
+function checkRestaurant(node: Node, where: string): string[] {
+  const errors = checkPlace(node, where, 'Restaurant', nap.restaurantName);
+  for (const key of RESTAURANT_FORBIDDEN) {
+    if (node[key] !== undefined) errors.push(`${where}: Restaurant must not have ${key}`);
   }
   return errors;
 }
@@ -99,6 +122,7 @@ function checkOffer(node: Node, where: string): string[] {
 /** Pages that must carry a given JSON-LD type. Key: HTML path in the export folder. */
 const REQUIRED_TYPES: Record<string, string[]> = {
   'faq/index.html': ['FAQPage'],
+  'restauracja/index.html': ['Restaurant'],
 };
 
 export function requiredTypesFor(file: string): string[] {
@@ -138,6 +162,7 @@ export function checkHtml(html: string, file: string): string[] {
           hotelCount += 1;
           errors.push(...checkHotel(node, where));
         }
+        if (types.includes('Restaurant')) errors.push(...checkRestaurant(node, where));
         if (types.includes('HotelRoom')) errors.push(...checkHotelRoom(node, where));
         if (types.includes('FAQPage')) errors.push(...checkFaqPage(node, where));
         if (types.includes('Offer')) errors.push(...checkOffer(node, where));
