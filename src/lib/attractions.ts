@@ -56,7 +56,7 @@ export const attractions: readonly Attraction[] = [
     slug: 'teznie',
     name: 'Tężnie solankowe',
     paragraphs: [
-      'W Uniejowie działają tężnie solankowe. Pakiet „Kobiecy Chill & Fun” poleca je razem ze spacerem po bulwarach i z termami.',
+      'W Uniejowie działają tężnie solankowe. Dobrze łączą się ze spacerem po bulwarach i z wizytą w termach.',
     ],
     todo: 'TODO: lokalizacja tężni i godziny dostępu – stare strony hotelu ich nie podają',
   },
