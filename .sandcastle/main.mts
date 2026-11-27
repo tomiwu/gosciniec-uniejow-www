@@ -513,6 +513,140 @@ function markWaiting(url: string, issueNumber: number, comment: boolean): void {
 const waiting = new Set<number>();
 const failed = new Set<number>();
 
+// ---------------------------------------------------------------------------
+// Keep PR branches up to date with BASE_BRANCH (2026-11-27). PR #21 was opened from an old
+// main, had a conflict, and GitHub Actions did not run at all. Main is protected with strict
+// required checks, so a PR that is behind cannot merge either.
+// ---------------------------------------------------------------------------
+type MergeState = "BEHIND" | "DIRTY" | "CLEAN" | "BLOCKED" | "UNSTABLE" | "UNKNOWN" | string;
+
+function prMergeState(url: string): MergeState {
+  // GitHub computes the state lazily. UNKNOWN can stay for some seconds after a push.
+  for (let i = 0; i < 6; i++) {
+    const r = spawnSync(
+      "gh",
+      ["pr", "view", url, "--json", "mergeStateStatus", "--jq", ".mergeStateStatus"],
+      { encoding: "utf8" },
+    );
+    const st = (r.stdout ?? "").trim();
+    if (st && st !== "UNKNOWN") return st;
+    spawnSync("sleep", ["5"]);
+  }
+  return "UNKNOWN";
+}
+
+// Merge origin/BASE_BRANCH into the sandbox branch. A conflict goes to the merge-resolver agent.
+async function syncWithBase(
+  sandbox: sandcastle.Sandbox,
+  args: Record<string, string>,
+): Promise<"same" | "merged" | "failed"> {
+  sh("git", ["fetch", "origin", BASE_BRANCH]);
+  const wt = sandbox.worktreePath;
+  const base = `origin/${BASE_BRANCH}`;
+  const upToDate = () =>
+    spawnSync("git", ["-C", wt, "merge-base", "--is-ancestor", base, "HEAD"]).status === 0;
+  if (upToDate()) return "same";
+  const m = spawnSync(
+    "git",
+    ["-C", wt, "-c", "user.name=Sandcastle loop", "-c", "user.email=sandcastle@localhost",
+      "merge", "--no-edit", "-m", `RALPH: #${args.ISSUE} merge ${base}`, base],
+    { encoding: "utf8" },
+  );
+  if (m.status === 0) {
+    console.log(`Merged ${base} into ${args.BRANCH} without a conflict.`);
+    await sandbox.exec(`${CONFIG.setup} || true`); // dependencies can change with the merge
+    return "merged";
+  }
+  const conflicts = spawnSync("git", ["-C", wt, "diff", "--name-only", "--diff-filter=U"], {
+    encoding: "utf8",
+  }).stdout.trim();
+  spawnSync("git", ["-C", wt, "merge", "--abort"]);
+  console.log(`Merge conflict with ${base} in: ${conflicts.replace(/\n/g, ", ")}. Run the merge-resolver.`);
+  await runPhase(sandbox, {
+    name: "merge-resolver",
+    maxIterations: 1,
+    promptFile: "./.sandcastle/merge-prompt.md",
+    promptArgs: { ...args, BASE: base, CONFLICTS: conflicts },
+  });
+  if (!upToDate()) return "failed";
+  await sandbox.exec(`${CONFIG.setup} || true`);
+  return "merged";
+}
+
+// Run the local checks; the fixer gets the log. True when all checks pass.
+async function checkAndFix(
+  sandbox: sandcastle.Sandbox,
+  args: Record<string, string>,
+): Promise<boolean> {
+  for (let attempt = 0; attempt <= MAX_FIX_ATTEMPTS; attempt++) {
+    const result = await runChecks(sandbox);
+    if (result.ok) return true;
+    console.log(`Checks failed for #${args.ISSUE} (attempt ${attempt}).`);
+    if (attempt === MAX_FIX_ATTEMPTS) break;
+    await runPhase(sandbox, {
+      name: `fixer-${attempt + 1}`,
+      maxIterations: 1,
+      promptFile: "./.sandcastle/fix-prompt.md",
+      promptArgs: { ...args, CHECK_LOG: result.log.slice(-12000) },
+      checkLog: result.log.slice(-12000),
+    });
+  }
+  return false;
+}
+
+// Bring an open PR up to date. BEHIND: GitHub "Update branch" (a new head commit, so CI runs).
+// DIRTY: merge in a sandbox (merge-resolver on a conflict), run the checks, push.
+// Returns false only when the branch cannot be brought up to date.
+async function refreshPr(url: string, branch: string, issueNumber: number): Promise<boolean> {
+  const st = prMergeState(url);
+  if (st === "BEHIND") {
+    const r = spawnSync("gh", ["pr", "update-branch", url], { stdio: "inherit" });
+    if (r.status === 0) {
+      console.log(`Updated ${url} with ${BASE_BRANCH}.`);
+      return true;
+    }
+  } else if (st !== "DIRTY") {
+    return true;
+  }
+  console.log(`${url} has a conflict with ${BASE_BRANCH} (state ${st}). Merge in a sandbox.`);
+  const args = { PROJECT, ISSUE: String(issueNumber), BRANCH: branch };
+  spawnSync("git", ["fetch", "origin", branch]);
+  spawnSync("git", ["branch", "-f", branch, `origin/${branch}`]);
+  const box = await sandcastle.createSandbox({
+    branch,
+    baseBranch: `origin/${BASE_BRANCH}`,
+    sandbox: podman(),
+    hooks,
+  });
+  let ok = false;
+  try {
+    ok = (await syncWithBase(box, args)) !== "failed" && (await checkAndFix(box, args));
+  } finally {
+    await box.close();
+  }
+  if (ok) sh("git", ["push", "origin", `${branch}:${branch}`]);
+  return ok;
+}
+
+// Waiting PRs go behind when another PR merges. Update them, so that they stay mergeable.
+// A conflicting PR leaves the waiting set; the main loop resumes it and calls refreshPr.
+function refreshWaitingPrs(): void {
+  const prs: { url: string; headRefName: string }[] = JSON.parse(
+    sh("gh", ["pr", "list", "--state", "open", "--json", "url,headRefName"]),
+  );
+  for (const p of prs) {
+    const n = Number(/^sandcastle\/issue-(\d+)-/.exec(p.headRefName)?.[1]);
+    if (!n || !waiting.has(n)) continue;
+    const st = prMergeState(p.url);
+    if (st === "BEHIND") {
+      spawnSync("gh", ["pr", "update-branch", p.url], { stdio: "inherit" });
+      waiting.delete(n); // resume it: wait for the new CI run
+    } else if (st === "DIRTY") {
+      waiting.delete(n);
+    }
+  }
+}
+
 async function waitCiWithFixes(
   url: string,
   branch: string,
@@ -520,6 +654,8 @@ async function waitCiWithFixes(
 ): Promise<boolean> {
   const args = { PROJECT, ISSUE: String(issueNumber), BRANCH: branch };
   for (let attempt = 0; attempt <= MAX_FIX_ATTEMPTS; attempt++) {
+    // A PR with a conflict gets no CI run at all. Resolve it first.
+    if (!(await refreshPr(url, branch, issueNumber))) return false;
     if (await waitCi(url)) return true;
     if (attempt === MAX_FIX_ATTEMPTS) break;
     console.log(`CI failed for ${url}. Fixer attempt ${attempt + 1}.`);
@@ -564,6 +700,7 @@ async function mainLoop(): Promise<void> {
   while (iteration < MAX_ITERATIONS) {
     sh("git", ["fetch", "origin", BASE_BRANCH]);
     sh("git", ["checkout", "--detach", `origin/${BASE_BRANCH}`]);
+    refreshWaitingPrs();
     const skip = new Set<number>([...waiting, ...failed]);
     // nextIssue() treats numbers in its argument as closed. Pass an empty set, filter here,
     // so that waiting and failed issues still block their dependents.
@@ -606,7 +743,8 @@ async function mainLoop(): Promise<void> {
 
     if (existing) {
       console.log(`Resume the open PR ${existing.url}.`);
-      if (ciState(existing.url) === "success") {
+      const st = prMergeState(existing.url);
+      if (ciState(existing.url) === "success" && st !== "BEHIND" && st !== "DIRTY") {
         waiting.add(issue.number);
         markWaiting(existing.url, issue.number, false);
         continue;
@@ -647,21 +785,13 @@ async function mainLoop(): Promise<void> {
           promptFile: "./.sandcastle/review-prompt.md",
           promptArgs: args,
         });
-        for (let attempt = 0; attempt <= MAX_FIX_ATTEMPTS; attempt++) {
-          const result = await runChecks(sandbox);
-          if (result.ok) {
-            passed = true;
-            break;
-          }
-          console.log(`Checks failed for #${issue.number} (attempt ${attempt}).`);
-          if (attempt === MAX_FIX_ATTEMPTS) break;
-          await runPhase(sandbox, {
-            name: `fixer-${attempt + 1}`,
-            maxIterations: 1,
-            promptFile: "./.sandcastle/fix-prompt.md",
-            promptArgs: { ...args, CHECK_LOG: result.log.slice(-12000) },
-            checkLog: result.log.slice(-12000),
-          });
+        passed = await checkAndFix(sandbox, args);
+        // Bring the branch up to date with BASE_BRANCH before the push, so that the PR has no
+        // conflict and CI runs. After a merge, run the checks again.
+        if (passed) {
+          const sync = await syncWithBase(sandbox, args);
+          if (sync === "failed") passed = false;
+          else if (sync === "merged") passed = await checkAndFix(sandbox, args);
         }
       }
     } finally {
