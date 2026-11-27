@@ -23,7 +23,15 @@ describe('fonts', () => {
   });
 
   it('covers the Polish letters', () => {
-    for (const range of ['U+0104-0107', 'U+0118-0119', 'U+0141-0144', 'U+015A-015B', 'U+0179-017C', 'U+00D3', 'U+00F3']) {
+    for (const range of [
+      'U+0104-0107',
+      'U+0118-0119',
+      'U+0141-0144',
+      'U+015A-015B',
+      'U+0179-017C',
+      'U+00D3',
+      'U+00F3',
+    ]) {
       expect(fontFaceCss()).toContain(range);
     }
   });
