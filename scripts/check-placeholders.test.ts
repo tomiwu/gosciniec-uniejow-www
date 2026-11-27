@@ -6,6 +6,7 @@ import {
   checkPlaceholders,
   findBadgeInOutput,
   findPlaceholderUsers,
+  findTodoInOutput,
   isProductionBuild,
 } from './check-placeholders';
 
@@ -57,6 +58,67 @@ describe('checkPlaceholders', () => {
     });
     expect(result.ok).toBe(false);
     expect(result.messages.join('\n')).toContain('badge');
+  });
+});
+
+describe('checkPlaceholders and visible TODO markers', () => {
+  it('fails a production build when a page shows a TODO marker', () => {
+    const result = checkPlaceholders({
+      production: true,
+      users: [],
+      todoFiles: ['kontakt/index.html'],
+    });
+    expect(result.ok).toBe(false);
+    expect(result.messages.join('\n')).toContain('kontakt/index.html');
+    expect(result.messages.join('\n')).toContain('TODO');
+  });
+
+  it('passes a production build with no TODO marker', () => {
+    expect(checkPlaceholders({ production: true, users: [], todoFiles: [] }).ok).toBe(true);
+  });
+
+  it('passes a preview build that shows TODO markers', () => {
+    const result = checkPlaceholders({
+      production: false,
+      users: [],
+      todoFiles: ['kontakt/index.html'],
+      checkedOutput: true,
+    });
+    expect(result.ok).toBe(true);
+  });
+});
+
+describe('findTodoInOutput', () => {
+  it('lists the HTML files with a visible TODO marker', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'todo-'));
+    mkdirSync(join(dir, 'kontakt'));
+    writeFileSync(
+      join(dir, 'kontakt', 'index.html'),
+      '<p>Parking: <span class="todo">TODO: potwierdzić</span></p>',
+    );
+    writeFileSync(join(dir, 'index.html'), '<p>Strona główna</p>');
+    expect(findTodoInOutput(dir)).toEqual(['kontakt/index.html']);
+  });
+
+  it('ignores TODO in scripts, styles, comments, attributes and longer words', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'todo-'));
+    writeFileSync(
+      join(dir, 'index.html'),
+      [
+        '<!-- TODO: remove -->',
+        '<style>.TODO { color: red }</style>',
+        '<script>self.__next_f.push([1,"TODO: parking"])</script>',
+        '<script type="application/ld+json">{"description":"TODO"}</script>',
+        '<p class="TODO" data-note="TODO">Mastodont TODOS</p>',
+      ].join('\n'),
+    );
+    expect(findTodoInOutput(dir)).toEqual([]);
+  });
+
+  it('ignores a TODO after a ">" inside a quoted attribute', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'todo-'));
+    writeFileSync(join(dir, 'index.html'), `<a title="a > TODO" data-x='b > TODO'>Link</a>`);
+    expect(findTodoInOutput(dir)).toEqual([]);
   });
 });
 

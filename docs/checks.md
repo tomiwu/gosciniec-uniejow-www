@@ -15,4 +15,4 @@ The loop reads `checks.json` one time, when the process starts (`CONFIG` in `.sa
 
 ## Deploy gate (production, webd.pl)
 
-Deploy only an export of `npm run build:production` (`PRODUCTION_BUILD=1`). `scripts/check-placeholders.ts` runs before and after `next build`. In a production build it fails when a source file uses `src/content/placeholders.ts` or when an exported page shows the badge "Dane testowe". Remove a placeholder only after the owner confirms the real value (issue #14).
+Deploy only an export of `npm run build:production` (`PRODUCTION_BUILD=1`). `scripts/check-placeholders.ts` runs before and after `next build`. In a production build it fails when a source file uses `src/content/placeholders.ts` or when an exported page shows the badge "Dane testowe" or a visible `TODO` marker (issue #57). Only text counts. A `TODO` in a script, a style, a comment or an attribute does not. A preview build (`npm run build`) keeps passing with `TODO` markers. Remove a placeholder only after the owner confirms the real value (issue #14).
