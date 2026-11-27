@@ -89,14 +89,12 @@ function checkOffer(node: Node, where: string): string[] {
     const numeric = Number(price);
     if (!Number.isFinite(numeric) || numeric <= 0) {
       errors.push(`${where}: Offer price must be a number greater than 0`);
+    } else if (!offers.some((offer) => offer.price === numeric)) {
+      // An Offer may only carry a real price: one that is in offers.ts (PRD D3).
+      errors.push(`${where}: Offer price ${String(price)} is not in offers.ts`);
     }
   } else {
     errors.push(`${where}: Offer needs a price`);
-  }
-  // An Offer may only carry a real price: one that is in offers.ts (PRD D3).
-  const known = offers.some((offer) => offer.price !== null && offer.price === Number(price));
-  if (!known && errors.length === 0) {
-    errors.push(`${where}: Offer price ${String(price)} is not in offers.ts`);
   }
   if (node['priceCurrency'] !== 'PLN') errors.push(`${where}: Offer priceCurrency must be PLN`);
   return errors;
