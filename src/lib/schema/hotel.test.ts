@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { nap } from '../nap';
 import { rooms } from '../rooms';
@@ -23,6 +24,11 @@ describe('buildHotelSchema', () => {
       addressLocality: nap.city,
       addressCountry: nap.country,
     });
+  });
+
+  it('has the logo as a file of the site', () => {
+    expect(schema.logo).toBe(`${nap.siteUrl}/logo.png`);
+    expect(existsSync('public/logo.png')).toBe(true);
   });
 
   it('has no rating and no price range', () => {
