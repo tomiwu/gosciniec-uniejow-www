@@ -10,7 +10,7 @@
     "dev": "next dev",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "lint": "eslint . --max-warnings 0",
+    "lint": "eslint . --max-warnings 0 && php -l public/api/contact.php",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "build": "next build && tsx scripts/postbuild.ts",
