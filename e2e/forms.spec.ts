@@ -36,6 +36,7 @@ test.describe('/rezerwacja/', () => {
       'Data wyjazdu',
       'Liczba dorosłych',
       'Liczba dzieci',
+      'Oferta lub pakiet',
       'Typ pokoju',
       'Imię i nazwisko',
       'Adres e-mail',
@@ -146,6 +147,27 @@ test.describe('/rezerwacja/', () => {
   test('preselects the room from ?pokoj=', async ({ page }) => {
     await page.goto('/rezerwacja/?pokoj=apartament-rodzinny');
     await expect(page.getByLabel('Typ pokoju')).toHaveValue('Apartament rodzinny');
+  });
+
+  test('preselects Sylwester from ?pakiet= and names the offer in the page', async ({ page }) => {
+    await page.goto('/rezerwacja/?pakiet=sylwester-2026-2027');
+    await expect(page.getByLabel('Oferta lub pakiet')).toHaveValue('sylwester-2026-2027');
+    await expect(page.getByText(/Formularz dotyczy oferty:/)).toContainText('Sylwester 2026/2027');
+    await expect(page.locator('#rezerwacja-oferta .test-badge')).toHaveCount(0);
+  });
+
+  test('shows the sample package with the badge and no test price', async ({ page }) => {
+    await page.goto('/rezerwacja/?pakiet=pakiet-testowy');
+    await expect(page.getByLabel('Oferta lub pakiet')).toHaveValue('pakiet-testowy');
+    await expect(page.locator('#rezerwacja-oferta')).toContainText('Dane testowe');
+    await expect(page.locator('form')).not.toContainText('719');
+    await expect(page.locator('form')).not.toContainText(/zł/);
+  });
+
+  test('leaves the package field empty for an unknown ?pakiet=', async ({ page }) => {
+    await page.goto('/rezerwacja/?pakiet=pakiet-kobiecy-weekend');
+    await expect(page.getByLabel('Oferta lub pakiet')).toHaveValue('');
+    await expect(page.getByText(/Formularz dotyczy oferty:/)).toHaveCount(0);
   });
 
   test('keeps the honeypot out of sight and out of the tab order', async ({ page }) => {

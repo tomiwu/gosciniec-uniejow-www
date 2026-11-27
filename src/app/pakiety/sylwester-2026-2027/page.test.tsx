@@ -4,6 +4,7 @@ import { extractJsonLd } from '../../../../scripts/check-schema';
 import { PLACEHOLDER_BADGE } from '@/content/placeholders';
 import { nap } from '@/lib/nap';
 import { offers } from '@/lib/offers';
+import { sylwesterBookingSlug } from '@/lib/form/booking-offers';
 import { sylwester } from '@/lib/venue';
 import { expectOfferFaqSchema, expectOfferFaqVisible } from '@/test/venue-assertions';
 import Page, { metadata } from './page';
@@ -90,6 +91,10 @@ describe('/pakiety/sylwester-2026-2027/', () => {
     for (const href of ['/pakiety', '/rezerwacja', '/przyjecia']) {
       expect(html).toContain(`href="${href}"`);
     }
+  });
+
+  it('opens the booking form with the Sylwester package prefill slug', () => {
+    expect(html).toMatch(new RegExp(`/rezerwacja/?\\?pakiet=${sylwesterBookingSlug}`));
   });
 
   it('shows the official NAP and the sales mailbox, no promo phone and no person name', () => {

@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { extractJsonLd } from '../../../scripts/check-schema';
 import { PLACEHOLDER_BADGE, placeholderPackages } from '@/content/placeholders';
+import { sylwesterBookingSlug } from '@/lib/form/booking-offers';
 import { sylwester } from '@/lib/venue';
 import { expectOfferFaqSchema, expectOfferFaqVisible } from '@/test/venue-assertions';
 import Page, { metadata } from './page';
@@ -40,12 +41,16 @@ describe('/pakiety/ hub', () => {
     expect(list[1]).toContain(placeholderPackages[0]!.name);
   });
 
-  it('gives every card a name, an occasion and one primary link', () => {
+  it('gives every card a name, an occasion and booking links with package slug', () => {
     for (const card of cards()) {
       expect(card).toMatch(/<h2[ >]/);
       expect(card).toContain('class="package-card__audience"');
-      expect(card.match(/class="button[^"]*"/g)).toHaveLength(1);
     }
+    const [sylwesterCard, sampleCard] = cards();
+    expect(sylwesterCard!.match(/class="button[^"]*"/g)).toHaveLength(2);
+    expect(sylwesterCard).toMatch(new RegExp(`/rezerwacja/?\\?pakiet=${sylwesterBookingSlug}`));
+    expect(sampleCard!.match(/class="button[^"]*"/g)).toHaveLength(1);
+    expect(sampleCard).toMatch(new RegExp(`/rezerwacja/?\\?pakiet=${placeholderPackages[0]!.id}`));
   });
 
   it('shows the Sylwester facts and nothing invented', () => {
