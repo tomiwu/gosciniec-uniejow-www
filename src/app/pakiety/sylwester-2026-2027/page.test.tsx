@@ -5,8 +5,7 @@ import { PLACEHOLDER_BADGE } from '@/content/placeholders';
 import { nap } from '@/lib/nap';
 import { offers } from '@/lib/offers';
 import { sylwester } from '@/lib/venue';
-import { offerFaq } from '@/lib/offer-faq';
-import { visibleFaq } from '@/test/venue-assertions';
+import { expectOfferFaqSchema, expectOfferFaqVisible } from '@/test/venue-assertions';
 import Page, { metadata } from './page';
 
 const html = renderToStaticMarkup(<Page />);
@@ -112,20 +111,10 @@ describe('/pakiety/sylwester-2026-2027/', () => {
   });
 
   it('shows the offer questions with the same answers as /faq/ (issue #36)', () => {
-    const visible = visibleFaq(html);
-    for (const item of offerFaq) {
-      expect(visible).toContainEqual({ question: item.question, answer: item.answer });
-    }
+    expectOfferFaqVisible(html);
   });
 
   it('has one FAQPage JSON-LD with the offer questions and no placeholder claim', () => {
-    const pages = extractJsonLd(html)
-      .map((block) => JSON.parse(block) as Record<string, unknown>)
-      .filter((node) => node['@type'] === 'FAQPage');
-    expect(pages).toHaveLength(1);
-    const names = (pages[0]!['mainEntity'] as { name: string }[]).map((q) => q.name);
-    for (const item of offerFaq) expect(names).toContain(item.question);
-    expect(JSON.stringify(pages[0])).not.toContain(PLACEHOLDER_BADGE);
-    expect(JSON.stringify(pages[0])).not.toContain('599');
+    expectOfferFaqSchema(html);
   });
 });
