@@ -2,13 +2,25 @@ import type { Metadata } from 'next';
 import { nap } from './nap';
 import { findRoute } from './routes';
 
+/** Site part of every `<title>`. */
+export const TITLE_SUFFIX = `${nap.name} – hotel w Uniejowie`;
+
 /** Next.js metadata for a route in `routes.ts`. */
 export function routeMetadata(path: string): Metadata {
   const route = findRoute(path);
   if (!route) throw new Error(`Unknown route: ${path}`);
+  const title = `${route.metaTitle} | ${TITLE_SUFFIX}`;
   return {
-    title: path === '/' ? { absolute: nap.name } : route.title,
+    title: { absolute: title },
     description: route.description,
     alternates: { canonical: path },
+    openGraph: {
+      type: 'website',
+      locale: 'pl_PL',
+      siteName: nap.name,
+      title,
+      description: route.description,
+      url: path,
+    },
   };
 }
