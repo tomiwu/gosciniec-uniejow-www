@@ -2,8 +2,13 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { faq } from '@/lib/faq';
 import { homeFaqIds } from '@/lib/home';
-import { cheapestRoomFromPrice, PLACEHOLDER_BADGE } from '@/content/placeholders';
+import {
+  cheapestRoomFromPrice,
+  PLACEHOLDER_BADGE,
+  placeholderPackages,
+} from '@/content/placeholders';
 import { nap } from '@/lib/nap';
+import { sylwester } from '@/lib/venue';
 import Page, { metadata } from './page';
 
 const html = renderToStaticMarkup(<Page />);
@@ -26,6 +31,7 @@ describe('home page', () => {
   it('has the sections of the PRD', () => {
     const h2s = [...html.matchAll(/<h2[^>]*>(.*?)<\/h2>/g)].map((m) => m[1]);
     expect(h2s).toEqual([
+      'Aktualne oferty',
       'Pokoje w Uniejowie',
       'Od porannej kawy do wieczoru w altanie',
       'SPA i wellness w hotelu',
@@ -128,6 +134,25 @@ describe('home page', () => {
 
   it('uses the route metadata', () => {
     expect(metadata.alternates?.canonical).toBe('/');
+  });
+
+  it('shows the offers strip: Sylwester first at 740 zł, then the sample package with a badge', () => {
+    const strip = html.slice(
+      html.indexOf('id="home-offers-title"'),
+      html.indexOf('class="marquee"'),
+    );
+    const cards = [...strip.matchAll(/<article class="home-offer[\s\S]*?<\/article>/g)].map(
+      (m) => m[0],
+    );
+    expect(cards).toHaveLength(2);
+    expect(cards[0]).toContain('Sylwester 2026/2027');
+    expect(cards[0]).toContain('740 zł za parę');
+    expect(cards[0]).toContain(`href="${sylwester.path.slice(0, -1)}"`);
+    expect(cards[0]).not.toContain(PLACEHOLDER_BADGE);
+    expect(cards[1]).toContain(placeholderPackages[0]!.name);
+    expect(cards[1]).toContain(PLACEHOLDER_BADGE);
+    expect(strip).not.toContain('599');
+    expect(strip).not.toMatch(/Kobiecy|719/i);
   });
 
   it('shows the sample from-price once, with the badge "Dane testowe", and no Offer JSON-LD', () => {

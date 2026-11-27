@@ -1,19 +1,19 @@
 import Link from 'next/link';
+import { HomeOffersStrip } from '@/components/HomeOffersStrip';
 import { Picture } from '@/components/Picture';
 import { PlaceholderBadge } from '@/components/PlaceholderBadge';
 import { cheapestRoomFromPrice } from '@/content/placeholders';
 import { nap } from '@/lib/nap';
 import { routeMetadata } from '@/lib/metadata';
 import { withBase } from '@/lib/preview';
+import { cardPictureSizes } from '@/lib/picture-sizes';
 import { rooms } from '@/lib/rooms';
 import { faq } from '@/lib/faq';
 import { amenities, dayStory, gallery, homeFaqIds, venue } from '@/lib/home';
 
 const path = '/';
 const splitSizes = '(min-width: 64rem) 560px, 100vw';
-const roomCardSizes = '(min-width: 64rem) 370px, (min-width: 48rem) 44vw, 82vw';
 const storySizes = '(min-width: 56rem) 560px, 100vw';
-const gallerySizes = '(min-width: 64rem) 370px, (min-width: 48rem) 44vw, 82vw';
 const spaCardSizes = '(min-width: 64rem) 370px, (min-width: 44rem) 50vw, 100vw';
 
 export const metadata = routeMetadata(path);
@@ -71,7 +71,7 @@ export default function Page() {
         <span className="scroll-cue" aria-hidden="true" />
       </section>
 
-      {/* Offers strip (issue #43) goes here, between the hero and the amenities. */}
+      <HomeOffersStrip />
 
       {/* Amenities: the list is plain HTML. The moving copy is decoration only. */}
       <div className="marquee">
@@ -114,7 +114,11 @@ export default function Page() {
               {rooms.map((room) => (
                 <li key={room.slug} className="card room-card">
                   <div className="card__media">
-                    <Picture slug={room.imageSlugs[0]} alt={room.imageAlt} sizes={roomCardSizes} />
+                    <Picture
+                      slug={room.imageSlugs[0]}
+                      alt={room.imageAlt}
+                      sizes={cardPictureSizes}
+                    />
                   </div>
                   <div className="card__body">
                     <h3>{room.name}</h3>
@@ -396,7 +400,7 @@ export default function Page() {
                       aria-label={`Powiększ zdjęcie: ${photo.alt}`}
                       data-lightbox
                     >
-                      <Picture slug={photo.slug} alt={photo.alt} sizes={gallerySizes} />
+                      <Picture slug={photo.slug} alt={photo.alt} sizes={cardPictureSizes} />
                     </a>
                     <figcaption>{photo.caption}</figcaption>
                   </figure>

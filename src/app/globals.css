@@ -2455,6 +2455,42 @@ a:hover > .arr,
   font-size: 1.25rem;
 }
 
+.home-offers__list {
+  display: grid;
+  gap: var(--space-5);
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 48rem) {
+  .home-offers__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.home-offer__price {
+  font-size: 1.125rem;
+  margin: var(--space-3) 0;
+}
+
+.sylwester-dj {
+  margin: var(--space-5) 0 0;
+  max-width: 28rem;
+}
+
+.sylwester-dj img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+}
+
+.sylwester-dj figcaption {
+  margin-top: var(--space-2);
+  color: var(--muted);
+}
+
 /* Badge "Dane testowe". Always visible on a page that shows placeholder data. */
 .test-badge {
   display: inline-block;
