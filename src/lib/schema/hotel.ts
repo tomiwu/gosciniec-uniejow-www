@@ -1,5 +1,6 @@
 import type { Hotel, WithContext } from 'schema-dts';
 import { nap } from '../nap';
+import type { Room } from '../rooms';
 
 /**
  * JSON-LD for the hotel. Built from `nap.ts` only.
@@ -7,10 +8,14 @@ import { nap } from '../nap';
  */
 export type HotelSchema = Exclude<WithContext<Hotel>, string>;
 
+/** Same `@id` on every page. Search engines merge the blocks of one page into one entity. */
+const HOTEL_ID = `${nap.siteUrl}/#hotel`;
+
 export function buildHotelSchema(): HotelSchema {
   return {
     '@context': 'https://schema.org',
     '@type': 'Hotel',
+    '@id': HOTEL_ID,
     name: nap.name,
     url: nap.siteUrl,
     telephone: nap.phoneE164,
@@ -22,5 +27,20 @@ export function buildHotelSchema(): HotelSchema {
       addressLocality: nap.city,
       addressCountry: nap.country,
     },
+  };
+}
+
+/**
+ * The Hotel block with one `HotelRoom` for each room type (page `/pokoje/`).
+ * There is no `Offer`: the site has no real room price (PRD D3).
+ */
+export function buildHotelRoomsSchema(rooms: readonly Room[]): HotelSchema {
+  return {
+    ...buildHotelSchema(),
+    containsPlace: rooms.map((room) => ({
+      '@type': 'HotelRoom' as const,
+      name: room.name,
+      description: room.shortDescription,
+    })),
   };
 }
