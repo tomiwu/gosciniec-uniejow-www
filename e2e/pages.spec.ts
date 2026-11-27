@@ -11,7 +11,7 @@ for (const route of routes) {
       expect(response?.status()).toBe(200);
       await expect(page.locator('html')).toHaveAttribute('lang', 'pl');
       await expect(page.locator('h1')).toHaveCount(1);
-      await expect(page.getByRole('link', { name: 'Rezerwuj' })).toHaveAttribute(
+      await expect(page.locator('header').getByRole('link', { name: 'Rezerwuj' })).toHaveAttribute(
         'href',
         '/rezerwacja/',
       );
