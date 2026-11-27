@@ -24,3 +24,12 @@ export function routeMetadata(path: string): Metadata {
     },
   };
 }
+
+/** Metadata for a page that search engines must not index (for example a thank-you page). */
+export function noindexMetadata(title: string, description: string): Metadata {
+  return {
+    title: { absolute: `${title} | ${TITLE_SUFFIX}` },
+    description,
+    robots: { index: false, follow: false },
+  };
+}

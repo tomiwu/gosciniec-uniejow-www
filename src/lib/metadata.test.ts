@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { routeMetadata } from './metadata';
+import { noindexMetadata, routeMetadata } from './metadata';
 import { nap } from './nap';
 import { routes } from './routes';
 
@@ -68,5 +68,13 @@ describe('routeMetadata', () => {
 
   it('throws for an unknown route', () => {
     expect(() => routeMetadata('/nie-ma/')).toThrow();
+  });
+});
+
+describe('noindexMetadata', () => {
+  it('sets robots to noindex and keeps the site suffix in the title', () => {
+    const metadata = noindexMetadata('Dziękujemy', 'Opis strony.');
+    expect(metadata.robots).toEqual({ index: false, follow: false });
+    expect(metadata.title).toEqual({ absolute: `Dziękujemy | ${SUFFIX}` });
   });
 });
