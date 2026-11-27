@@ -120,6 +120,10 @@ describe('checkHtml', () => {
       const errors = checkHtml(page(hotel, offer({ price: 10, priceCurrency: 'EUR' })), 'a.html');
       expect(errors.join('\n')).toContain('PLN');
     });
+    it('fails on a price that is not in offers.ts', () => {
+      const errors = checkHtml(page(hotel, offer({ price: 123, priceCurrency: 'PLN' })), 'a.html');
+      expect(errors.join('\n')).toContain('not in offers.ts');
+    });
     it('checks an Offer nested in another node', () => {
       const nested = { ...hotel, makesOffer: offer({ price: 0, priceCurrency: 'PLN' }) };
       expect(checkHtml(page(nested), 'a.html').join('\n')).toContain('greater than 0');
@@ -133,6 +137,7 @@ describe('required types per page', () => {
   it('requires FAQPage on /faq/', () => {
     expect(requiredTypesFor('faq/index.html')).toEqual(['FAQPage']);
     expect(requiredTypesFor('pokoje/index.html')).toEqual([]);
+    expect(requiredTypesFor('pakiety/index.html')).toEqual(['Offer']);
   });
 
   it('fails on /faq/ without a FAQPage block', () => {

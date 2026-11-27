@@ -1,13 +1,29 @@
 import Link from 'next/link';
-import { legalNav } from '@/lib/navigation';
+import { legalNav, mainNav } from '@/lib/navigation';
 import { nap } from '@/lib/nap';
+import { LogoMark } from './LogoMark';
 import { NapBlock } from './NapBlock';
 
 export function SiteFooter() {
   return (
     <footer className="site-footer">
       <div className="site-footer__inner">
-        <NapBlock />
+        <div className="site-footer__brand">
+          <p className="site-footer__logo">
+            <LogoMark />
+            <span>{nap.name}</span>
+          </p>
+          <NapBlock />
+        </div>
+        <nav aria-label="Na skróty">
+          <ul className="footer-links footer-links--grid">
+            {mainNav.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href}>{item.label}</Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
         <nav aria-label="Informacje prawne">
           <ul className="footer-links">
             {legalNav.map((item) => (

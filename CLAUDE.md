@@ -17,6 +17,9 @@
 - Keep pages light: LCP below 2500 ms (mobile lab). Pre-sized images in `public/img/` with width and height. `next/font` with local subset or system fonts. No large client libraries.
 - Accessibility: WCAG 2.2 AA. Semantic HTML, one `h1` per page, labels on all inputs, visible focus, contrast 4.5:1, target size 24x24 px, no `user-scalable=no`.
 
+## Design
+- Follow `docs/design-system.md` (light theme A, dark theme B, tokens, building blocks, motion rules). New UI must pass axe in both themes.
+
 ## Commands (all must pass before a commit; run `scripts/precommit.sh`)
 - `npm run format:check`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`, `npm run test:redirects`, `npm run test:schema`, `npm run test:e2e`, `npm run lighthouse`.
 - Use the formatter (`npm run format`). Do not format by hand.

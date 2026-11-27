@@ -15,6 +15,7 @@ const IMAGE_SIZES = '(min-width: 48rem) 36rem, 100vw';
 export default function Page() {
   return (
     <div className="page page--wide">
+      <p className="eyebrow">Pokoje</p>
       <h1>Pokoje w Uniejowie</h1>
       <p className="lead">
         Nocleg w Uniejowie w czterech typach pokoi: standard, superior, Deluxe w standardzie 3* i
@@ -30,7 +31,12 @@ export default function Page() {
         {rooms.map((room, index) => {
           const headingId = `pokoj-${room.slug}`;
           return (
-            <article key={room.slug} className="room" aria-labelledby={headingId}>
+            <article
+              key={room.slug}
+              // The first card holds the LCP image: it must not wait for a reveal animation.
+              className={index === 0 ? 'room card' : 'room card reveal'}
+              aria-labelledby={headingId}
+            >
               <div className="room__image">
                 <Picture
                   slug={room.imageSlugs[0]}
@@ -42,7 +48,7 @@ export default function Page() {
               <div className="room__body">
                 <h2 id={headingId}>{room.name}</h2>
                 <p>{room.shortDescription}</p>
-                <ul className="room__features">
+                <ul className="room__features tags">
                   {room.features.map((feature) => (
                     <li key={feature}>{feature}</li>
                   ))}

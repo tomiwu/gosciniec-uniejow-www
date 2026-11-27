@@ -123,6 +123,8 @@ test('interactive targets are at least 24x24 CSS px', async ({ page }) => {
   const count = await targets.count();
   expect(count).toBeGreaterThan(0);
   for (let i = 0; i < count; i += 1) {
+    // Some targets exist only on one screen size (action bar, desktop phone link).
+    if (!(await targets.nth(i).isVisible())) continue;
     const box = await targets.nth(i).boundingBox();
     expect(box?.width, `target ${i} width`).toBeGreaterThanOrEqual(24);
     expect(box?.height, `target ${i} height`).toBeGreaterThanOrEqual(24);
