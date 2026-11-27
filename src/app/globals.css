@@ -1154,6 +1154,72 @@ p {
   }
 }
 
+/* FAQ (accordion) */
+.faq__list {
+  display: grid;
+  gap: 10px;
+  margin: 32px 0;
+}
+
+.faq__item {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--card);
+  transition: box-shadow var(--base) var(--ease-out);
+}
+
+.faq__item[open] {
+  box-shadow: var(--shadow);
+}
+
+.faq__item summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 56px;
+  padding: 14px 18px;
+  border-radius: var(--r-lg);
+  font-weight: 650;
+  cursor: pointer;
+  list-style: none;
+}
+
+.faq__item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq__item summary::after {
+  content: '+' / '';
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--tag-bg);
+  color: var(--ink);
+  font: 500 20px/1 var(--sans);
+  transition:
+    transform var(--base) var(--ease-out),
+    background-color var(--fast);
+}
+
+.faq__item[open] summary::after {
+  background: var(--gold);
+  color: var(--on-gold);
+  transform: rotate(45deg);
+}
+
+.faq__answer {
+  padding: 0 18px 8px;
+}
+
+.faq__todo {
+  font-weight: 600;
+  color: var(--muted);
+}
+
 /* ---------- Footer (night in both themes) ---------- */
 .site-footer {
   position: relative;
