@@ -4,6 +4,8 @@
  * with the same cases (`fixtures.ts`). Change both files together.
  */
 
+import { isKnownBookingOfferSlug } from './booking-offers';
+
 export type FormKind = 'kontakt' | 'rezerwacja';
 
 /** Maximum lengths in characters (code points). */
@@ -12,6 +14,7 @@ export const LIMITS = {
   email: 254,
   phone: 30,
   subject: 100,
+  package: 60,
   room: 100,
   message: 2000,
   guestsMax: 20,
@@ -22,6 +25,7 @@ export type FieldName =
   | 'departure'
   | 'adults'
   | 'children'
+  | 'package'
   | 'room'
   | 'subject'
   | 'name'
@@ -37,6 +41,7 @@ export const FIELDS_BY_FORM: Record<FormKind, readonly FieldName[]> = {
     'departure',
     'adults',
     'children',
+    'package',
     'room',
     'name',
     'email',
@@ -63,6 +68,8 @@ export const MESSAGES = {
   adultsRequired: 'Podaj liczbę dorosłych.',
   adultsInvalid: `Liczba dorosłych: od 1 do ${LIMITS.guestsMax}.`,
   childrenInvalid: `Liczba dzieci: od 0 do ${LIMITS.guestsMax}.`,
+  packageUnknown: 'Wybierz ofertę z listy albo zostaw pole puste.',
+  packageTooLong: `Identyfikator oferty może mieć najwyżej ${LIMITS.package} znaków.`,
   roomTooLong: `Typ pokoju może mieć najwyżej ${LIMITS.room} znaków.`,
   roomNewline: 'Typ pokoju nie może zawierać nowej linii.',
   subjectRequired: 'Wybierz temat wiadomości.',
@@ -150,6 +157,11 @@ export function validateForm(form: string, input: FormInput): ValidationResult {
     ) {
       errors.children = MESSAGES.childrenInvalid;
     }
+
+    const packageSlug = get('package');
+    if (hasNewline(packageSlug)) errors.package = MESSAGES.packageUnknown;
+    else if (textLength(packageSlug) > LIMITS.package) errors.package = MESSAGES.packageTooLong;
+    else if (!isKnownBookingOfferSlug(packageSlug)) errors.package = MESSAGES.packageUnknown;
 
     const room = get('room');
     if (hasNewline(room)) errors.room = MESSAGES.roomNewline;

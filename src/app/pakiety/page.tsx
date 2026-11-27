@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { FaqList } from '@/components/FaqList';
 import { JsonLd } from '@/components/JsonLd';
 import { PLACEHOLDER_BADGE, placeholderPackages } from '@/content/placeholders';
+import { sylwesterBookingSlug } from '@/lib/form/booking-offers';
 import { routeMetadata } from '@/lib/metadata';
 import { buildFaqSchema } from '@/lib/faq';
 import { offerFaq } from '@/lib/offer-faq';
@@ -49,6 +50,11 @@ export default function Page() {
                 Zobacz szczegóły balu
               </Link>
             </p>
+            <p>
+              <Link className="button" href={`/rezerwacja/?pakiet=${sylwesterBookingSlug}`}>
+                Zapytaj o Sylwestra
+              </Link>
+            </p>
           </article>
         </li>
         {placeholderPackages.map((item) => (
@@ -66,7 +72,7 @@ export default function Page() {
               </ul>
               <p className="package-card__price">{item.priceText}</p>
               <p>
-                <Link className="button" href={item.path}>
+                <Link className="button" href={`/rezerwacja/?pakiet=${item.id}`}>
                   {item.linkLabel}
                 </Link>
               </p>

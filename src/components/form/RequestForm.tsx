@@ -1,7 +1,20 @@
 'use client';
 
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type FormEvent,
+  type ReactNode,
+} from 'react';
 import { flushSync } from 'react-dom';
+import {
+  PLACEHOLDER_BADGE,
+  bookingOfferBySlug,
+  bookingOfferOptions,
+  packageFromParam,
+} from '@/lib/form/booking-offers';
 import { roomFromParam, subjectFromParam, subjects } from '@/lib/form/prefill';
 import {
   FIELDS_BY_FORM,
@@ -20,6 +33,15 @@ const THANKS_PATH: Record<FormKind, string> = {
   rezerwacja: '/rezerwacja/dziekujemy/',
 };
 const NETWORK_ERROR = `Nie udało się wysłać formularza. Spróbuj ponownie lub zadzwoń: ${nap.phoneDisplay}.`;
+
+function packageSlugFromUrl(): string {
+  return packageFromParam(new URLSearchParams(window.location.search).get('pakiet'));
+}
+
+function subscribeToUrl(onStoreChange: () => void): () => void {
+  window.addEventListener('popstate', onStoreChange);
+  return () => window.removeEventListener('popstate', onStoreChange);
+}
 
 type FieldProps = {
   name: FieldName;
@@ -76,6 +98,8 @@ export function RequestForm({ kind }: { kind: FormKind }) {
   const summaryRef = useRef<HTMLParagraphElement>(null);
   const [errors, setErrors] = useState<FormErrors>({});
   const [sending, setSending] = useState(false);
+  const urlPackageSlug = useSyncExternalStore(subscribeToUrl, packageSlugFromUrl, () => '');
+  const [packageOverride, setPackageOverride] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const form = formRef.current;
@@ -142,6 +166,8 @@ export function RequestForm({ kind }: { kind: FormKind }) {
   }
 
   const isBooking = kind === 'rezerwacja';
+  const packageSlug = kind === 'rezerwacja' ? (packageOverride ?? urlPackageSlug) : '';
+  const selectedOffer = packageSlug ? bookingOfferBySlug(packageSlug) : undefined;
   return (
     <form
       ref={formRef}
@@ -157,6 +183,18 @@ export function RequestForm({ kind }: { kind: FormKind }) {
         <p className="form-error" role="alert" tabIndex={-1} ref={summaryRef}>
           <span className="visually-hidden">Błąd: </span>
           {errors.form}
+        </p>
+      ) : null}
+
+      {isBooking && selectedOffer ? (
+        <p className="form-note" id="rezerwacja-oferta">
+          Formularz dotyczy oferty: <strong>{selectedOffer.name}</strong>
+          {selectedOffer.isPlaceholder ? (
+            <>
+              {' '}
+              <span className="test-badge">{PLACEHOLDER_BADGE}</span>
+            </>
+          ) : null}
         </p>
       ) : null}
 
@@ -199,6 +237,29 @@ export function RequestForm({ kind }: { kind: FormKind }) {
               )}
             </Field>
           </div>
+          <Field
+            name="package"
+            label="Oferta lub pakiet"
+            error={errors.package}
+            hint="Wybierz ofertę, jeśli zapytanie dotyczy konkretnego pakietu lub balu."
+          >
+            {(aria) => (
+              <select
+                {...aria}
+                name="package"
+                value={packageSlug}
+                onChange={(event) => setPackageOverride(event.currentTarget.value)}
+              >
+                <option value="">Brak wybranej oferty</option>
+                {bookingOfferOptions.map((item) => (
+                  <option key={item.slug} value={item.slug}>
+                    {item.name}
+                    {item.isPlaceholder ? ` (${PLACEHOLDER_BADGE})` : ''}
+                  </option>
+                ))}
+              </select>
+            )}
+          </Field>
           <Field name="room" label="Typ pokoju" error={errors.room}>
             {(aria) => <input {...aria} name="room" type="text" maxLength={LIMITS.room} />}
           </Field>
