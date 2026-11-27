@@ -130,12 +130,12 @@ function setUpCarousel(carousel: HTMLElement, calm: boolean): () => void {
 }
 
 function setUpLightbox(dialog: HTMLDialogElement): () => void {
-  const big = dialog.querySelector('img') ?? document.createElement('img');
-  if (!big.isConnected) dialog.prepend(big);
   const onClick = (event: MouseEvent) => {
     const link = (event.target as Element).closest<HTMLAnchorElement>('a[data-lightbox]');
     if (!link || event.metaKey || event.ctrlKey || event.shiftKey) return;
     event.preventDefault();
+    // The photo is created on the first click: the page has no image without a source or alt.
+    const big = dialog.querySelector('img') ?? dialog.appendChild(document.createElement('img'));
     big.src = link.href;
     big.alt = link.querySelector('img')?.alt ?? '';
     dialog.showModal();

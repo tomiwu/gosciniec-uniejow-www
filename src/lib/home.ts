@@ -79,7 +79,7 @@ export const venue = {
 } as const;
 
 /** Home gallery: photos of the old site (`public/img`). The alt texts describe what each photo shows. */
-export const gallery: readonly { slug: string; alt: string; caption: string }[] = [
+export const gallery: readonly { slug: ImageSlug; alt: string; caption: string }[] = [
   {
     slug: 'foto-10',
     alt: 'Drewniana altana grillowa w ogrodzie hotelu z girlandą lampek',
