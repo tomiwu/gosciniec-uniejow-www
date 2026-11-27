@@ -8,4 +8,4 @@ podman build -t localhost/sandcastle:gosciniec-uniejow-www \
   --build-arg AGENT_UID="$(id -u)" --build-arg AGENT_GID="$(id -g)" \
   -f .sandcastle/Containerfile .sandcastle
 podman run --rm --entrypoint sh localhost/sandcastle:gosciniec-uniejow-www \
-  -c 'touch /tmp/smoke && node -v && claude --version && gh --version | head -1 && "$CHROME_PATH" --version'
+  -c 'touch /tmp/smoke && node -v && claude --version && agent --version && gh --version | head -1 && "$CHROME_PATH" --version'

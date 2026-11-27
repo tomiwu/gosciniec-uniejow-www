@@ -10,7 +10,7 @@
 //   5. If a check fails, run the fixer agent. Retry up to MAX_FIX_ATTEMPTS.
 //   6. Push the branch, open a PR, wait for CI. Never merge: label needs-validation.
 // See the policy block at the end of this file (idle polling, webhook events).
-// The agent is always Claude Code on the local machine. Do not use cloud agents.
+// The agents run on the local machine only (Claude Code, then the Cursor CLI). Do not use cloud agents.
 //
 // Loop policy (tomiwu 2026-11-13, review of the Lydia Hallie talk; helpers in loop-policy.mts):
 //  1. A Claude limit ("resets 6:30pm (UTC)"): skip the other Claude models (one shared limit),
@@ -27,6 +27,13 @@
 //  8. ## Verification = the command and the pasted tail of its real output; before/after numbers.
 //  9. Effort per phase (EFFORT_<PHASE>; a format/lint-only fixer uses low).
 //  Status file STATUS_FILE (JSON: phase, model, issue, startedAt, lastOutputAt).
+// 10. Cursor CLI fallback (tomiwu 2026-11-27, issue #58): on a Claude limit, the loop runs the same
+//     phase with the local Cursor CLI (`agent --print`, CURSOR_MODEL, default composer-2.5) in the same
+//     podman sandbox. Before each phase, when the parsed Claude reset time has passed, the loop goes back
+//     to Claude. If the Cursor CLI also fails, the loop pauses until the Claude reset (old behavior).
+//     The fallback is active only when .sandcastle/.env has a CURSOR_API_KEY line with a value (or the
+//     value is in the env). CURSOR_FALLBACK=0 turns it off. .cursor/cli.json has the same deny rules as
+//     .claude/settings.json. The Cursor CLI has no Stop hook: the host checks still run after the phase.
 //
 // Usage:
 //   MAX_ITERATIONS=10 npx tsx .sandcastle/main.mts
@@ -39,8 +46,10 @@ import { execFileSync, spawn, spawnSync } from "node:child_process";
 import { copyFileSync, mkdirSync, openSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import {
+  agentBeforePhase,
   CLAUDE_LIMIT,
   effortFor,
+  isClaudeLabel,
   limitWait,
   modelOfLabel,
   nextAgentAfterStall,
@@ -60,6 +69,8 @@ const REVIEW_MODEL = process.env.REVIEW_MODEL ?? CLAUDE_MODEL;
 const PAUSE_MINUTES = Number(process.env.PAUSE_MINUTES ?? "30");
 const MAX_PAUSES = Number(process.env.MAX_PAUSES ?? "12");
 const LIMIT_MAX_HOURS = Number(process.env.LIMIT_MAX_HOURS ?? "6");
+// Cursor CLI fallback (rule 10). Local CLI only, never Cursor cloud agents.
+const CURSOR_MODEL = process.env.CURSOR_MODEL ?? "composer-2.5";
 
 // Project-specific settings. Edit .sandcastle/checks.json, not this file.
 interface Config {
@@ -84,8 +95,36 @@ const MODELS = [
     ? [CLAUDE_FALLBACK_MODEL]
     : []),
 ];
-const LABELS = MODELS.map((m) => `Claude Code (${m})`);
+// Sandcastle copies only the keys of .sandcastle/.env into the sandbox (the value can come from the
+// env). Thus the Cursor CLI can authenticate only when the file has the key. Never log the value.
+function cursorKeyReady(): boolean {
+  if (process.env.CURSOR_FALLBACK === "0") return false;
+  let line = "";
+  try {
+    line =
+      readFileSync(".sandcastle/.env", "utf8")
+        .split("\n")
+        .find((l) => /^\s*CURSOR_API_KEY\s*=/.test(l)) ?? "";
+  } catch {
+    return false;
+  }
+  if (!line) return false;
+  const value = line.replace(/^[^=]*=/, "").trim().replace(/^["']|["']$/g, "");
+  return value.length > 0 || Boolean(process.env.CURSOR_API_KEY);
+}
+const CURSOR_READY = cursorKeyReady();
+const LABELS = [
+  ...MODELS.map((m) => `Claude Code (${m})`),
+  ...(CURSOR_READY ? [`Cursor CLI (${CURSOR_MODEL})`] : []),
+];
+console.log(
+  CURSOR_READY
+    ? `Agent chain: ${LABELS.join(" -> ")}. A Claude limit changes to the Cursor CLI until the reset.`
+    : `Agent chain: ${LABELS.join(" -> ")}. Cursor CLI fallback is off (no CURSOR_API_KEY in .sandcastle/.env, or CURSOR_FALLBACK=0).`,
+);
 let agentIndex = 0;
+// Wall-clock time (ms) when the Claude limit resets. Undefined: Claude has no known limit.
+let claudeResetAtMs: number | undefined;
 let pauses = 0;
 let currentIssue: number | null = null;
 const PROJECT_NAME =
@@ -109,6 +148,30 @@ function logTail(name?: string): string {
   const f = newestLog(name);
   try {
     return f ? readFileSync(f, "utf8").slice(-4000) : "";
+  } catch {
+    return "";
+  }
+}
+
+// Position in the newest log of a phase. A retry in the same sandbox appends to the same log, so the
+// stall check reads only the text after this position (not an old limit message of the last agent).
+// A different (new) log file is read from the start.
+interface LogMark { file?: string; size: number }
+function logMark(name: string): LogMark {
+  const file = newestLog(name);
+  try {
+    return { file, size: file ? statSync(file).size : 0 };
+  } catch {
+    return { file, size: 0 };
+  }
+}
+function logTailSince(name: string, mark: LogMark): string {
+  const f = newestLog(name);
+  try {
+    if (!f) return "";
+    const buf = readFileSync(f);
+    const from = f === mark.file && mark.size <= buf.length ? mark.size : 0;
+    return buf.subarray(from).toString("utf8").slice(-4000);
   } catch {
     return "";
   }
@@ -143,22 +206,38 @@ async function runPhase(
   const name = options.name ?? "phase";
   const baseSha = (await sandbox.exec("git rev-parse HEAD")).stdout.trim();
   for (;;) {
+    const back = agentBeforePhase(LABELS, agentIndex, claudeResetAtMs, Date.now());
+    if (back !== agentIndex) {
+      console.log(
+        `The Claude limit reset time has passed. Change from ${LABELS[agentIndex]} back to ${LABELS[back]}.`,
+      );
+      agentIndex = back;
+      claudeResetAtMs = undefined;
+    }
+    const label = LABELS[agentIndex];
+    const onCursor = !isClaudeLabel(label);
     const effort = effortFor(phaseOfName(name, checkLog));
-    const model = name === "reviewer" ? REVIEW_MODEL : MODELS[agentIndex];
+    const model = onCursor
+      ? CURSOR_MODEL
+      : name === "reviewer"
+        ? REVIEW_MODEL
+        : MODELS[agentIndex];
     const env = {
       LOOP_STOP_GATE: "1",
       LOOP_PHASE: name,
       LOOP_BASE_SHA: baseSha,
     };
     const startedAt = new Date().toISOString();
-    saveStatus(name, `${model}, effort ${effort}`, startedAt, null);
+    const agentName = onCursor ? `Cursor CLI (${model})` : `Claude Code (${model})`;
+    console.log(`Phase ${name}: agent ${agentName}${onCursor ? "" : `, effort ${effort}`}.`);
+    saveStatus(name, `${agentName}, effort ${effort}`, startedAt, null);
     const beat = setInterval(() => {
       const f = newestLog(name);
       try {
         if (f)
           saveStatus(
             name,
-            `${model}, effort ${effort}`,
+            `${agentName}, effort ${effort}`,
             startedAt,
             new Date(statSync(f).mtimeMs).toISOString(),
           );
@@ -167,28 +246,40 @@ async function runPhase(
       }
     }, 30_000);
     let failure = "";
+    const logStart = logMark(name);
     try {
       const result = await sandbox.run({
         idleTimeoutSeconds: 1800,
         ...runOptions,
-        agent: sandcastle.claudeCode(model, { effort, env }),
+        agent: onCursor
+          ? sandcastle.cursor(model, { env })
+          : sandcastle.claudeCode(model, { effort, env }),
       });
-      if (result.commits.length || !STALL.test(logTail(name))) return result;
-      failure = `stall text in the agent log: ${logTail(name).slice(-300)}`;
+      const runLog = logTailSince(name, logStart);
+      if (result.commits.length || !STALL.test(runLog)) return result;
+      failure = `stall text in the agent log: ${runLog.slice(-300)}`;
     } catch (error) {
       // A broken container runtime is not a Claude limit. Do not pause and retry in the same
       // sandbox: crash, so that loop_crashed is sent and a restart creates a new sandbox.
       if (CONTAINER_BROKEN.test(`${error}`)) throw error;
-      failure = `${error} ${logTail(name).slice(-600)}`;
-      if (!STALL.test(failure)) throw error;
+      failure = `${error} ${logTailSince(name, logStart).slice(-600)}`;
+      // Any error of the Cursor CLI (limit, login, prompt too long for argv) is a stall:
+      // the loop then waits for Claude, as before the fallback.
+      if (!onCursor && !STALL.test(failure)) throw error;
     } finally {
       clearInterval(beat);
     }
-    console.log(
-      `Claude Code (${model}) stalled in ${name}: ${failure.slice(0, 300)}`,
-    );
+    console.log(`${agentName} stalled in ${name}: ${failure.slice(0, 300)}`);
+    if (!onCursor && CLAUDE_LIMIT.test(failure)) {
+      const w = limitWait(failure, Date.now(), PAUSE_MINUTES, LIMIT_MAX_HOURS);
+      claudeResetAtMs = w.untilMs;
+      console.log(
+        `Claude limit: Claude is free again at ${new Date(w.untilMs).toISOString()} (${w.reason}).`,
+      );
+    }
     const next = nextAgentAfterStall(LABELS, agentIndex, failure);
     if (next >= 0) {
+      console.log(`Change from ${agentName} to ${LABELS[next]} and run ${name} again.`);
       agentIndex = next;
       continue;
     }
@@ -197,18 +288,26 @@ async function runPhase(
         `All models stalled ${MAX_PAUSES + 1} times. Last error: ${failure.slice(0, 300)}`,
       );
     pauses++;
-    const w = CLAUDE_LIMIT.test(failure)
-      ? limitWait(failure, Date.now(), PAUSE_MINUTES, LIMIT_MAX_HOURS)
-      : {
-          untilMs: Date.now() + PAUSE_MINUTES * 60_000,
-          reason: `fixed pause ${PAUSE_MINUTES} min`,
-        };
+    // A known Claude reset in the future: wait for it (also after a Cursor failure).
+    const w =
+      claudeResetAtMs !== undefined && claudeResetAtMs > Date.now()
+        ? {
+            untilMs: claudeResetAtMs,
+            reason: `wait for the Claude limit reset${onCursor ? " (the Cursor CLI also failed)" : ""}`,
+          }
+        : CLAUDE_LIMIT.test(failure) && !onCursor
+          ? limitWait(failure, Date.now(), PAUSE_MINUTES, LIMIT_MAX_HOURS)
+          : {
+              untilMs: Date.now() + PAUSE_MINUTES * 60_000,
+              reason: `fixed pause ${PAUSE_MINUTES} min`,
+            };
     console.log(
       `Pause until ${new Date(w.untilMs).toISOString()} on the wall clock (${w.reason}, pause ${pauses}/${MAX_PAUSES}).`,
     );
     saveStatus("pause", w.reason, new Date().toISOString(), null);
     await sleepUntil(w.untilMs);
     agentIndex = 0;
+    claudeResetAtMs = undefined;
   }
 }
 

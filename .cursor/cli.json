@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [],
+    "deny": [
+      "Shell(git:push*)",
+      "Shell(git:commit*--no-verify*)",
+      "Shell(gh:pr*)",
+      "Shell(gh:api*)",
+      "Shell(gh:release*)",
+      "Shell(gh:repo*)",
+      "Shell(gh:secret*)",
+      "Shell(gh:workflow*)",
+      "Shell(gh:issue close*)",
+      "Shell(gh:issue edit*)",
+      "Shell(gh:auth*)",
+      "Shell(env)",
+      "Shell(printenv)",
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(**/.env)",
+      "Read(.sandcastle/.env)",
+      "Write(docs/PRD.md)",
+      "Write(.sandcastle/**)",
+      "Write(.claude/**)",
+      "Write(.cursor/**)"
+    ]
+  }
+}
