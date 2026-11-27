@@ -28,7 +28,6 @@ describe('rooms', () => {
       expect(room.shortDescription.length).toBeGreaterThan(20);
       expect(room.features.length).toBeGreaterThan(3);
       expect(room.imageAlt.trim()).not.toBe('');
-      expect(room.imageSlugs.length).toBeGreaterThan(0);
       for (const slug of room.imageSlugs) {
         expect(images.some((image) => image.slug === slug)).toBe(true);
       }

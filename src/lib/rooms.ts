@@ -11,7 +11,7 @@ export interface Room {
   /** Polish list of facts about the room. */
   features: readonly string[];
   /** Photos of the room. The page shows the first one. */
-  imageSlugs: readonly ImageSlug[];
+  imageSlugs: readonly [ImageSlug, ...ImageSlug[]];
   /** Polish alt text for the first photo. It describes only what the photo shows. */
   imageAlt: string;
   /** Lowest price per night in PLN. `null` until the owner gives real prices (PRD D3). */

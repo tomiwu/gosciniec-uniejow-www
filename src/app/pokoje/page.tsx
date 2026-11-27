@@ -32,7 +32,7 @@ export default function Page() {
             <article key={room.slug} className="room" aria-labelledby={headingId}>
               <div className="room__image">
                 <Picture
-                  slug={room.imageSlugs[0] ?? 'img-3729'}
+                  slug={room.imageSlugs[0]}
                   alt={room.imageAlt}
                   sizes={IMAGE_SIZES}
                   priority={index === 0}
