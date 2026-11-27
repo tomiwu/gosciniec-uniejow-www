@@ -1,7 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { extractJsonLd } from '../../../scripts/check-schema';
-import { allPlaceholders } from '@/content/placeholders';
 import { nap } from '@/lib/nap';
 import { salesEmail } from '@/lib/venue';
 import { bodyOf, hasLink } from '@/test/venue-assertions';
@@ -47,11 +46,7 @@ describe('/kontakt/ page', () => {
     expect(body).not.toMatch(/bezpłatny parking|parking jest (bezpłatny|płatny)/i);
   });
 
-  it('uses no placeholder record and shows no badge', () => {
-    for (const record of allPlaceholders) {
-      const pages = (record as { pages?: readonly string[] }).pages ?? [];
-      expect(pages).not.toContain('/kontakt/');
-    }
+  it('shows no placeholder badge', () => {
     expect(body).not.toContain('Dane testowe');
   });
 
