@@ -595,3 +595,39 @@ summary:focus-visible,
   font-weight: 700;
   text-align: center;
 }
+
+/* Prices page: table of room types. */
+.prices {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--space-5) 0;
+}
+
+.prices caption {
+  padding-bottom: var(--space-2);
+  text-align: left;
+  font-weight: 600;
+}
+
+.prices th,
+.prices td {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  border: 1px solid var(--color-border);
+}
+
+.prices thead th {
+  background: var(--color-bg-alt);
+}
+
+/* Packages page. */
+.package img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+}
+
+.package__price {
+  font-size: 1.25rem;
+}
