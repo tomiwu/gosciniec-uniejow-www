@@ -12,8 +12,7 @@ const inquiry = `Zapytanie wyślij na ${salesEmail} albo zadzwoń: ${nap.phoneDi
 
 const shared = faq.find((item) => item.id === 'przyjecia-konferencje');
 if (!shared) throw new Error('faq.ts needs the item "przyjecia-konferencje".');
-/** Same answer on every page. Only the link differs, so no page links to itself. */
-const sharedItem: FaqItem = { ...shared };
+/** Same answer on both pages. Only the link differs, so no page links to itself. */
 const sharedForConferences: FaqItem = {
   ...shared,
   link: { href: '/przyjecia/', label: 'Przyjęcia i sala balowa' },
@@ -52,7 +51,7 @@ export const conferenceFaq: readonly FaqItem[] = [
 ];
 
 export const partiesFaq: readonly FaqItem[] = [
-  sharedItem,
+  shared,
   {
     id: 'rodzaje',
     question: 'Jakie przyjęcia można zorganizować w hotelu?',
@@ -61,7 +60,7 @@ export const partiesFaq: readonly FaqItem[] = [
   {
     id: 'sylwester',
     question: 'Czy hotel organizuje Sylwestra?',
-    answer: `Tak. ${sylwester.title} odbędzie się ${sylwester.dateText} w sali balowej hotelu. Szczegóły i cena są na stronie oferty.`,
+    answer: `Tak. ${sylwester.title} odbędzie się ${sylwester.dateText} w sali balowej hotelu. Szczegóły są na stronie oferty.`,
     link: { href: sylwester.path, label: 'Zobacz ofertę Sylwestra 2026/2027' },
   },
   {
