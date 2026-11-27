@@ -33,4 +33,4 @@ Status: approved by Tomasz on 2026-11-27 (issue #25).
 ## Visual review
 
 Each PR gets screenshots of the key routes at 390 px and 1280 px in both themes, a pixel diff
-against `main` and a UX review comment. The workflow is added by issue #26.
+against `main` and a UX review comment. It is a report, not a gate. See `docs/ux-review.md`.

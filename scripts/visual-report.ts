@@ -40,7 +40,8 @@ interface PwSuite {
 }
 
 // Playwright colours the error text. Remove the ANSI codes before we read it.
-const stripAnsi = (text: string) => text.replace(/\u001b\[[0-9;]*m/g, '');
+const ANSI = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
+const stripAnsi = (text: string) => text.replace(ANSI, '');
 
 export function classify(
   result: PwResult | undefined,
