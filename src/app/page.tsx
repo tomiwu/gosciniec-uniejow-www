@@ -33,7 +33,7 @@ export default function Page() {
           <Picture
             slug="foto-7"
             alt="Budynek hotelu Gościniec Uniejów w otoczeniu zielonego ogrodu"
-            sizes="(min-width: 72rem) 1152px, 100vw"
+            sizes="(min-width: 72rem) 576px, (min-width: 48rem) 50vw, 100vw"
             priority
           />
         </div>
