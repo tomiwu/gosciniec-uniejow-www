@@ -18,6 +18,9 @@ Issue #26. Tomasz asked for a UI/UX expert review after each PR (2026-11-27).
    job results, and posts **one** PR comment (updated on each run): regressions, UX issues with
    severity (`blocker`, `major`, `minor`) and a verdict (`ok`, `ok-with-notes`, `regression`).
    Verdict `regression` adds the label `ux-regression`.
+   When Claude reaches its limit, the script runs the same review with the local Cursor CLI
+   (`agent`, model `UX_REVIEW_CURSOR_MODEL`, default `grok-4.7`). This needs `CURSOR_API_KEY` in
+   `.sandcastle/.env`. The Cursor CLI gets no shell, no web and no MCP tools (issue #58).
 3. **Loop hook**: the Sandcastle loop starts the reviewer in the background when a PR is green
    (`startUxReview` in `.sandcastle/main.mts`). PRs that the supervisor bot opens get the review
    from the bot (`scripts/ux-review.sh <pr>`).

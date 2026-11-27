@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # UX review of one PR (issue #26). It runs on the box, not in CI: it needs Claude Code and the
 # Claude token in .sandcastle/.env. The visual-review workflow must have run for the PR head.
+# Claude limit (issue #58): the script runs the same review with the local Cursor CLI (`agent`,
+# UX_REVIEW_CURSOR_MODEL, default grok-4.7) when CURSOR_API_KEY is set. Never Cursor cloud agents.
 #
 #   scripts/ux-review.sh <pr-number-or-url> [--force]
 #
@@ -27,6 +29,9 @@ if [[ -f "$ROOT/.sandcastle/.env" ]]; then
 fi
 export GH_TOKEN CLAUDE_CODE_OAUTH_TOKEN
 MODEL="${UX_REVIEW_MODEL:-${REVIEW_MODEL:-claude-sonnet-5-5}}"
+CURSOR_MODEL_UX="${UX_REVIEW_CURSOR_MODEL:-grok-4.7}"
+# Same limit words as CLAUDE_LIMIT in .sandcastle/loop-policy.mts.
+LIMIT_RE='hit your ([A-Za-z0-9-]+ )?limit|usage limit|limit reached|rate limit|out of (extra )?usage'
 
 PR="$(gh pr view "$PR_ARG" --repo "$REPO" --json number --jq .number)" || { log "PR not found"; exit 0; }
 SHA="$(gh pr view "$PR" --repo "$REPO" --json headRefOid --jq .headRefOid)"
@@ -74,17 +79,51 @@ gh pr view "$PR" --repo "$REPO" --json title,body,files >"$WORK/pr.json"
 
 # 3. The reviewer agent. It may only read files and write review.json in the work dir.
 sed "s/{{PR}}/$PR/g" "$ROOT/.sandcastle/ux-review-prompt.md" >"$WORK/prompt.md"
+AGENT_OK=1
 (
   cd "$WORK" &&
     timeout 1500 claude -p "$(cat prompt.md)" --model "$MODEL" \
       --allowedTools "Read" "Glob" "Grep" "Edit(./review.json)" \
       --output-format text >"$WORK/agent.log" 2>&1
-) || {
+) || AGENT_OK=0
+
+# 3b. Claude limit: run the same review with the local Cursor CLI (issue #58).
+CURSOR_BIN="$(command -v agent || true)"
+[[ -z "$CURSOR_BIN" && -x "$HOME/.local/bin/agent" ]] && CURSOR_BIN="$HOME/.local/bin/agent"
+if [[ ! -s "$WORK/review.json" ]] && grep -Eqi "$LIMIT_RE" "$WORK/agent.log"; then
+  if [[ -n "${CURSOR_API_KEY:-}" && -n "$CURSOR_BIN" && "${UX_REVIEW_CURSOR:-1}" != "0" ]]; then
+    log "Claude reached its limit. Run the review with the Cursor CLI ($CURSOR_MODEL_UX)."
+    mv "$WORK/agent.log" "$WORK/agent-claude.log"
+    # Cursor CLI permissions for this work dir: no shell, no web, no MCP, no writes outside it.
+    mkdir -p "$WORK/.cursor"
+    cat >"$WORK/.cursor/cli.json" <<'JSON'
+{
+  "permissions": {
+    "allow": ["Read(**)", "Write(review.json)"],
+    "deny": ["Shell(*)", "WebFetch(*)", "Mcp(*:*)", "Write(/workspace/**)", "Write(/home/**)",
+             "Read(/workspace/**/.env*)", "Read(/home/**/.env*)", "Read(/home/*/.config/**)"]
+  }
+}
+JSON
+    AGENT_OK=1
+    (
+      cd "$WORK" &&
+        CURSOR_API_KEY="$CURSOR_API_KEY" timeout 1500 "$CURSOR_BIN" -p "$(cat prompt.md)" \
+          --model "$CURSOR_MODEL_UX" --output-format text --force --trust --workspace "$WORK" \
+          >"$WORK/agent.log" 2>&1
+    ) || AGENT_OK=0
+    [[ -s "$WORK/review.json" ]] && MODEL="$CURSOR_MODEL_UX (Cursor CLI)"
+  else
+    log "Claude reached its limit. No Cursor CLI fallback (CURSOR_API_KEY or agent is missing)."
+  fi
+fi
+if [[ "$AGENT_OK" != 1 || ! -s "$WORK/review.json" ]]; then
   log "the reviewer agent ended with an error (see $WORK/agent.log)."
   # Last line of the agent output (for example "You've hit your limit"), without token-like words.
   UX_AGENT_ERROR="$(tail -n 1 "$WORK/agent.log" | cut -c1-160 | sed -E 's/[A-Za-z0-9_-]{32,}/[hidden]/g')"
   export UX_AGENT_ERROR
-}
+fi
+log "reviewer: $MODEL"
 
 # 4. Post or update the comment, set or remove the label.
 node --no-warnings "$ROOT/scripts/ux-review-format.ts" "$WORK/review.json" "$SHA" >"$WORK/comment.md"
