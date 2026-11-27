@@ -2,9 +2,8 @@
  * Package and offer slugs for the `/rezerwacja/` form (`?pakiet=<slug>`).
  * Real offers come from `offers.ts`. Sample packages come from `placeholders.ts` only here.
  */
-import { PLACEHOLDER_BADGE, placeholderPackages } from '@/content/placeholders';
+import { placeholderPackages } from '@/content/placeholders';
 import { offers } from '@/lib/offers';
-import { sylwester } from '@/lib/venue';
 
 const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
@@ -26,12 +25,12 @@ if (!sylwesterOffer) {
 }
 
 /** Stable slug for `?pakiet=` links (issue #34 path segment). */
-export const sylwesterBookingSlug = slugFromOfferPath(sylwester.path);
+export const sylwesterBookingSlug = slugFromOfferPath(sylwesterOffer.path);
 
 /** Options in the booking form. Unknown slugs are not listed. */
 export const bookingOfferOptions: readonly BookingOfferOption[] = [
   {
-    slug: slugFromOfferPath(sylwester.path),
+    slug: sylwesterBookingSlug,
     name: sylwesterOffer.name,
   },
   ...placeholderPackages.map((item) => ({
@@ -56,11 +55,3 @@ export function bookingOfferBySlug(slug: string): BookingOfferOption | undefined
 export function isKnownBookingOfferSlug(slug: string): boolean {
   return slug === '' || bySlug.has(slug);
 }
-
-export function bookingOfferNameForMail(slug: string): string {
-  if (slug === '') return '';
-  return bySlug.get(slug)?.name ?? '';
-}
-
-/** Re-export for the form badge. */
-export { PLACEHOLDER_BADGE };

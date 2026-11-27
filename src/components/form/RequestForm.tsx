@@ -9,8 +9,8 @@ import {
   type ReactNode,
 } from 'react';
 import { flushSync } from 'react-dom';
+import { PLACEHOLDER_BADGE } from '@/content/placeholders';
 import {
-  PLACEHOLDER_BADGE,
   bookingOfferBySlug,
   bookingOfferOptions,
   packageFromParam,
