@@ -197,8 +197,7 @@ summary:focus-visible,
     display: none;
   }
 
-  .main-nav__list,
-  .main-nav__list[data-open='false'] {
+  .main-nav__list {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
