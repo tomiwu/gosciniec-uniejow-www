@@ -6,5 +6,7 @@
 _repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export XDG_RUNTIME_DIR=/tmp/xdg-runtime-gosciniec-www
 mkdir -p "$XDG_RUNTIME_DIR" && chmod 700 "$XDG_RUNTIME_DIR"
-export CONTAINERS_STORAGE_CONF="$_repo/.sandcastle/podman-storage.conf"
+# The loop checks out other commits in this work tree, so point podman at a copy outside it.
+export CONTAINERS_STORAGE_CONF="$HOME/.config/containers/gosciniec-www/storage.conf"
+install -D -m 644 "$_repo/.sandcastle/podman-storage.conf" "$CONTAINERS_STORAGE_CONF"
 unset DBUS_SESSION_BUS_ADDRESS _repo
