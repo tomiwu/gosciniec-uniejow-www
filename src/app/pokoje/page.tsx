@@ -10,8 +10,11 @@ const path = '/pokoje/';
 
 export const metadata = routeMetadata(path);
 
-/** One column on a phone, two from 48 rem, four from 72 rem (as in the design demo). */
-const IMAGE_SIZES = '(min-width: 72rem) 290px, (min-width: 48rem) 46vw, 100vw';
+/**
+ * One column on a phone, two from 48 rem, four from 72 rem (as in the design demo).
+ * On a phone the card is the screen width minus the two gutters (20 px each).
+ */
+const IMAGE_SIZES = '(min-width: 72rem) 290px, (min-width: 48rem) 46vw, calc(100vw - 40px)';
 
 export default function Page() {
   return (

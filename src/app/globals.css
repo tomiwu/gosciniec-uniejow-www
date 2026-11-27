@@ -1913,17 +1913,19 @@ a:hover > .arr,
   contain-intrinsic-size: auto 70rem;
 }
 
-/* The photos of cards 2 and more stay display:none for 1.2 s. Lighthouse then does not count
-   their bytes before the LCP photo is painted. The box keeps its size (aspect-ratio), so there
-   is no layout shift. After the delay, the lazy loading works as usual. */
-@keyframes room-photo-defer {
+/* Photos below the first screen stay display:none for 1.2 s: /pokoje/ cards 2 and more, and all
+   home sections after the hero. They then do not take bandwidth from the LCP element, and
+   Lighthouse does not count their bytes before it. The boxes keep their size (aspect-ratio), so
+   there is no layout shift. After the delay, lazy loading works as usual. */
+@keyframes photo-defer {
   from {
     display: none;
   }
 }
 
-.room + .room .card__media img {
-  animation: room-photo-defer 1ms 1.2s backwards;
+.room + .room .card__media img,
+.home > :not(.hero) img {
+  animation: photo-defer 1ms 1.2s backwards;
 }
 
 @media (min-width: 768px) {
