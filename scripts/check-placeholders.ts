@@ -4,6 +4,8 @@
  * A production build (`PRODUCTION_BUILD=1`, see `npm run build:production`) must not use
  * `src/content/placeholders.ts`. It also must not carry the badge "Dane testowe" in `out/`.
  * A preview build may keep placeholders. Then the badge must be on every page that uses them.
+ * A production build must also not show a visible `TODO` marker in any exported HTML file (issue #57).
+ * A preview build may show `TODO` markers.
  *
  * Usage:
  *   tsx scripts/check-placeholders.ts        check the source files (before the build)
@@ -43,12 +45,30 @@ export function findBadgeInOutput(outDir: string): string[] {
     .map((file) => relative(outDir, file).replaceAll('\\', '/'));
 }
 
+const NON_VISIBLE_BLOCKS = /<!--[\s\S]*?-->|<(script|style)\b[\s\S]*?<\/\1\s*>/gi;
+const TAGS = /<(?:[^>"']|"[^"]*"|'[^']*')*>/g;
+const TODO_MARKER = /\bTODO\b/;
+
+/** True when the HTML shows the word TODO as text. Scripts, styles, comments and tags do not count. */
+export function hasVisibleTodo(html: string): boolean {
+  return TODO_MARKER.test(html.replace(NON_VISIBLE_BLOCKS, ' ').replace(TAGS, ' '));
+}
+
+/** HTML files in the export folder that show a TODO marker. Paths are relative to the folder. */
+export function findTodoInOutput(outDir: string): string[] {
+  return listFiles(outDir, ['.html'])
+    .filter((file) => hasVisibleTodo(readFileSync(file, 'utf8')))
+    .map((file) => relative(outDir, file).replaceAll('\\', '/'));
+}
+
 export interface PlaceholderInput {
   production: boolean;
   /** Source files that import the placeholder module. */
   users: readonly string[];
   /** HTML files with the badge. Leave empty when the export is not checked. */
   badgeFiles?: readonly string[];
+  /** HTML files with a visible TODO marker. Leave empty when the export is not checked. */
+  todoFiles?: readonly string[];
   /** True when the export was scanned. */
   checkedOutput?: boolean;
 }
@@ -61,6 +81,7 @@ export interface PlaceholderResult {
 export function checkPlaceholders(input: PlaceholderInput): PlaceholderResult {
   const messages: string[] = [];
   const badgeFiles = input.badgeFiles ?? [];
+  const todoFiles = input.todoFiles ?? [];
   if (input.production) {
     for (const file of input.users) {
       messages.push(
@@ -69,6 +90,9 @@ export function checkPlaceholders(input: PlaceholderInput): PlaceholderResult {
     }
     for (const file of badgeFiles) {
       messages.push(`Production build: ${file} shows the badge "${PLACEHOLDER_BADGE}".`);
+    }
+    for (const file of todoFiles) {
+      messages.push(`Production build: ${file} shows a visible TODO marker.`);
     }
   } else if (input.checkedOutput && input.users.length > 0 && badgeFiles.length === 0) {
     messages.push(
@@ -83,6 +107,7 @@ function main(): number {
   const outArg = process.argv[2];
   const users = findPlaceholderUsers();
   let badgeFiles: string[] = [];
+  let todoFiles: string[] = [];
   let checkedOutput = false;
   if (outArg !== undefined) {
     const outDir = resolve(outArg);
@@ -91,18 +116,23 @@ function main(): number {
       return 1;
     }
     badgeFiles = findBadgeInOutput(outDir);
+    todoFiles = findTodoInOutput(outDir);
     checkedOutput = true;
   }
-  const result = checkPlaceholders({ production, users, badgeFiles, checkedOutput });
+  const result = checkPlaceholders({ production, users, badgeFiles, todoFiles, checkedOutput });
   for (const message of result.messages) console.error(`FAIL ${message}`);
   if (!result.ok) {
-    console.error('FAIL A production build must not use placeholder data. Use a preview build.');
+    console.error(
+      'FAIL A production build must not use placeholder data or show TODO markers. Use a preview build.',
+    );
     return 1;
   }
   const mode = production ? 'production' : 'preview/non-production';
   console.log(
     `placeholders OK (${mode} build): ${users.length} source file(s) use placeholder data` +
-      (checkedOutput ? `, ${badgeFiles.length} HTML file(s) show the badge` : ''),
+      (checkedOutput
+        ? `, ${badgeFiles.length} HTML file(s) show the badge, ${todoFiles.length} show a TODO marker`
+        : ''),
   );
   return 0;
 }
