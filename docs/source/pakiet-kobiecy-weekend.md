@@ -1,5 +1,7 @@
 # Source: https://gosciniecuniejow.pl/pakiet-kobiecy-weekend/
 
+> ARCHIVED (owner decision 2026-11-27): this package is NOT a current offer. Do not show it or its 719 zł price on the public site.
+
 Snapshot: 2026-11-11 (raw HTML from the audit). Text of the old WordPress page, menus included. Use it as source material only.
 
 Old title: Pakiet Kobiecy Chill & Fun w Uniejowie – Gościniec Uniejów

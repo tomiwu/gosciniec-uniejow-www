@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { placeholderPackages } from '../src/content/placeholders';
 import { nap } from '../src/lib/nap';
 import { offers } from '../src/lib/offers';
 
@@ -105,6 +106,15 @@ function checkFaqPage(node: Node, where: string): string[] {
   return [];
 }
 
+/** A placeholder record must not be in an Offer, an Event or an OfferCatalog (issue #33). */
+function checkNotPlaceholder(node: Node, where: string): string[] {
+  const name = node['name'];
+  if (typeof name === 'string' && placeholderPackages.some((record) => record.name === name)) {
+    return [`${where}: JSON-LD has the placeholder record "${name}"`];
+  }
+  return [];
+}
+
 function checkOffer(node: Node, where: string): string[] {
   const errors: string[] = [];
   const price = node['price'];
@@ -171,6 +181,9 @@ export function checkHtml(html: string, file: string): string[] {
         if (types.includes('HotelRoom')) errors.push(...checkHotelRoom(node, where));
         if (types.includes('FAQPage')) errors.push(...checkFaqPage(node, where));
         if (types.includes('Offer')) errors.push(...checkOffer(node, where));
+        if (['Offer', 'Event', 'OfferCatalog'].some((type) => types.includes(type))) {
+          errors.push(...checkNotPlaceholder(node, where));
+        }
       });
     }
   });

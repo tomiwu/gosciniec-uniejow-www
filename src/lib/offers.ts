@@ -1,8 +1,8 @@
 /**
  * Offers of the hotel. One source of truth for the pages and for the `Offer` JSON-LD.
- * Source: `docs/source/pakiet-kobiecy-weekend.md`, `docs/source/portfolio_swieta-w-goscincu.md`.
- * Rule (PRD D3): a price is a real number only when the old site shows it. Else it is `null`.
+ * Rule (PRD D3): a price is a real number only when a source shows it. Else it is `null`.
  * The schema builder skips each offer with a `null` price.
+ * Sample (placeholder) packages are NOT here. They live in `src/content/placeholders.ts`.
  */
 export interface OfferItem {
   id: string;
@@ -19,21 +19,13 @@ export interface OfferItem {
 
 export const offers: readonly OfferItem[] = [
   {
-    id: 'kobiecy-chill-fun',
-    name: 'Kobiecy Chill & Fun',
+    id: 'sylwester-2026',
+    name: 'Bal Sylwestrowy – Sylwester 2026/2027',
     description:
-      'Weekend dla dwóch osób w Uniejowie: dwie noce w pokoju Deluxe, śniadania w formie bufetu, kolacja, masaż relaksacyjny, strefa wellness i karnety do Term Uniejów.',
-    // Old site, 2025-09-22: "Cena pakietu: 719 zł / osoba". Still to confirm (docs/content-todo.md).
-    price: 719,
-    priceCurrency: 'PLN',
-    path: '/pakiety/',
-  },
-  {
-    id: 'swieta',
-    name: 'Święta w Gościńcu',
-    description: 'Oferta świąteczna hotelu Gościniec Uniejów. Szczegóły i cenę podaje recepcja.',
-    // The old site has no price and no details. Only a Lorem ipsum text.
-    price: null,
+      'Bal Sylwestrowy 31.12.2026 w odnowionej sali balowej hotelu Gościniec Uniejów. Cena dotyczy balu, za parę. Nocleg i menu na zapytanie.',
+    // Owner promo text (2026-11-27): "bal za 599 zł od pary zamiast 740 zł".
+    // The 599 zł Black Friday price ends on 2026-11-29 23:59 (Europe/Warsaw). The site never shows it.
+    price: 740,
     priceCurrency: 'PLN',
     path: '/pakiety/',
   },

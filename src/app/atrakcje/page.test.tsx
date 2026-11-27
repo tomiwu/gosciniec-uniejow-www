@@ -121,3 +121,9 @@ describe('attractions page', () => {
     expect(metadata.alternates?.canonical).toBe('/atrakcje/');
   });
 });
+
+describe('attractions page: archived package', () => {
+  it('does not name the archived package "Kobiecy Chill & Fun"', () => {
+    expect(text).not.toMatch(/Kobiecy/i);
+  });
+});
