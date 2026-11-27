@@ -1,0 +1,12 @@
+/* Mark of a sample figure (src/content/placeholders.ts). Same tokens in both themes. */
+.badge {
+  display: inline-block;
+  margin-left: 0.4em;
+  padding: 1px 8px;
+  border: 1.5px solid var(--gold-text);
+  border-radius: 999px;
+  background: var(--tag-bg);
+  color: var(--ink);
+  font: 650 0.8rem/1.4 var(--sans);
+  white-space: nowrap;
+}

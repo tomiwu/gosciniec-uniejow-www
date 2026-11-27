@@ -123,4 +123,4 @@ export const gallery: readonly { slug: ImageSlug; alt: string; caption: string }
 ];
 
 /** FAQ teaser on the home page: only questions with a confirmed answer (no `todo`). */
-export const homeFaqIds = ['termy', 'rodzinne', 'przyjecia-konferencje', 'dojazd'] as const;
+export const homeFaqIds = ['termy', 'rodzinne', 'rezerwacja', 'dojazd'] as const;

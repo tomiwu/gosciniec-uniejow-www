@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { placeholderPackages } from '../src/content/placeholders';
+import { PLACEHOLDER_BADGE_TEXT, placeholderPackages } from '../src/content/placeholders';
 import { nap } from '../src/lib/nap';
 import { offers } from '../src/lib/offers';
 
@@ -133,11 +133,33 @@ function checkOffer(node: Node, where: string): string[] {
   return errors;
 }
 
+/** Facts of a venue that the owner has not confirmed. Sample figures must not reach the schema. */
+const UNCONFIRMED_VENUE_KEYS = [
+  'maximumAttendeeCapacity',
+  'numberOfRooms',
+  'floorSize',
+  'offers',
+  'event',
+];
+
+function checkVenue(node: Node, where: string, type: string): string[] {
+  const errors: string[] = [];
+  if (!nonEmptyString(node['name'])) errors.push(`${where}: ${type} needs a name`);
+  for (const key of UNCONFIRMED_VENUE_KEYS) {
+    if (node[key] !== undefined) {
+      errors.push(`${where}: ${type} must not have ${key} (the figure is not confirmed)`);
+    }
+  }
+  return errors;
+}
+
 /** Pages that must carry a given JSON-LD type. Key: HTML path in the export folder. */
 const REQUIRED_TYPES: Record<string, string[]> = {
   'faq/index.html': ['FAQPage'],
   'restauracja/index.html': ['Restaurant'],
   'pakiety/index.html': ['Offer'],
+  'konferencje/index.html': ['FAQPage', 'MeetingRoom'],
+  'przyjecia/index.html': ['FAQPage', 'EventVenue'],
 };
 
 export function requiredTypesFor(file: string): string[] {
@@ -153,6 +175,9 @@ export function checkHtml(html: string, file: string): string[] {
 
   blocks.forEach((raw, index) => {
     const where = `${file} [block ${index + 1}]`;
+    if (raw.includes(PLACEHOLDER_BADGE_TEXT)) {
+      errors.push(`${where}: JSON-LD contains placeholder text "${PLACEHOLDER_BADGE_TEXT}"`);
+    }
     let data: Json;
     try {
       data = JSON.parse(raw);
@@ -181,6 +206,9 @@ export function checkHtml(html: string, file: string): string[] {
         if (types.includes('HotelRoom')) errors.push(...checkHotelRoom(node, where));
         if (types.includes('FAQPage')) errors.push(...checkFaqPage(node, where));
         if (types.includes('Offer')) errors.push(...checkOffer(node, where));
+        for (const type of ['MeetingRoom', 'EventVenue']) {
+          if (types.includes(type)) errors.push(...checkVenue(node, where, type));
+        }
         if (['Offer', 'Event', 'OfferCatalog'].some((type) => types.includes(type))) {
           errors.push(...checkNotPlaceholder(node, where));
         }

@@ -1,5 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
+import { faq } from '@/lib/faq';
+import { homeFaqIds } from '@/lib/home';
 import { nap } from '@/lib/nap';
 import Page, { metadata } from './page';
 
@@ -66,7 +68,9 @@ describe('home page', () => {
   it('has an FAQ teaser with confirmed answers only, and a link to all questions', () => {
     const teaser = html.slice(html.indexOf('id="faq-title"'));
     expect(teaser.match(/<details/g)?.length).toBeGreaterThanOrEqual(3);
-    expect(teaser).not.toContain('recepcj');
+    for (const id of homeFaqIds) {
+      expect(faq.find((item) => item.id === id)?.todo, id).toBeUndefined();
+    }
     expect(teaser).toMatch(/href="\/faq\/?"/);
   });
 
