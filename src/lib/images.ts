@@ -40,7 +40,7 @@ export const images = [
   { slug: 'foto-5-1', widths: [480, 960, 1600], width: 1600, height: 1066 },
   { slug: 'foto-6', widths: [480, 960, 1600], width: 1600, height: 1066 },
   { slug: 'foto-6-1', widths: [480, 960, 1600], width: 1600, height: 1066 },
-  { slug: 'foto-7', widths: [480, 960, 1600], width: 1600, height: 1066 },
+  { slug: 'foto-7', widths: [480, 720, 960, 1600], width: 1600, height: 1066 },
   { slug: 'foto-8', widths: [480, 960, 1600], width: 1600, height: 1066 },
   { slug: 'foto-9', widths: [480, 960, 1600], width: 1600, height: 1066 },
   { slug: 'img-0164', widths: [480, 960, 1600], width: 1600, height: 1200 },
