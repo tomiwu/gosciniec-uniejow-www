@@ -24,11 +24,30 @@ describe('home page', () => {
     const h2s = [...html.matchAll(/<h2[^>]*>(.*?)<\/h2>/g)].map((m) => m[1]);
     expect(h2s).toEqual([
       'Pokoje w Uniejowie',
+      'Od porannej kawy do wieczoru w altanie',
       'SPA i wellness w hotelu',
+      'Wesela, przyjęcia i konferencje w Uniejowie',
       'Restauracja',
       'Ogród',
       'Lokalizacja',
     ]);
+  });
+
+  it('has the time-of-day story as HTML text, one step for each time', () => {
+    const steps = [...html.matchAll(/data-time="([^"]+)"/g)].map((m) => m[1]);
+    expect(steps).toEqual(['Poranek', 'Południe', 'Popołudnie', 'Wieczór']);
+    // Without JS the first photo shows (the others wait for the scroll script).
+    expect(html.match(/story__photo is-on/g)).toHaveLength(1);
+  });
+
+  it('links the ballroom and conference section to the event pages', () => {
+    const hrefs = linkHrefs();
+    expect(hrefs).toContain('/przyjecia/');
+    expect(hrefs).toContain('/konferencje/');
+    expect(html).toContain('sala balowa');
+    // Capacities only from the old site (docs/source/przyjecia.md, konferencje.md).
+    expect(html).toContain('300');
+    expect(html).toContain('400');
   });
 
   it('links to booking, phone, rooms, SPA, restaurant, attractions and FAQ', () => {
