@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { mainNav } from '@/lib/navigation';
 
-/** Main navigation. On small screens a button opens and closes the list. */
+/** Main navigation. On small screens a button opens the list as a bottom sheet. */
 export function MainNav() {
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -23,7 +23,7 @@ export function MainNav() {
   }, [open]);
 
   return (
-    <nav aria-label="Menu główne" className="main-nav">
+    <nav aria-label="Menu główne" className="main-nav" data-open={open}>
       <button
         ref={buttonRef}
         type="button"
@@ -32,7 +32,12 @@ export function MainNav() {
         aria-controls="main-menu"
         onClick={() => setOpen((value) => !value)}
       >
-        Menu
+        <span className="menu-button__bars" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </span>
+        <span className="visually-hidden">Menu</span>
       </button>
       <ul id="main-menu" className="main-nav__list" data-open={open}>
         {mainNav.map((item) => (
@@ -47,6 +52,8 @@ export function MainNav() {
           </li>
         ))}
       </ul>
+      {/* Pointer users close the sheet with a tap outside it. Keyboard users have Escape. */}
+      <div className="main-nav__backdrop" aria-hidden="true" onClick={() => setOpen(false)} />
     </nav>
   );
 }

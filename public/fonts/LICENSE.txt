@@ -1,0 +1,5 @@
+Fonts in this folder are subsets of:
+- Fraunces, Copyright 2018 The Fraunces Project Authors (https://github.com/undercasetype/Fraunces)
+- Mona Sans, Copyright 2023 GitHub, Inc. (https://github.com/github/mona-sans)
+Both are licensed under the SIL Open Font License, Version 1.1: https://openfontlicense.org/open-font-license-official-text/
+The files are subsets (Latin and Polish glyphs) with reduced variable axes.
