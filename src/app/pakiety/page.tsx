@@ -1,10 +1,8 @@
 import Link from 'next/link';
-import { JsonLd } from '@/components/JsonLd';
 import { PLACEHOLDER_BADGE, placeholderPackages } from '@/content/placeholders';
 import { routeMetadata } from '@/lib/metadata';
-import { nap } from '@/lib/nap';
 import { offers } from '@/lib/offers';
-import { buildOffersSchema } from '@/lib/schema/offers';
+import { sylwester as sylwesterFacts } from '@/lib/venue';
 
 const path = '/pakiety/';
 
@@ -34,6 +32,7 @@ export default function Page() {
               sala balowa.
             </p>
             <ul>
+              <li>Muzyka: {sylwesterFacts.dj}.</li>
               <li>Podana cena dotyczy balu, za parę.</li>
               <li>Nocleg i menu: na zapytanie.</li>
             </ul>
@@ -41,7 +40,7 @@ export default function Page() {
               <strong>{sylwester.price} zł za parę</strong> (bal)
             </p>
             <p>
-              <Link className="button" href="#sylwester-szczegoly">
+              <Link className="button" href={sylwesterFacts.path}>
                 Zobacz szczegóły balu
               </Link>
             </p>
@@ -71,34 +70,6 @@ export default function Page() {
         ))}
       </ul>
 
-      <section className="page-section" id="sylwester-szczegoly" aria-labelledby="sylwester-title">
-        <h2 id="sylwester-title">Bal Sylwestrowy 2026/2027 – szczegóły</h2>
-        <ul>
-          <li>Termin: 31.12.2026 (czwartek).</li>
-          <li>Miejsce: odnowiona sala balowa w hotelu, {nap.street}, Uniejów.</li>
-          <li>Muzyka: DJ Letsky.</li>
-          <li>
-            Cena balu: {sylwester.price} zł za parę. Cena dotyczy balu. Nocleg i menu są na
-            zapytanie.
-          </li>
-          <li>Dojazd: łatwy dojazd z autostrady A2 i drogi S8.</li>
-        </ul>
-        <p>Chcesz zostać na noc? Zapraszamy. Zapytaj o nocleg i menu.</p>
-        <p>
-          1 stycznia rano możesz zregenerować siły w pobliskich Termach Uniejów. Wstęp do Term nie
-          jest w cenie balu.
-        </p>
-        <p>
-          Zadzwoń: <a href={`tel:${nap.phoneE164}`}>{nap.phoneDisplay}</a> albo napisz:{' '}
-          <a href={`mailto:${nap.email}`}>{nap.email}</a>.
-        </p>
-        <p>
-          <Link className="button" href="/rezerwacja/">
-            Zapytaj o Sylwestra
-          </Link>
-        </p>
-      </section>
-
       <section className="page-section" aria-labelledby="pakiety-wiecej">
         <h2 id="pakiety-wiecej">Zobacz też</h2>
         <ul>
@@ -124,10 +95,6 @@ export default function Page() {
           wellness (jacuzzi, saunę fińską i siłownię), ale nie ma basenów termalnych.
         </p>
       </section>
-
-      {buildOffersSchema(offers).map((offer, index) => (
-        <JsonLd key={index} data={offer} />
-      ))}
     </div>
   );
 }

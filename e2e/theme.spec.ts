@@ -11,6 +11,7 @@ const KEY_ROUTES = [
   '/atrakcje/',
   '/ceny/',
   '/pakiety/',
+  '/pakiety/sylwester-2026-2027/',
 ];
 
 test.describe('theme follows the system setting', () => {

@@ -152,7 +152,8 @@ describe('required types per page', () => {
   it('requires FAQPage on /faq/', () => {
     expect(requiredTypesFor('faq/index.html')).toEqual(['FAQPage']);
     expect(requiredTypesFor('pokoje/index.html')).toEqual([]);
-    expect(requiredTypesFor('pakiety/index.html')).toEqual(['Offer']);
+    expect(requiredTypesFor('pakiety/index.html')).toEqual([]);
+    expect(requiredTypesFor('pakiety/sylwester-2026-2027/index.html')).toEqual(['Offer']);
   });
 
   it('fails on /faq/ without a FAQPage block', () => {
