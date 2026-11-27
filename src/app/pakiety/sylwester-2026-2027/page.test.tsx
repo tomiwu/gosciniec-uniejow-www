@@ -5,6 +5,7 @@ import { PLACEHOLDER_BADGE } from '@/content/placeholders';
 import { nap } from '@/lib/nap';
 import { offers } from '@/lib/offers';
 import { sylwester } from '@/lib/venue';
+import { expectOfferFaqSchema, expectOfferFaqVisible } from '@/test/venue-assertions';
 import Page, { metadata } from './page';
 
 const html = renderToStaticMarkup(<Page />);
@@ -107,5 +108,13 @@ describe('/pakiety/sylwester-2026-2027/', () => {
 
   it('makes no claim of thermal pools in the hotel', () => {
     expect(body).not.toMatch(/basen(y)? hotel/i);
+  });
+
+  it('shows the offer questions with the same answers as /faq/ (issue #36)', () => {
+    expectOfferFaqVisible(html);
+  });
+
+  it('has one FAQPage JSON-LD with the offer questions and no placeholder claim', () => {
+    expectOfferFaqSchema(html);
   });
 });

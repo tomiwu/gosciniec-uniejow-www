@@ -2,6 +2,7 @@ import { expect } from 'vitest';
 import { extractJsonLd } from '../../scripts/check-schema';
 import { allPlaceholders, PLACEHOLDER_BADGE_TEXT } from '@/content/placeholders';
 import { nap } from '@/lib/nap';
+import { offerFaq } from '@/lib/offer-faq';
 import { salesEmail, sylwester } from '@/lib/venue';
 
 /** Shared checks for the venue pages. `html` is the static markup of the page. */
@@ -79,4 +80,35 @@ export function expectVenueRules(html: string): void {
 export function expectVisibleFaq(html: string, items: readonly { question: string }[]): void {
   const summaries = [...html.matchAll(/<summary>([\s\S]*?)<\/summary>/g)].length;
   expect(summaries).toBe(items.length);
+}
+
+/** Visible question texts of a page: the `summary` of each FAQ item. */
+export function visibleFaq(html: string): { question: string; answer: string }[] {
+  const decode = (s: string): string =>
+    s
+      .replace(/<[^>]+>/g, '')
+      .replace(/&quot;/g, '"')
+      .replace(/&#x27;/g, "'")
+      .replace(/&amp;/g, '&');
+  return [
+    ...bodyOf(html).matchAll(/<summary[^>]*>([\s\S]*?)<\/summary>[\s\S]*?<p>([\s\S]*?)<\/p>/g),
+  ].map((m) => ({ question: decode(m[1]!), answer: decode(m[2]!) }));
+}
+
+/** The offer questions of issue #36 show on the page with the same answers. */
+export function expectOfferFaqVisible(html: string): void {
+  const visible = visibleFaq(html);
+  for (const item of offerFaq) {
+    expect(visible).toContainEqual({ question: item.question, answer: item.answer });
+  }
+}
+
+/** The page has one FAQPage block with the offer questions, no placeholder claim, no 599 zł. */
+export function expectOfferFaqSchema(html: string): void {
+  const pages = jsonLdNodes(html).filter((node) => node['@type'] === 'FAQPage');
+  expect(pages).toHaveLength(1);
+  const names = (pages[0]!['mainEntity'] as { name: string }[]).map((q) => q.name);
+  for (const item of offerFaq) expect(names).toContain(item.question);
+  expect(JSON.stringify(pages[0])).not.toContain('Dane testowe');
+  expect(JSON.stringify(pages[0])).not.toContain('599');
 }

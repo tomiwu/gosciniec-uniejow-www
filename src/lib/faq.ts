@@ -1,5 +1,6 @@
 import type { FAQPage, WithContext } from 'schema-dts';
 import { nap } from './nap';
+import { offerFaq } from './offer-faq';
 import { salesEmail } from './venue';
 
 /**
@@ -17,11 +18,16 @@ export type FaqItem = {
   todo?: true;
   /** Optional link shown under the answer on the page. */
   link?: { href: string; label: string };
+  /**
+   * True when the answer shows a placeholder record (sample data). The page shows the badge
+   * "Dane testowe". The item stays out of the FAQPage JSON-LD (issue #36).
+   */
+  isPlaceholder?: true;
 };
 
 const reception = `Prosimy o kontakt z recepcją: ${nap.phoneDisplay}`;
 
-export const faq: readonly FaqItem[] = [
+const stayFaq: readonly FaqItem[] = [
   {
     id: 'sniadanie',
     question: 'Czy w cenie jest śniadanie?',
@@ -101,17 +107,27 @@ export const faq: readonly FaqItem[] = [
   },
 ];
 
+/** All questions of `/faq/`: the stay questions, then the offer questions (same list as `/pakiety/`). */
+export const faq: readonly FaqItem[] = [...stayFaq, ...offerFaq];
+
 export type FaqSchema = Exclude<WithContext<FAQPage>, string>;
 
-/** JSON-LD for a FAQ list. Built from the same list as the visible page. */
+/**
+ * JSON-LD for a FAQ list. Built from the same list as the visible page.
+ * A placeholder claim is left out: an item with `isPlaceholder`.
+ * This file must not import `placeholders.ts`: the placeholder guard would then block every build.
+ * `scripts/check-schema.ts` also rejects the badge text in any JSON-LD block.
+ */
 export function buildFaqSchema(items: readonly FaqItem[] = faq): FaqSchema {
   return {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: items.map((item) => ({
-      '@type': 'Question',
-      name: item.question,
-      acceptedAnswer: { '@type': 'Answer', text: item.answer },
-    })),
+    mainEntity: items
+      .filter((item) => !item.isPlaceholder)
+      .map((item) => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: { '@type': 'Answer', text: item.answer },
+      })),
   };
 }
