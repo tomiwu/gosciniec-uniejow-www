@@ -1,30 +1,15 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import { extractJsonLd } from '../../../../scripts/check-schema';
 import { PLACEHOLDER_BADGE } from '@/content/placeholders';
 import { nap } from '@/lib/nap';
 import { offers } from '@/lib/offers';
 import { sylwesterBookingSlug } from '@/lib/form/booking-offers';
 import { sylwester } from '@/lib/venue';
-import { expectOfferFaqSchema, expectOfferFaqVisible } from '@/test/venue-assertions';
+import { expectOfferFaqSchema, expectOfferFaqVisible, jsonLdOfType } from '@/test/venue-assertions';
 import Page, { metadata } from './page';
 
 const html = renderToStaticMarkup(<Page />);
 const body = html.replace(/<script[\s\S]*?<\/script>/g, '');
-
-function jsonLdNodes(type: string): Record<string, unknown>[] {
-  const found: Record<string, unknown>[] = [];
-  const visit = (value: unknown): void => {
-    if (Array.isArray(value)) value.forEach(visit);
-    else if (typeof value === 'object' && value !== null) {
-      const node = value as Record<string, unknown>;
-      if (node['@type'] === type) found.push(node);
-      Object.values(node).forEach(visit);
-    }
-  };
-  for (const block of extractJsonLd(html)) visit(JSON.parse(block));
-  return found;
-}
 
 describe('/pakiety/sylwester-2026-2027/', () => {
   it('uses the URL that the venue pages link to', () => {
@@ -36,6 +21,13 @@ describe('/pakiety/sylwester-2026-2027/', () => {
     expect([...html.matchAll(/<h1[ >]/g)]).toHaveLength(1);
     expect(body).toMatch(/<h1[^>]*>[^<]*Sylwester 2026\/2027/);
     expect(String(metadata.description).length).toBeGreaterThan(80);
+  });
+
+  it('shows the DJ portrait with Polish alt text and without high fetch priority', () => {
+    expect(body).toContain('dj-letsky');
+    expect(body).toMatch(/alt="[^"]*DJ Letsky[^"]{10,}"/);
+    expect(html).not.toMatch(/dj-letsky[\s\S]*fetchPriority="high"/);
+    expect(html.match(/loading="eager"/g)?.length ?? 0).toBe(0);
   });
 
   it('shows the listed facts: date, place, DJ, overnight invite, A2 and S8', () => {
@@ -68,7 +60,7 @@ describe('/pakiety/sylwester-2026-2027/', () => {
   });
 
   it('has one Offer for the ball with a visible, real price', () => {
-    const nodes = jsonLdNodes('Offer');
+    const nodes = jsonLdOfType(html, 'Offer');
     expect(nodes).toHaveLength(1);
     const real = offers.find((o) => o.id === 'sylwester-2026');
     expect(nodes[0]).toMatchObject({
@@ -82,8 +74,8 @@ describe('/pakiety/sylwester-2026-2027/', () => {
   });
 
   it('has no Event, no OfferCatalog and no placeholder', () => {
-    expect(jsonLdNodes('Event')).toHaveLength(0);
-    expect(jsonLdNodes('OfferCatalog')).toHaveLength(0);
+    expect(jsonLdOfType(html, 'Event')).toHaveLength(0);
+    expect(jsonLdOfType(html, 'OfferCatalog')).toHaveLength(0);
     expect(html).not.toContain(PLACEHOLDER_BADGE);
   });
 

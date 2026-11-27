@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { FaqList } from '@/components/FaqList';
+import { Picture } from '@/components/Picture';
 import { JsonLd } from '@/components/JsonLd';
 import { buildFaqSchema } from '@/lib/faq';
 import { routeMetadata } from '@/lib/metadata';
@@ -16,11 +17,6 @@ export const metadata = routeMetadata(path);
 
 const offer = offers.find((item) => item.id === 'sylwester-2026');
 
-/**
- * Offer page of the New Year's Eve ball (issue #34).
- * Facts only: no menu, no inclusions, no overnight rate. The Offer JSON-LD has the visible amount.
- * The 599 zł Black Friday price is not shown. It ends on 2026-11-29 and a static page cannot hide it.
- */
 export default function Page() {
   if (!offer || offer.price === null || offer.path !== path) {
     throw new Error('offers.ts needs the Sylwester offer with a price and this path.');
@@ -47,6 +43,14 @@ export default function Page() {
           <li>Muzyka: {sylwester.dj}.</li>
           <li>Dojazd: łatwy dojazd z autostrady A2 i drogi S8.</li>
         </ul>
+        <figure className="sylwester-dj">
+          <Picture
+            slug="dj-letsky"
+            alt="DJ Letsky przy konsoli – muzyka na balu sylwestrowym w Gościńcu Uniejów"
+            sizes="(min-width: 48rem) 360px, 82vw"
+          />
+          <figcaption>Muzyka na balu: {sylwester.dj}.</figcaption>
+        </figure>
       </section>
 
       <section className="page-section" aria-labelledby="sylwester-cena">

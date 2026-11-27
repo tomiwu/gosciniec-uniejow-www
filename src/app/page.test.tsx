@@ -147,7 +147,7 @@ describe('home page', () => {
 
   it('shows the offers strip after the hero: Sylwester first, sample package, then from-price with /ceny/', () => {
     const heroEnd = html.indexOf('class="marquee"');
-    const strip = html.slice(html.indexOf('home-offers'), heroEnd);
+    const strip = html.slice(html.indexOf('id="home-offers-title"'), heroEnd);
     expect(html.indexOf('home-offers')).toBeLessThan(heroEnd);
     const cards = [...strip.matchAll(/<article class="home-offer[\s\S]*?<\/article>/g)].map(
       (m) => m[0],
@@ -169,10 +169,15 @@ describe('home page', () => {
     expect(fromBlocks).toHaveLength(1);
     expect(fromBlocks[0]).toContain(`${cheapestRoomFromPrice.amount} zł`);
     expect(fromBlocks[0]).toContain(PLACEHOLDER_BADGE);
+  });
+
+  it('shows the sample from-price once, with the badge "Dane testowe", and no Offer JSON-LD', () => {
+    const blocks = [...html.matchAll(/<p class="from-price[^"]*"[\s\S]*?<\/p>/g)].map((m) => m[0]);
+    expect(blocks).toHaveLength(1);
+    expect(blocks[0]).toContain(`${cheapestRoomFromPrice.amount} zł`);
+    expect(blocks[0]).toContain(PLACEHOLDER_BADGE);
     const roomsBlock = html.slice(html.indexOf('id="rooms-title"'), html.indexOf('id="day-title"'));
     expect(roomsBlock).not.toMatch(/class="from-price/);
-    const pageFromBlocks = [...html.matchAll(/<p class="from-price[^"]*"[\s\S]*?<\/p>/g)];
-    expect(pageFromBlocks).toHaveLength(1);
     const ld = [...html.matchAll(/<script[^>]*ld\+json[^>]*>([\s\S]*?)<\/script>/g)].map(
       (m) => m[1],
     );

@@ -4,25 +4,11 @@ import { extractJsonLd } from '../../../scripts/check-schema';
 import { PLACEHOLDER_BADGE, placeholderPackages } from '@/content/placeholders';
 import { sylwesterBookingSlug } from '@/lib/form/booking-offers';
 import { sylwester } from '@/lib/venue';
-import { expectOfferFaqSchema, expectOfferFaqVisible } from '@/test/venue-assertions';
+import { expectOfferFaqSchema, expectOfferFaqVisible, jsonLdOfType } from '@/test/venue-assertions';
 import Page, { metadata } from './page';
 
 const html = renderToStaticMarkup(<Page />);
 const body = html.replace(/<script[\s\S]*?<\/script>/g, '');
-
-function jsonLdNodes(type: string): Record<string, unknown>[] {
-  const found: Record<string, unknown>[] = [];
-  const visit = (value: unknown): void => {
-    if (Array.isArray(value)) value.forEach(visit);
-    else if (typeof value === 'object' && value !== null) {
-      const node = value as Record<string, unknown>;
-      if (node['@type'] === type) found.push(node);
-      Object.values(node).forEach(visit);
-    }
-  };
-  for (const block of extractJsonLd(html)) visit(JSON.parse(block));
-  return found;
-}
 
 function cards(): string[] {
   return [...body.matchAll(/<article[\s\S]*?<\/article>/g)].map((match) => match[0]);
@@ -83,14 +69,14 @@ describe('/pakiety/ hub', () => {
   });
 
   it('has no Event JSON-LD and no placeholder in any JSON-LD', () => {
-    expect(jsonLdNodes('Event')).toHaveLength(0);
-    expect(jsonLdNodes('OfferCatalog')).toHaveLength(0);
+    expect(jsonLdOfType(html, 'Event')).toHaveLength(0);
+    expect(jsonLdOfType(html, 'OfferCatalog')).toHaveLength(0);
     const ld = extractJsonLd(html).join('');
     for (const record of placeholderPackages) expect(ld).not.toContain(record.name);
   });
 
   it('leaves the Offer JSON-LD to the offer page', () => {
-    expect(jsonLdNodes('Offer')).toHaveLength(0);
+    expect(jsonLdOfType(html, 'Offer')).toHaveLength(0);
   });
 
   it('shows no promo phone number', () => {
