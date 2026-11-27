@@ -37,6 +37,13 @@ describe('/pakiety/sylwester-2026-2027/', () => {
     expect(String(metadata.description).length).toBeGreaterThan(80);
   });
 
+  it('shows the DJ portrait with Polish alt text and without high fetch priority', () => {
+    expect(body).toContain('dj-letsky');
+    expect(body).toMatch(/alt="[^"]*DJ Letsky[^"]{10,}"/);
+    expect(html).not.toMatch(/dj-letsky[\s\S]*fetchPriority="high"/);
+    expect(html.match(/loading="eager"/g)?.length ?? 0).toBe(0);
+  });
+
   it('shows the listed facts: date, place, DJ, overnight invite, A2 and S8', () => {
     expect(body).toContain('31.12.2026');
     expect(body).toContain('czwartek');

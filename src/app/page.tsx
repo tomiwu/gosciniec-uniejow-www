@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { HomeOffersStrip } from '@/components/HomeOffersStrip';
 import { Picture } from '@/components/Picture';
 import { PlaceholderBadge } from '@/components/PlaceholderBadge';
 import { cheapestRoomFromPrice } from '@/content/placeholders';
@@ -71,7 +72,7 @@ export default function Page() {
         <span className="scroll-cue" aria-hidden="true" />
       </section>
 
-      {/* Offers strip (issue #43) goes here, between the hero and the amenities. */}
+      <HomeOffersStrip />
 
       {/* Amenities: the list is plain HTML. The moving copy is decoration only. */}
       <div className="marquee">

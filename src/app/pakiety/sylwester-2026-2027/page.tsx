@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { FaqList } from '@/components/FaqList';
+import { Picture } from '@/components/Picture';
 import { JsonLd } from '@/components/JsonLd';
 import { buildFaqSchema } from '@/lib/faq';
 import { routeMetadata } from '@/lib/metadata';
@@ -46,6 +47,14 @@ export default function Page() {
           <li>Muzyka: {sylwester.dj}.</li>
           <li>Dojazd: łatwy dojazd z autostrady A2 i drogi S8.</li>
         </ul>
+        <figure className="sylwester-dj">
+          <Picture
+            slug="dj-letsky"
+            alt="DJ Letsky przy konsoli – muzyka na balu sylwestrowym w Gościńcu Uniejów"
+            sizes="(min-width: 48rem) 360px, 82vw"
+          />
+          <figcaption>Muzyka na balu: {sylwester.dj}.</figcaption>
+        </figure>
       </section>
 
       <section className="page-section" aria-labelledby="sylwester-cena">

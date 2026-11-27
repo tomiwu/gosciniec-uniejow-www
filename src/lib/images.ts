@@ -20,6 +20,7 @@ export const images = [
   { slug: 'dsc0e0297', widths: [480, 960, 1600], width: 1600, height: 900 },
   { slug: 'dsc0e3968', widths: [480, 960, 1600], width: 1600, height: 900 },
   { slug: 'dsc0e8152', widths: [480, 960, 1600], width: 1600, height: 1069 },
+  { slug: 'dj-letsky', widths: [480, 960], width: 960, height: 720 },
   { slug: 'foto-1', widths: [480, 960, 1600], width: 1600, height: 1066 },
   { slug: 'foto-10', widths: [480, 960, 1600], width: 1600, height: 1066 },
   { slug: 'foto-11', widths: [480, 960, 1600], width: 1600, height: 1066 },
