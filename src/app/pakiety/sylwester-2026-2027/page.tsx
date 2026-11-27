@@ -8,6 +8,7 @@ import { nap } from '@/lib/nap';
 import { offerFaq } from '@/lib/offer-faq';
 import { offers } from '@/lib/offers';
 import { buildOffersSchema } from '@/lib/schema/offers';
+import { sylwesterBookingSlug } from '@/lib/form/booking-offers';
 import { contact, sylwester } from '@/lib/venue';
 
 const path = sylwester.path;
@@ -77,7 +78,7 @@ export default function Page() {
           <a href={contact.mailto}>{contact.email}</a>.
         </p>
         <p>
-          <Link className="button" href="/rezerwacja/">
+          <Link className="button" href={`/rezerwacja/?pakiet=${sylwesterBookingSlug}`}>
             Zapytaj o Sylwestra
           </Link>
         </p>

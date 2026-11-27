@@ -143,6 +143,18 @@ export const validationCases: ValidationCase[] = [
     errors: { room: MESSAGES.roomNewline },
   },
   {
+    name: 'valid booking with Sylwester package slug',
+    form: 'rezerwacja',
+    input: { ...booking, package: 'sylwester-2026-2027' },
+    errors: {},
+  },
+  {
+    name: 'unknown package slug',
+    form: 'rezerwacja',
+    input: { ...booking, package: 'pakiet-kobiecy-weekend' },
+    errors: { package: MESSAGES.packageUnknown },
+  },
+  {
     name: 'name too long',
     form: 'kontakt',
     input: { ...contact, name: 'ł'.repeat(LIMITS.name + 1) },

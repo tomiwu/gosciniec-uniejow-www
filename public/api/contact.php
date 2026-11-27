@@ -26,12 +26,22 @@ const CONTACT_LIMITS = [
     'email' => 254,
     'phone' => 30,
     'subject' => 100,
+    'package' => 60,
     'room' => 100,
     'message' => 2000,
     'guests_max' => 20,
 ];
+/** Keep in sync with src/lib/form/booking-offers.ts. */
+const CONTACT_PACKAGE_SLUGS = [
+    'sylwester-2026-2027',
+    'pakiet-testowy',
+];
+const CONTACT_PACKAGE_NAMES = [
+    'sylwester-2026-2027' => 'Bal Sylwestrowy – Sylwester 2026/2027',
+    'pakiet-testowy' => 'Pakiet testowy: krótki pobyt w Uniejowie',
+];
 const CONTACT_FIELDS = [
-    'rezerwacja' => ['arrival', 'departure', 'adults', 'children', 'room', 'name', 'email', 'phone', 'message', 'consent'],
+    'rezerwacja' => ['arrival', 'departure', 'adults', 'children', 'package', 'room', 'name', 'email', 'phone', 'message', 'consent'],
     'kontakt' => ['subject', 'name', 'email', 'phone', 'message', 'consent'],
 ];
 const CONTACT_LABELS = [
@@ -39,6 +49,7 @@ const CONTACT_LABELS = [
     'departure' => 'Wyjazd',
     'adults' => 'Dorośli',
     'children' => 'Dzieci',
+    'package' => 'Oferta lub pakiet',
     'room' => 'Typ pokoju',
     'subject' => 'Temat',
     'name' => 'Imię i nazwisko',
@@ -124,6 +135,15 @@ function contact_validate(string $form, array $input): array
         $children = $values['children'];
         if ($children !== '' && (preg_match('/^\d{1,3}$/D', $children) !== 1 || (int) $children > $max)) {
             $errors['children'] = "Liczba dzieci: od 0 do $max.";
+        }
+
+        $package = $values['package'];
+        if (contact_has_newline($package)) {
+            $errors['package'] = 'Wybierz ofertę z listy albo zostaw pole puste.';
+        } elseif (contact_length($package) > CONTACT_LIMITS['package']) {
+            $errors['package'] = 'Identyfikator oferty może mieć najwyżej ' . CONTACT_LIMITS['package'] . ' znaków.';
+        } elseif ($package !== '' && !in_array($package, CONTACT_PACKAGE_SLUGS, true)) {
+            $errors['package'] = 'Wybierz ofertę z listy albo zostaw pole puste.';
         }
 
         $room = $values['room'];
@@ -292,6 +312,9 @@ function contact_build_mail(string $form, array $values): array
             continue;
         }
         $value = $values[$field] ?? '';
+        if ($field === 'package' && $value !== '') {
+            $value = CONTACT_PACKAGE_NAMES[$value] ?? $value;
+        }
         $lines[] = CONTACT_LABELS[$field] . ': ' . ($value === '' ? '-' : $value);
     }
     $lines[] = 'Zgoda na przetwarzanie danych: tak';
