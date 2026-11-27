@@ -51,7 +51,7 @@ export const images = [
   { slug: 'img-2616', widths: [480, 960, 1600], width: 1600, height: 1067 },
   { slug: 'img-2852', widths: [480, 960, 1600], width: 1600, height: 1200 },
   { slug: 'img-2999', widths: [480, 960, 1600], width: 1600, height: 1200 },
-  { slug: 'img-3729', widths: [480, 960, 1600], width: 1600, height: 1200 },
+  { slug: 'img-3729', widths: [480, 720, 960, 1600], width: 1600, height: 1200 },
   { slug: 'img-7041', widths: [480, 960, 1600], width: 1600, height: 1243 },
   { slug: 'img-e5609', widths: [480, 960, 1600], width: 1600, height: 1066 },
   { slug: 'jedzenie', widths: [268], width: 268, height: 299 },
