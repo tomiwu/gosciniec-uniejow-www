@@ -17,6 +17,10 @@ if pgrep -f "${DIR}/.sandcastle/node_modules/.bin/tsx .sandcastle/main.mts" >/de
   echo "running: a loop process exists without a pid file"; exit 0
 fi
 cd "$DIR"
+# shellcheck disable=SC1091
+source scripts/podman-env.sh
+command -v podman >/dev/null || { echo "podman is missing. See docs/restore-loop.md" >&2; exit 1; }
+podman image exists localhost/sandcastle:gosciniec-uniejow-www || { echo "image is missing. Run scripts/build-image.sh" >&2; exit 1; }
 # The box GH_TOKEN is invalid. Drop it, then load the project file (PAT, Claude token, webhook).
 unset GH_TOKEN
 [ -f .sandcastle/.env ] || { echo ".sandcastle/.env is missing" >&2; exit 1; }
@@ -24,6 +28,17 @@ set -a
 # shellcheck disable=SC1091
 source .sandcastle/.env
 set +a
+# Webhook values live outside .sandcastle/.env, because Sandcastle copies every key of
+# .sandcastle/.env into the agent container. The host process reads them from here.
+WEBHOOK_ENV="${WEBHOOK_ENV:-/workspace/gosciniec-www-secrets/loop-webhook.env}"
+if [ -f "$WEBHOOK_ENV" ]; then
+  set -a
+  # shellcheck disable=SC1090
+  source "$WEBHOOK_ENV"
+  set +a
+else
+  echo "warning: $WEBHOOK_ENV is missing. Loop events are not sent." >&2
+fi
 [ -n "${GH_TOKEN:-}" ] || { echo "GH_TOKEN is missing in .sandcastle/.env" >&2; exit 1; }
 export PROJECT="${PROJECT:-gosciniec-uniejow-www}"
 export STATUS_FILE="/tmp/${NAME}-loop.status.json"
