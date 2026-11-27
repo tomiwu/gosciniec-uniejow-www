@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { extractJsonLd } from '../../../scripts/check-schema';
 import { PLACEHOLDER_BADGE, placeholderPackages } from '@/content/placeholders';
 import { sylwester } from '@/lib/venue';
+import { offerFaq } from '@/lib/offer-faq';
+import { visibleFaq } from '@/test/venue-assertions';
 import Page, { metadata } from './page';
 
 const html = renderToStaticMarkup(<Page />);
@@ -101,5 +103,23 @@ describe('/pakiety/ hub', () => {
 
   it('makes no claim of thermal pools in the hotel', () => {
     expect(body).not.toMatch(/basen(y)? hotel/i);
+  });
+
+  it('shows the offer questions with the same answers as /faq/ (issue #36)', () => {
+    const visible = visibleFaq(html);
+    for (const item of offerFaq) {
+      expect(visible).toContainEqual({ question: item.question, answer: item.answer });
+    }
+  });
+
+  it('has one FAQPage JSON-LD with the offer questions and no placeholder claim', () => {
+    const pages = extractJsonLd(html)
+      .map((block) => JSON.parse(block) as Record<string, unknown>)
+      .filter((node) => node['@type'] === 'FAQPage');
+    expect(pages).toHaveLength(1);
+    const names = (pages[0]!['mainEntity'] as { name: string }[]).map((q) => q.name);
+    for (const item of offerFaq) expect(names).toContain(item.question);
+    expect(JSON.stringify(pages[0])).not.toContain(PLACEHOLDER_BADGE);
+    expect(JSON.stringify(pages[0])).not.toContain('599');
   });
 });

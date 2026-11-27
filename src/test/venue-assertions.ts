@@ -80,3 +80,16 @@ export function expectVisibleFaq(html: string, items: readonly { question: strin
   const summaries = [...html.matchAll(/<summary>([\s\S]*?)<\/summary>/g)].length;
   expect(summaries).toBe(items.length);
 }
+
+/** Visible question texts of a page: the `summary` of each FAQ item. */
+export function visibleFaq(html: string): { question: string; answer: string }[] {
+  const decode = (s: string): string =>
+    s
+      .replace(/<[^>]+>/g, '')
+      .replace(/&quot;/g, '"')
+      .replace(/&#x27;/g, "'")
+      .replace(/&amp;/g, '&');
+  return [
+    ...bodyOf(html).matchAll(/<summary[^>]*>([\s\S]*?)<\/summary>[\s\S]*?<p>([\s\S]*?)<\/p>/g),
+  ].map((m) => ({ question: decode(m[1]!), answer: decode(m[2]!) }));
+}

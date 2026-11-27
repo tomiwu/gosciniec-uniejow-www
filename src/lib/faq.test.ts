@@ -3,8 +3,8 @@ import { buildFaqSchema, faq } from './faq';
 import { nap } from './nap';
 
 describe('faq list', () => {
-  it('has the 12 questions of the issue, each with a question mark', () => {
-    expect(faq).toHaveLength(12);
+  it('has the 12 stay questions and the 5 offer questions, each with a question mark', () => {
+    expect(faq).toHaveLength(17);
     for (const item of faq) expect(item.question).toMatch(/\?$/);
   });
 
@@ -22,7 +22,12 @@ describe('faq list', () => {
   });
 
   it('does not invent hours, prices or payment methods', () => {
-    const text = faq.map((i) => i.answer).join(' ');
+    // The only price is the ball price of offers.ts. A date such as 31.12.2026 is not an hour.
+    const text = faq
+      .map((i) => i.answer)
+      .join(' ')
+      .replace(/\d{1,2}\.\d{1,2}\.\d{4}/g, '')
+      .replace(/\b740 zł za parę/g, '');
     expect(text).not.toMatch(/\d{1,2}[:.]\d{2}/);
     expect(text).not.toMatch(/\bzł\b|PLN/);
   });
