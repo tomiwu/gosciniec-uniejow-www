@@ -24,7 +24,7 @@
   --control: #7d705b;
   --tag-bg: #f3ebdd;
   --header-bg: rgb(251 247 239 / 0.88);
-  --bar-bg: rgb(255 255 255 / 0.92);
+  --bar-bg: rgb(255 255 255 / 0.97);
   --shadow: 0 8px 24px rgb(31 26 20 / 0.1);
   --shadow-hover: 0 16px 40px rgb(31 26 20 / 0.16);
   --page-glow: none;
@@ -39,7 +39,7 @@
   --night-line: #2a3d47;
 
   --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
-  --sans: 'Mona Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --r-sm: 6px;
   --r-md: 12px;
   --r-lg: 20px;
@@ -71,7 +71,7 @@
   --control: #5e727d;
   --tag-bg: #1d323c;
   --header-bg: rgb(14 26 34 / 0.9);
-  --bar-bg: rgb(14 26 34 / 0.94);
+  --bar-bg: rgb(14 26 34 / 0.97);
   --shadow: 0 10px 30px rgb(0 0 0 / 0.45);
   --shadow-hover: 0 16px 40px rgb(0 0 0 / 0.5), 0 0 0 1px rgb(227 179 65 / 0.5);
   --night: #08121a;
@@ -98,7 +98,7 @@
     --control: #5e727d;
     --tag-bg: #1d323c;
     --header-bg: rgb(14 26 34 / 0.9);
-    --bar-bg: rgb(14 26 34 / 0.94);
+    --bar-bg: rgb(14 26 34 / 0.97);
     --night: #08121a;
   }
 }
@@ -189,6 +189,7 @@ h3 {
 h1,
 h2 {
   font-family: var(--serif);
+  font-synthesis-weight: none;
   letter-spacing: -0.01em;
   font-variation-settings: 'opsz' 144;
 }
@@ -461,7 +462,7 @@ p {
 }
 
 .logo__text {
-  font: 600 22px/1 var(--serif);
+  font: 500 22px/1 var(--serif);
 }
 
 .logo__text small {
@@ -811,10 +812,10 @@ p {
   z-index: -1;
   background: linear-gradient(
     180deg,
-    rgb(14 26 34 / 0.55) 0%,
-    rgb(14 26 34 / 0.2) 30%,
-    rgb(14 26 34 / 0.55) 60%,
-    rgb(14 26 34 / 0.88) 100%
+    rgb(14 26 34 / 0.6) 0%,
+    rgb(14 26 34 / 0.25) 28%,
+    rgb(14 26 34 / 0.68) 55%,
+    rgb(14 26 34 / 0.92) 100%
   );
 }
 
@@ -832,8 +833,16 @@ p {
   padding-block: 48px 40px;
 }
 
+@media (max-width: 1023.98px) {
+  .hero__text {
+    padding-bottom: 32px;
+  }
+}
+
 .hero .eyebrow {
+  font-size: 14px;
   color: #f6de9a;
+  text-shadow: 0 1px 8px rgb(0 0 0 / 0.45);
 }
 
 .hero h1 {
@@ -876,6 +885,19 @@ p {
   backdrop-filter: blur(8px);
   font-size: 14px;
   font-weight: 600;
+}
+
+@media (max-width: 47.98em) {
+  /* Mobile: smaller chips, so they take two rows at most and the hero text stays in view. */
+  .chips {
+    gap: 6px;
+    margin-top: 18px;
+  }
+
+  .chips li {
+    padding: 6px 11px;
+    font-size: 13px;
+  }
 }
 
 /* ---------- Cards, rooms rail, features ---------- */
@@ -1256,7 +1278,7 @@ p {
   display: flex;
   align-items: center;
   gap: 10px;
-  font: 600 22px/1 var(--serif);
+  font: 500 22px/1 var(--serif);
 }
 
 .site-footer__logo svg {
