@@ -1,4 +1,5 @@
 import { JsonLd } from '@/components/JsonLd';
+import { withBase } from '@/lib/preview';
 import { Picture } from '@/components/Picture';
 import { routeMetadata } from '@/lib/metadata';
 import { rooms } from '@/lib/rooms';
@@ -56,7 +57,7 @@ export default function Page() {
                   )}
                 </p>
                 <p>
-                  <a className="button" href={`/rezerwacja/?pokoj=${room.slug}`}>
+                  <a className="button" href={withBase(`/rezerwacja/?pokoj=${room.slug}`)}>
                     Zapytaj o termin
                     <span className="visually-hidden"> – {room.name}</span>
                   </a>

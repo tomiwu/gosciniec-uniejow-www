@@ -1,4 +1,5 @@
 import { images, type ImageSlug } from '@/lib/images';
+import { withBase } from '@/lib/preview';
 
 interface BaseProps {
   slug: ImageSlug;
@@ -15,7 +16,7 @@ type DecorativeProps = BaseProps & { alt: ''; decorative: true };
 export type PictureProps = InformativeProps | DecorativeProps;
 
 function srcSet(slug: string, widths: readonly number[], format: string): string {
-  return widths.map((w) => `/img/${slug}-${w}.${format} ${w}w`).join(', ');
+  return widths.map((w) => `${withBase(`/img/${slug}-${w}.${format}`)} ${w}w`).join(', ');
 }
 
 export function Picture({
@@ -41,7 +42,7 @@ export function Picture({
       <source type="image/webp" srcSet={srcSet(slug, image.widths, 'webp')} sizes={sizes} />
       {/* The rule @next/next/no-img-element allows an img inside a picture element. */}
       <img
-        src={`/img/${slug}-${largest}.jpg`}
+        src={withBase(`/img/${slug}-${largest}.jpg`)}
         srcSet={srcSet(slug, image.widths, 'jpg')}
         sizes={sizes}
         width={image.width}
