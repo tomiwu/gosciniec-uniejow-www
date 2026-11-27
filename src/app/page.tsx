@@ -379,7 +379,7 @@ export default function Page() {
             </div>
             <CarouselButtons label="Galeria" />
           </div>
-          <div className="carousel gallery" data-carousel>
+          <div className="carousel home-gallery" data-carousel>
             <ul className="track" aria-label="Zdjęcia hotelu">
               {gallery.map((photo) => (
                 <li key={photo.slug}>

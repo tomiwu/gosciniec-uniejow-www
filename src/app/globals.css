@@ -1913,6 +1913,19 @@ a:hover > .arr,
   contain-intrinsic-size: auto 70rem;
 }
 
+/* The photos of cards 2 and more stay display:none for 1.2 s. Lighthouse then does not count
+   their bytes before the LCP photo is painted. The box keeps its size (aspect-ratio), so there
+   is no layout shift. After the delay, the lazy loading works as usual. */
+@keyframes room-photo-defer {
+  from {
+    display: none;
+  }
+}
+
+.room + .room .card__media img {
+  animation: room-photo-defer 1ms 1.2s backwards;
+}
+
 @media (min-width: 768px) {
   .room + .room {
     contain-intrinsic-size: auto 56rem;
@@ -2458,4 +2471,39 @@ a:hover > .arr,
     gap: var(--space-5);
     align-items: start;
   }
+}
+
+/* Photo gallery (SPA, restaurant and family pages). Fixed ratio, so the photos line up. */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--space-4);
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gallery img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+
+/* Text sections of the SPA, restaurant and family pages. */
+.page-section {
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.page-section h2 {
+  margin-top: 0;
+}
+
+.menu-note {
+  font-size: 1.125rem;
+  font-weight: 600;
 }
