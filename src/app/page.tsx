@@ -4,6 +4,7 @@ import { nap } from '@/lib/nap';
 import { routeMetadata } from '@/lib/metadata';
 
 const path = '/';
+const teaserSizes = '(min-width: 72rem) 560px, (min-width: 48rem) 50vw, 100vw';
 
 export const metadata = routeMetadata(path);
 
@@ -44,7 +45,7 @@ export default function Page() {
           <p>
             Noclegi w Uniejowie w czterech typach pokoi: standard, superior, deluxe w standardzie 3*
             oraz rodzinny apartament. Pokoje mają łazienkę, telewizor z płaskim ekranem i zestaw do
-            parzenia kawy i herbaty. Wybierz widok na ogród lub zielone pola.
+            parzenia kawy i herbaty. Z okien widać ogród lub zielone pola.
           </p>
           <p>
             <Link href="/pokoje/">Zobacz pokoje</Link>
@@ -53,8 +54,8 @@ export default function Page() {
         <div className="teaser__image">
           <Picture
             slug="pokoj-3"
-            alt="Jasny pokój hotelowy z łóżkiem i wyjściem na balkon"
-            sizes="(min-width: 72rem) 560px, (min-width: 48rem) 50vw, 100vw"
+            alt="Pokój hotelowy z łóżkiem i dużym oknem z widokiem na zieleń"
+            sizes={teaserSizes}
           />
         </div>
       </section>
@@ -77,8 +78,8 @@ export default function Page() {
         <div className="teaser__image">
           <Picture
             slug="foto-5-1"
-            alt="Strefa wellness w hotelu z jacuzzi i leżakami"
-            sizes="(min-width: 72rem) 560px, (min-width: 48rem) 50vw, 100vw"
+            alt="Strefa wellness w hotelu z jacuzzi, sauną i leżakami"
+            sizes={teaserSizes}
           />
         </div>
       </section>
@@ -98,8 +99,8 @@ export default function Page() {
         <div className="teaser__image">
           <Picture
             slug="dsc0e0297"
-            alt="Zapiekane mięso z puree podane w ceramicznej misce"
-            sizes="(min-width: 72rem) 560px, (min-width: 48rem) 50vw, 100vw"
+            alt="Pieczone mięso z ziołami, puree i kapustą na drewnianej desce"
+            sizes={teaserSizes}
           />
         </div>
       </section>
@@ -117,7 +118,7 @@ export default function Page() {
           <Picture
             slug="foto-1"
             alt="Rabaty z lawendą i kwiatami w ogrodzie hotelu"
-            sizes="(min-width: 72rem) 560px, (min-width: 48rem) 50vw, 100vw"
+            sizes={teaserSizes}
           />
         </div>
       </section>
