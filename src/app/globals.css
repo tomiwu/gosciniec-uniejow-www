@@ -1133,6 +1133,13 @@ p {
   flex-direction: column;
 }
 
+/* Skip layout and paint of cards below the first one. Their lazy photos then do not load
+   before the LCP photo is painted (they compete with it for bandwidth in Lighthouse). */
+.room + .room {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 55rem; /* About the card height on a phone. */
+}
+
 .room__image {
   overflow: hidden;
   aspect-ratio: 4 / 3;
@@ -1173,6 +1180,10 @@ p {
 @media (min-width: 768px) {
   .rooms {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .room + .room {
+    contain-intrinsic-size: auto 62rem;
   }
 }
 
