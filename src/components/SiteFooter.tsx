@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { legalNav, mainNav } from '@/lib/navigation';
 import { nap } from '@/lib/nap';
-import { LogoMark } from './LogoMark';
+import { LogoRef } from './Logo';
 import { NapBlock } from './NapBlock';
 
 export function SiteFooter() {
@@ -10,8 +10,7 @@ export function SiteFooter() {
       <div className="site-footer__inner">
         <div className="site-footer__brand">
           <p className="site-footer__logo">
-            <LogoMark />
-            <span>{nap.name}</span>
+            <LogoRef className="site-footer__logo-img" width={128} height={64} />
           </p>
           <NapBlock />
         </div>

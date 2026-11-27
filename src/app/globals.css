@@ -473,23 +473,19 @@ p {
   transition: color var(--base) var(--ease-out);
 }
 
-.logo__mark {
-  width: 34px;
+.logo__img {
+  /* Old-site logo (issue #44). Width and height are set in HTML: no layout shift. */
+  --logo-gold: #d6a317;
+  display: block;
+  width: 96px;
   height: auto;
   flex: none;
 }
 
-.logo__text {
-  font: 500 22px/1 var(--serif);
-}
-
-.logo__text small {
-  display: block;
-  margin-top: 3px;
-  font: 600 11px/1 var(--sans);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--gold-text);
+@media (min-width: 1024px) {
+  .logo__img {
+    width: 112px;
+  }
 }
 
 .site-header__actions {
@@ -769,9 +765,6 @@ p {
 :root:has(.hero) .site-header::before {
   opacity: 0;
 }
-:root:has(.hero) .logo__text small {
-  color: var(--night-gold);
-}
 :root[data-scrolled]:has(.hero) .site-header,
 :root:has(.hero) .site-header:focus-within,
 :root:has(.hero) .site-header:has([aria-expanded='true']) {
@@ -781,10 +774,6 @@ p {
 :root:has(.hero) .site-header:focus-within::before,
 :root:has(.hero) .site-header:has([aria-expanded='true'])::before {
   opacity: 1;
-}
-:root[data-scrolled]:has(.hero) .logo__text small,
-:root:has(.hero) .site-header:focus-within .logo__text small {
-  color: var(--gold-text);
 }
 @media (max-width: 1023.98px) {
   .site-header .action-bar,
@@ -2023,14 +2012,13 @@ a:hover > .arr,
 }
 
 .site-footer__logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font: 500 22px/1 var(--serif);
+  margin: 0 0 12px;
 }
 
-.site-footer__logo svg {
-  width: 34px;
+.site-footer__logo-img {
+  --logo-gold: #d6a317;
+  display: block;
+  width: 128px;
   height: auto;
 }
 
