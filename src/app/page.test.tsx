@@ -171,11 +171,8 @@ describe('home page', () => {
     expect(fromBlocks[0]).toContain(PLACEHOLDER_BADGE);
     const roomsBlock = html.slice(html.indexOf('id="rooms-title"'), html.indexOf('id="day-title"'));
     expect(roomsBlock).not.toMatch(/class="from-price/);
-  });
-
-  it('shows the sample from-price once on the page and no Offer JSON-LD', () => {
-    const blocks = [...html.matchAll(/<p class="from-price[^"]*"[\s\S]*?<\/p>/g)].map((m) => m[0]);
-    expect(blocks).toHaveLength(1);
+    const pageFromBlocks = [...html.matchAll(/<p class="from-price[^"]*"[\s\S]*?<\/p>/g)];
+    expect(pageFromBlocks).toHaveLength(1);
     const ld = [...html.matchAll(/<script[^>]*ld\+json[^>]*>([\s\S]*?)<\/script>/g)].map(
       (m) => m[1],
     );

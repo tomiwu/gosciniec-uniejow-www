@@ -7,14 +7,11 @@ import { sylwester } from '@/lib/venue';
 
 const offerSizes = '(min-width: 64rem) 370px, (min-width: 48rem) 44vw, 82vw';
 
-/**
- * Home offers strip (issues #40, #43). Sylwester is the first card when it has a real price.
- * A sample package and the room from-price follow under the placeholder rules. No Offer JSON-LD.
- */
+/** Home offers row after the hero (#40, #43). Sylwester first; no Offer JSON-LD on `/`. */
 export function HomeOffersStrip() {
-  const ball = offers.find((item) => item.id === 'sylwester-2026');
-  const sample = placeholderPackages[0];
-  if (!ball || ball.price === null || !sample) {
+  const sylwesterOffer = offers.find((item) => item.id === 'sylwester-2026');
+  const samplePackage = placeholderPackages[0];
+  if (!sylwesterOffer || sylwesterOffer.price === null || !samplePackage) {
     throw new Error('Home offers strip needs the Sylwester offer and one placeholder package.');
   }
   return (
@@ -40,31 +37,31 @@ export function HomeOffersStrip() {
               </div>
               <div className="card__body">
                 <p className="eyebrow">Oferta sezonowa</p>
-                <h3 id="home-offer-sylwester">{ball.name}</h3>
+                <h3 id="home-offer-sylwester">{sylwesterOffer.name}</h3>
                 <p>
                   {sylwester.dateText}. Odnowiona sala balowa. Muzyka: {sylwester.dj}. Nocleg i
                   menu: na zapytanie.
                 </p>
                 <p className="home-offer__price">
-                  <strong>{ball.price} zł za parę</strong> (bal)
+                  <strong>{sylwesterOffer.price} zł za parę</strong> (bal)
                 </p>
-                <Link className="card__link" href={sylwester.path}>
+                <Link className="card__link" href={sylwesterOffer.path}>
                   Zobacz szczegóły balu <span aria-hidden="true">→</span>
                 </Link>
               </div>
             </article>
           </li>
           <li>
-            <article className="home-offer card" aria-labelledby={`home-offer-${sample.id}`}>
+            <article className="home-offer card" aria-labelledby={`home-offer-${samplePackage.id}`}>
               <div className="card__body">
                 <p className="eyebrow">
                   <PlaceholderBadge />
                 </p>
-                <h3 id={`home-offer-${sample.id}`}>{sample.name}</h3>
-                <p>{sample.audience}</p>
-                <p className="home-offer__price">{sample.priceText}</p>
-                <Link className="card__link" href={sample.path}>
-                  {sample.linkLabel} <span aria-hidden="true">→</span>
+                <h3 id={`home-offer-${samplePackage.id}`}>{samplePackage.name}</h3>
+                <p>{samplePackage.audience}</p>
+                <p className="home-offer__price">{samplePackage.priceText}</p>
+                <Link className="card__link" href={samplePackage.path}>
+                  {samplePackage.linkLabel} <span aria-hidden="true">→</span>
                 </Link>
               </div>
             </article>
