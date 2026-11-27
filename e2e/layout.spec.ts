@@ -93,7 +93,7 @@ test.describe('mobile menu', () => {
     await page.keyboard.press('Enter');
     await expect(page.locator('#main-menu')).toBeVisible();
     await page.keyboard.press('Tab');
-    await expect(page.getByRole('link', { name: 'Pokoje' })).toBeFocused();
+    await expect(page.locator('#main-menu').getByRole('link', { name: 'Pokoje' })).toBeFocused();
     await page.keyboard.press('Escape');
     await expect(button).toHaveAttribute('aria-expanded', 'false');
     await expect(page.locator('#main-menu')).toBeHidden();
