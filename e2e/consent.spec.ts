@@ -117,8 +117,11 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(actionBox).not.toBeNull();
       // The banner ends where the action bar starts (1 px for rounding).
       expect(barBox!.y + barBox!.height).toBeLessThanOrEqual(actionBox!.y + 1);
-      // The banner and the action bar together use at most 180 px of the first screen (issue #81).
-      expect(barBox!.height + actionBox!.height).toBeLessThanOrEqual(180);
+      // The banner and the action bar together use at most 220 px of the first screen.
+      // Issue #81 set 180 px. Issue #85 raised that to 190 px for 44 px tap targets.
+      // Issue #86 puts "Akceptuję wszystkie" on its own row so the label is not cut.
+      // The second button row adds about 50 px, so the limit is 220 px.
+      expect(barBox!.height + actionBox!.height).toBeLessThanOrEqual(220);
 
       // The action bar buttons are on top: nothing from the banner covers them.
       for (const name of ['Zadzwoń', 'Rezerwuj']) {
@@ -178,18 +181,61 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(accept.bg).not.toBe('rgba(0, 0, 0, 0)');
     });
 
-    test('three buttons fit in one row', async ({ page }) => {
+    test('accept sits on its own row and reject stays as large as settings', async ({ page }) => {
       await page.goto('/');
       const bar = await waitForConsentBar(page);
-      const tops: number[] = [];
+      const boxes: Record<string, { x: number; y: number; width: number; height: number }> = {};
       for (const name of ['Akceptuję wszystkie', 'Odrzucam', 'Ustawienia']) {
         const box = await bar.getByRole('button', { name }).boundingBox();
-        tops.push(Math.round(box!.y));
-        expect(box!.height).toBeGreaterThanOrEqual(24);
-        expect(box!.width).toBeGreaterThanOrEqual(24);
+        expect(box, name).not.toBeNull();
+        boxes[name] = box!;
+        // 44 px tap target (issue #85).
+        expect(box!.height, name).toBeGreaterThanOrEqual(44);
+        expect(box!.width, name).toBeGreaterThanOrEqual(44);
       }
-      expect(new Set(tops).size).toBe(1);
+      const accept = boxes['Akceptuję wszystkie']!;
+      const reject = boxes['Odrzucam']!;
+      const settings = boxes['Ustawienia']!;
+      // Accept is on the first row and uses the full button row width.
+      expect(accept.y + accept.height).toBeLessThanOrEqual(reject.y + 1);
+      expect(Math.abs(reject.y - settings.y)).toBeLessThanOrEqual(1);
+      // Reject stays at least as wide as settings (equal prominence).
+      expect(reject.width).toBeGreaterThanOrEqual(settings.width - 1);
+      expect(accept.width).toBeGreaterThan(reject.width);
     });
+
+    // Phone fonts are wider than the test font, so 320 px stands in for "390 px on a real phone".
+    for (const width of [390, 320]) {
+      test(`hero pill does not leave one word alone on a line at ${width} px`, async ({ page }) => {
+        await page.setViewportSize({ width, height: 844 });
+        await page.goto('/');
+        const lines = await page.locator('.hero .eyebrow').evaluate((el) => {
+          const range = document.createRange();
+          const rows = new Map<number, string>();
+          const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+          for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+            const text = node.textContent ?? '';
+            for (let i = 0; i < text.length; i++) {
+              if (/\s/.test(text[i]!)) continue;
+              range.setStart(node, i);
+              range.setEnd(node, i + 1);
+              const top = Math.round(range.getBoundingClientRect().top);
+              rows.set(top, (rows.get(top) ?? '') + text[i]);
+            }
+          }
+          return [...rows.values()];
+        });
+        // One line is best. Two lines are fine when each line holds at least two words.
+        // The words are the parts between the "·" separators.
+        expect(lines.length).toBeLessThanOrEqual(2);
+        if (lines.length > 1) {
+          for (const line of lines) {
+            const words = line.split('·').filter((w) => w.length > 0);
+            expect(words.length, `line "${line}" has one word`).toBeGreaterThanOrEqual(2);
+          }
+        }
+      });
+    }
 
     test('Ustawienia has a border with at least 3:1 contrast against the panel', async ({
       page,
@@ -422,3 +468,114 @@ for (const scheme of ['light', 'dark'] as const) {
     });
   }
 }
+
+/* ---------- Button labels are not cut (issue #86) ---------- */
+
+for (const scheme of ['light', 'dark'] as const) {
+  for (const viewport of [
+    { width: 390, height: 844 },
+    { width: 1280, height: 800 },
+  ]) {
+    test.describe(`banner labels at ${viewport.width} px, ${scheme} theme`, () => {
+      test.use({ colorScheme: scheme, viewport });
+
+      test('every banner button keeps its full label inside the button', async ({ page }) => {
+        await page.goto('/');
+        await expect(page.locator('html')).toHaveAttribute('data-theme', scheme);
+        const bar = await waitForConsentBar(page);
+        for (const name of ['Akceptuję wszystkie', 'Odrzucam', 'Ustawienia']) {
+          const btn = bar.getByRole('button', { name });
+          await expect(btn).toBeVisible();
+          const sizes = await btn.evaluate((el) => ({
+            scrollWidth: el.scrollWidth,
+            clientWidth: el.clientWidth,
+          }));
+          expect(
+            sizes.scrollWidth,
+            `"${name}" is cut (${sizes.scrollWidth} > ${sizes.clientWidth})`,
+          ).toBeLessThanOrEqual(sizes.clientWidth);
+        }
+      });
+    });
+  }
+}
+
+/* ---------- Desktop card (issue #85) ---------- */
+
+test.describe('1280 px viewport: the banner card stays off links and buttons', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  async function waitForSlideIn(page: Page, bar: Locator) {
+    await expect
+      .poll(async () => {
+        const box = (await bar.boundingBox())!;
+        return box.y + box.height;
+      })
+      .toBeLessThanOrEqual(800);
+  }
+
+  // Names of the page links and buttons that the card covers at the current scroll position.
+  async function coveredControls(page: Page): Promise<string[]> {
+    return page.evaluate(() => {
+      const card = document.querySelector('#cc-main .cm')!.getBoundingClientRect();
+      const controls = document.querySelectorAll<HTMLElement>(
+        'a[href], button, input, select, textarea, summary',
+      );
+      const hits: string[] = [];
+      for (const el of controls) {
+        if (el.closest('#cc-main')) continue;
+        const r = el.getBoundingClientRect();
+        if (r.width === 0 || r.height === 0 || r.bottom < 0 || r.top > innerHeight) continue;
+        const overlaps =
+          r.left < card.right && r.right > card.left && r.top < card.bottom && r.bottom > card.top;
+        if (overlaps) hits.push((el.textContent ?? '').trim().slice(0, 30) || el.tagName);
+      }
+      return hits;
+    });
+  }
+
+  for (const route of ['/pokoje/', '/pakiety/', '/kontakt/', '/rezerwacja/']) {
+    test(`${route}: card is small and covers no control at the top or the bottom`, async ({
+      page,
+    }) => {
+      await page.goto(route);
+      const bar = await waitForConsentBar(page);
+      await waitForSlideIn(page, bar);
+      const box = (await bar.boundingBox())!;
+      expect(box.width, 'card width').toBeLessThanOrEqual(340);
+      expect(box.height, 'card height').toBeLessThanOrEqual(220);
+      expect(await coveredControls(page), 'at the top').toEqual([]);
+      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      await page.waitForTimeout(200);
+      expect(await coveredControls(page), 'at the bottom').toEqual([]);
+    });
+
+    test(`${route}: keyboard focus is never hidden behind the card`, async ({ page }) => {
+      await page.goto(route);
+      const bar = await waitForConsentBar(page);
+      await waitForSlideIn(page, bar);
+      await page.locator('body').click({ position: { x: 5, y: 5 } });
+      for (let i = 0; i < 120; i++) {
+        await page.keyboard.press('Tab');
+        const state = await page.evaluate(() => {
+          const el = document.activeElement as HTMLElement | null;
+          if (!el || el === document.body) return { inCard: false, covered: false, name: '' };
+          if (el.closest('#cc-main')) return { inCard: true, covered: false, name: '' };
+          const card = document.querySelector('#cc-main .cm')!.getBoundingClientRect();
+          const r = el.getBoundingClientRect();
+          // A wide field may touch the card edge. Its centre must stay visible and clickable.
+          const cx = r.left + r.width / 2;
+          const cy = r.top + r.height / 2;
+          const covered = cx > card.left && cx < card.right && cy > card.top && cy < card.bottom;
+          return {
+            inCard: false,
+            covered,
+            name: ((el.textContent ?? '').trim() || el.outerHTML).slice(0, 80),
+          };
+        });
+        if (state.inCard) break;
+        expect(state.covered, `focused "${state.name}" is behind the card`).toBe(false);
+      }
+    });
+  }
+});
