@@ -11,7 +11,7 @@ export function BlogIndex({ posts }: { posts: readonly BlogPost[] }) {
         <>
           <p>Wkrótce pierwsze wpisy.</p>
           <p>Tymczasem zobacz, co oferuje hotel:</p>
-          <ul className="blog-empty-links">
+          <ul>
             <li>
               <Link className="text-link" href="/pakiety/">
                 Pakiety i oferty
