@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { ViewTransition, type ReactNode } from 'react';
+import { ConsentDefaultScript } from '@/components/ConsentDefaultScript';
+import { CookieConsentLoader } from '@/components/CookieConsentLoader';
 import { JsonLd } from '@/components/JsonLd';
 import { PreviewBanner } from '@/components/PreviewBanner';
 import { SiteEffects } from '@/components/SiteEffects';
@@ -32,6 +34,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head>
         {/* Runs before the first paint: no flash of the wrong theme. */}
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <ConsentDefaultScript />
         {preloadFonts.map((file) => (
           <link
             key={file}
@@ -60,6 +63,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </ViewTransition>
         <SiteFooter />
         <SiteEffects />
+        <CookieConsentLoader />
         <JsonLd data={buildHotelSchema()} />
       </body>
     </html>

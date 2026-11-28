@@ -2,6 +2,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 import { nap } from '../src/lib/nap';
 import { routes } from '../src/lib/routes';
+import { dismissConsentBar } from './helpers/consent';
 
 const AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 const MOBILE = { width: 390, height: 844 };
@@ -72,6 +73,7 @@ test.describe('mobile menu', () => {
   test.beforeEach(async ({ page }) => {
     await page.setViewportSize(MOBILE);
     await page.goto('/');
+    await dismissConsentBar(page);
   });
 
   test('is closed at first and opens with Enter', async ({ page }) => {

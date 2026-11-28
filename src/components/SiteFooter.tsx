@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { legalNav, mainNav } from '@/lib/navigation';
 import { nap } from '@/lib/nap';
+import { CookieSettingsLink } from './CookieSettingsLink';
 import { LogoRef } from './Logo';
 import { NapBlock } from './NapBlock';
 
@@ -30,6 +31,9 @@ export function SiteFooter() {
                 <Link href={item.href}>{item.label}</Link>
               </li>
             ))}
+            <li>
+              <CookieSettingsLink />
+            </li>
           </ul>
         </nav>
         <p className="site-footer__copy">

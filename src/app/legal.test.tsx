@@ -27,3 +27,14 @@ describe.each([
     expect(html).not.toMatch(/\bTODO\b/);
   });
 });
+
+describe('/polityka-prywatnosci/ cookie list', () => {
+  const html = renderToStaticMarkup(<Privacy />);
+
+  it('lists the phase-1 cookies next to the lawyer placeholder', () => {
+    expect(html).toContain('Krótka lista plików cookie');
+    expect(html).toContain('cc_cookie');
+    expect(html).toContain('gu-theme');
+    expect(html).toContain('_ga');
+  });
+});
