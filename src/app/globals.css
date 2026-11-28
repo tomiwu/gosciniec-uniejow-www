@@ -2648,7 +2648,6 @@ a:hover > .arr,
   color: var(--gold-text);
   font-size: 24px;
   line-height: 1;
-  transition: transform var(--base) var(--ease-out);
 }
 
 .blog-links__card:hover {
@@ -2656,17 +2655,13 @@ a:hover > .arr,
   box-shadow: var(--shadow-hover);
 }
 
-.blog-links__card:hover .blog-links__arrow {
-  transform: translateX(4px);
-}
-
-@media (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: no-preference) {
   .blog-links__arrow {
-    transition: none;
+    transition: transform var(--base) var(--ease-out);
   }
 
   .blog-links__card:hover .blog-links__arrow {
-    transform: none;
+    transform: translateX(4px);
   }
 }
 
