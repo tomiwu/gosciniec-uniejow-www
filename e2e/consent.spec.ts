@@ -181,6 +181,42 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(accept.bg).not.toBe('rgba(0, 0, 0, 0)');
     });
 
+    if (scheme === 'dark') {
+      test('dark theme: accept and reject are quieter than the gold Rezerwuj button', async ({
+        page,
+      }) => {
+        await page.goto('/');
+        const bar = await waitForConsentBar(page);
+        const read = (locator: Locator) =>
+          locator.evaluate((el) => {
+            const s = getComputedStyle(el);
+            const panel = getComputedStyle((el.closest('.cm') ?? el) as Element);
+            return {
+              bg: s.backgroundColor,
+              color: s.color,
+              border: s.borderTopColor,
+              panel: panel.backgroundColor,
+            };
+          });
+        const accept = await read(bar.getByRole('button', { name: 'Akceptuję wszystkie' }));
+        const reject = await read(bar.getByRole('button', { name: 'Odrzucam' }));
+        const rezerwuj = await read(
+          page.locator('.action-bar').getByRole('link', { name: 'Rezerwuj' }),
+        );
+        for (const button of [accept, reject]) {
+          // Dark fill: much darker than the gold button and not a light cream block.
+          expect(luminance(parseRgb(button.bg))).toBeLessThan(0.1);
+          expect(luminance(parseRgb(button.bg))).toBeLessThan(luminance(parseRgb(rezerwuj.bg)));
+          expect(contrast(parseRgb(button.color), parseRgb(button.bg))).toBeGreaterThanOrEqual(4.5);
+          // The edge of the button is visible on the panel (3:1, WCAG 1.4.11).
+          expect(contrast(parseRgb(button.border), parseRgb(button.panel))).toBeGreaterThanOrEqual(
+            3,
+          );
+        }
+        expect(reject).toEqual(accept);
+      });
+    }
+
     test('accept sits on its own row and reject stays as large as settings', async ({ page }) => {
       await page.goto('/');
       const bar = await waitForConsentBar(page);

@@ -2792,12 +2792,13 @@ html[data-theme='dark'] #cc-main {
   --cc-bg: var(--night-2);
   --cc-primary-color: var(--night-text);
   --cc-secondary-color: var(--night-muted);
-  --cc-btn-primary-bg: var(--night-text);
-  --cc-btn-primary-color: var(--night);
-  --cc-btn-primary-border-color: var(--night-text);
-  --cc-btn-primary-hover-bg: var(--night-muted);
-  --cc-btn-primary-hover-color: var(--night);
-  --cc-btn-primary-hover-border-color: var(--night-muted);
+  /* Dark fill with a light edge. A cream block would draw more eye than the gold "Rezerwuj". */
+  --cc-btn-primary-bg: var(--tag-bg);
+  --cc-btn-primary-color: var(--night-text);
+  --cc-btn-primary-border-color: var(--night-muted);
+  --cc-btn-primary-hover-bg: var(--night-line);
+  --cc-btn-primary-hover-color: var(--night-text);
+  --cc-btn-primary-hover-border-color: var(--night-text);
   --cc-btn-secondary-bg: transparent;
   --cc-btn-secondary-color: var(--night-text);
   --cc-btn-secondary-border-color: var(--night-muted);
@@ -2991,4 +2992,27 @@ html[data-theme='dark'] #cc-main {
   #cc-main .cm .cm__btn[data-role='all'] {
     grid-column: 1 / -1;
   }
+}
+
+/* Contact page (issue #87): the items and the call button share one vertical gap. */
+.contact-items,
+.nap--stacked {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.contact-items > *,
+.nap--stacked > * {
+  margin: 0;
+}
+
+.nap--stacked a {
+  display: inline-block;
+  padding-block: 0;
+}
+
+.nap--stacked > [data-contact-item] {
+  min-height: 24px;
 }

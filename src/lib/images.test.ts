@@ -77,4 +77,11 @@ describe('image manifest', () => {
     );
     expect(total).toBeLessThan(MAX_BYTES);
   });
+
+  // Issue #87: the first room photo is the LCP element of /pokoje/ on a phone. In the Lighthouse
+  // slow-4G model, a file that fits in the first TCP window (about 14 KB with the headers) saves
+  // one round trip. The 720 px AVIF is the file that a 412 px wide phone picks.
+  it('keeps the phone AVIF of the first room photo at 12 KB or less', () => {
+    expect(statSync(join(IMG_DIR, 'img-3729-720.avif')).size).toBeLessThanOrEqual(12 * 1024);
+  });
 });
