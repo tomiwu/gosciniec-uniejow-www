@@ -2,7 +2,7 @@
 
 ## GitHub CI (required)
 
-Branch protection requires 9 jobs: `format`, `lint`, `typecheck`, `test`, `build`, `redirects`, `schema`, `e2e-a11y`, `lighthouse` (PRD PS6). `build` runs `npm run build`. This is a non-production build: it may use sample data (`src/content/placeholders.ts`) when each page that shows it has the badge "Dane testowe". `lighthouse` runs Lighthouse CI on that export (`lighthouserc.json`: mobile preset, 3 runs, median LCP ≤ 2500 ms on `/` and `/pokoje/`).
+Branch protection requires 9 jobs: `format`, `lint`, `typecheck`, `test`, `build`, `redirects`, `schema`, `e2e-a11y`, `lighthouse` (PRD PS6). `build` runs `npm run build`. This is a non-production build: it may use sample data (`src/content/placeholders.ts`) when each page that shows it has the badge "Dane testowe". `lighthouse` runs Lighthouse CI on that export (`lighthouserc.json`: mobile preset, 3 runs, median LCP ≤ 2500 ms on `/`, `/pokoje/`, `/pakiety/` and `/blog/`).
 
 ## Local loop checks (`.sandcastle/checks.json`)
 

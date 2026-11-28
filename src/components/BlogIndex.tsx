@@ -8,7 +8,27 @@ export function BlogIndex({ posts }: { posts: readonly BlogPost[] }) {
     <div className="page blog">
       <h1>Blog</h1>
       {posts.length === 0 ? (
-        <p>Wkrótce pierwsze wpisy.</p>
+        <>
+          <p>Wkrótce pierwsze wpisy.</p>
+          <p>Tymczasem zobacz, co oferuje hotel:</p>
+          <ul className="blog-empty-links">
+            <li>
+              <Link className="text-link" href="/pakiety/">
+                Pakiety i oferty
+              </Link>
+            </li>
+            <li>
+              <Link className="text-link" href="/pokoje/">
+                Pokoje
+              </Link>
+            </li>
+          </ul>
+          <p>
+            <Link className="button" href="/rezerwacja/">
+              Rezerwuj
+            </Link>
+          </p>
+        </>
       ) : (
         <ul className="blog-list">
           {posts.map((post) => (

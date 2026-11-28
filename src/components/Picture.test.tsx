@@ -61,6 +61,20 @@ describe('Picture', () => {
     expect(html).not.toContain('loading="lazy"');
   });
 
+  it('preloads the AVIF set with high priority when priority is set', () => {
+    const html = render({ priority: true, sizes: '100vw' });
+    const [a, , c] = wide!.widths;
+    expect(html).toMatch(/<link rel="preload" as="image"[^>]*type="image\/avif"/);
+    expect(html).toContain(`imageSrcSet="/img/${wide!.slug}-${a}.avif ${a}w`);
+    expect(html).toContain(`/img/${wide!.slug}-${c}.avif ${c}w"`);
+    expect(html).toContain('imageSizes="100vw"');
+    expect(html).toMatch(/<link[^>]*fetchPriority="high"/);
+  });
+
+  it('adds no preload for a lazy image', () => {
+    expect(render()).not.toContain('<link');
+  });
+
   it('allows an empty alt only with the decorative prop', () => {
     expect(render({ alt: '', decorative: true })).toContain('alt=""');
     expect(() => render({ alt: '' })).toThrow(/alt/);
