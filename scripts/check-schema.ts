@@ -136,6 +136,23 @@ function checkNotPlaceholderAmount(node: Node, where: string): string[] {
   return [];
 }
 
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}(?:T[\d:.+Z-]+)?$/;
+
+/** A BlogPosting needs a headline, a real date and the hotel as Organization author (issue #13). */
+function checkBlogPosting(node: Node, where: string): string[] {
+  const errors: string[] = [];
+  if (!nonEmptyString(node['headline'])) errors.push(`${where}: BlogPosting needs a headline`);
+  const date = node['datePublished'];
+  if (typeof date !== 'string' || !ISO_DATE.test(date) || Number.isNaN(Date.parse(date))) {
+    errors.push(`${where}: BlogPosting datePublished must be an ISO date`);
+  }
+  const author = node['author'];
+  if (!isNode(author) || !typesOf(author).includes('Organization') || author['name'] !== nap.name) {
+    errors.push(`${where}: BlogPosting author must be the Organization "${nap.name}"`);
+  }
+  return errors;
+}
+
 function checkOffer(node: Node, where: string): string[] {
   const errors: string[] = [];
   const price = node['price'];
@@ -184,8 +201,13 @@ const REQUIRED_TYPES: Record<string, string[]> = {
   'przyjecia/index.html': ['FAQPage', 'EventVenue'],
 };
 
+/** Article pages: `blog/<slug>/index.html`. The list page `blog/index.html` is not one. */
+const BLOG_ARTICLE = /^blog\/[^/]+\/index\.html$/;
+
 export function requiredTypesFor(file: string): string[] {
-  return REQUIRED_TYPES[file.replaceAll('\\', '/')] ?? [];
+  const key = file.replaceAll('\\', '/');
+  if (BLOG_ARTICLE.test(key)) return ['BlogPosting'];
+  return REQUIRED_TYPES[key] ?? [];
 }
 
 /** Check one HTML document. Returns error messages. */
@@ -228,6 +250,7 @@ export function checkHtml(html: string, file: string): string[] {
         if (types.includes('Restaurant')) errors.push(...checkRestaurant(node, where));
         if (types.includes('HotelRoom')) errors.push(...checkHotelRoom(node, where));
         if (types.includes('FAQPage')) errors.push(...checkFaqPage(node, where));
+        if (types.includes('BlogPosting')) errors.push(...checkBlogPosting(node, where));
         if (types.includes('Offer')) errors.push(...checkOffer(node, where));
         for (const type of ['MeetingRoom', 'EventVenue']) {
           if (types.includes(type)) errors.push(...checkVenue(node, where, type));

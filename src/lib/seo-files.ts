@@ -1,4 +1,5 @@
 import { cheapestRoomFromPrice, PLACEHOLDER_BADGE } from '@/content/placeholders';
+import { getPublishedPosts, type BlogPost } from './blog';
 import { nap } from './nap';
 import { offers } from './offers';
 import { isPreview } from './preview';
@@ -77,8 +78,18 @@ export function buildLlmsTxt(): string {
   return lines.join('\n');
 }
 
-export function buildSitemapXml(): string {
-  const urls = routes.map((route) => `  <url><loc>${nap.siteUrl}${route.path}</loc></url>`);
+/** Indexed routes and published blog posts. A `noindex` route is not in the sitemap. */
+export function buildSitemapXml(
+  posts: readonly Pick<BlogPost, 'path' | 'date'>[] = getPublishedPosts(),
+): string {
+  const urls = [
+    ...routes
+      .filter((route) => !route.noindex)
+      .map((route) => `  <url><loc>${nap.siteUrl}${route.path}</loc></url>`),
+    ...posts.map(
+      (post) => `  <url><loc>${nap.siteUrl}${post.path}</loc><lastmod>${post.date}</lastmod></url>`,
+    ),
+  ];
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',

@@ -1,4 +1,5 @@
-import { StubPage } from '@/components/StubPage';
+import { BlogIndex } from '@/components/BlogIndex';
+import { getPublishedPosts } from '@/lib/blog';
 import { routeMetadata } from '@/lib/metadata';
 
 const path = '/blog/';
@@ -6,5 +7,5 @@ const path = '/blog/';
 export const metadata = routeMetadata(path);
 
 export default function Page() {
-  return <StubPage path={path} />;
+  return <BlogIndex posts={getPublishedPosts()} />;
 }

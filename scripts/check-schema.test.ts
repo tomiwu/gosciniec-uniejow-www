@@ -278,3 +278,44 @@ describe('Restaurant', () => {
     }
   });
 });
+
+describe('BlogPosting', () => {
+  const post = (fields: Record<string, unknown> = {}) => ({
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: 'Weekend w Uniejowie',
+    datePublished: '2026-12-01',
+    author: { '@type': 'Organization', name: 'Gościniec Uniejów' },
+    ...fields,
+  });
+
+  it('requires BlogPosting on a blog article page only', () => {
+    expect(requiredTypesFor('blog/przyklad/index.html')).toEqual(['BlogPosting']);
+    expect(requiredTypesFor('blog/index.html')).toEqual([]);
+  });
+
+  it('accepts a complete BlogPosting', () => {
+    expect(checkHtml(page(hotel, post()), 'blog/przyklad/index.html')).toEqual([]);
+  });
+
+  it('reports a missing BlogPosting on an article page', () => {
+    const errors = checkHtml(page(hotel), 'blog/przyklad/index.html');
+    expect(errors.join('\n')).toContain('no BlogPosting JSON-LD found');
+  });
+
+  it('rejects an empty headline, a bad date and a wrong author', () => {
+    expect(checkHtml(page(hotel, post({ headline: ' ' })), 'a.html').join()).toMatch(/headline/);
+    expect(checkHtml(page(hotel, post({ datePublished: 'wczoraj' })), 'a.html').join()).toMatch(
+      /datePublished/,
+    );
+    expect(
+      checkHtml(page(hotel, post({ author: { '@type': 'Person', name: 'Jan' } })), 'a.html').join(),
+    ).toMatch(/author/);
+    expect(
+      checkHtml(
+        page(hotel, post({ author: { '@type': 'Organization', name: 'Inna' } })),
+        'a.html',
+      ).join(),
+    ).toMatch(/author/);
+  });
+});

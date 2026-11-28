@@ -14,6 +14,7 @@ export function routeMetadata(path: string): Metadata {
     title: { absolute: title },
     description: route.description,
     alternates: { canonical: path },
+    ...(route.noindex ? { robots: { index: false, follow: false } } : {}),
     openGraph: {
       type: 'website',
       locale: 'pl_PL',

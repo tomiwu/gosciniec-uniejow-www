@@ -1,5 +1,6 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { cleanBlogOutput } from './blog-output';
 import { buildLlmsTxt, buildRobotsTxt, buildSitemapXml } from '../src/lib/seo-files';
 import { buildHtaccess } from '../src/redirects/htaccess';
 import { redirects } from '../src/redirects/map';
@@ -10,4 +11,5 @@ writeFileSync(join(outDir, '.htaccess'), buildHtaccess(redirects));
 writeFileSync(join(outDir, 'robots.txt'), buildRobotsTxt());
 writeFileSync(join(outDir, 'sitemap.xml'), buildSitemapXml());
 writeFileSync(join(outDir, 'llms.txt'), buildLlmsTxt());
+cleanBlogOutput(outDir);
 console.log(`postbuild: wrote .htaccess, robots.txt, sitemap.xml, llms.txt to ${outDir}/`);

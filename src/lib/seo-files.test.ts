@@ -17,10 +17,31 @@ describe('buildRobotsTxt', () => {
 describe('buildSitemapXml', () => {
   it('has one url for each route', () => {
     const xml = buildSitemapXml();
-    expect(xml.match(/<loc>/g)).toHaveLength(routes.length);
-    for (const route of routes) {
+    const indexed = routes.filter((route) => !route.noindex);
+    expect(xml.match(/<loc>/g)).toHaveLength(indexed.length);
+    for (const route of indexed) {
       expect(xml).toContain(`<loc>https://gosciniecuniejow.pl${route.path}</loc>`);
     }
+  });
+});
+
+describe('buildSitemapXml with blog posts and noindex routes', () => {
+  const post = { path: '/blog/przyklad/', date: '2026-12-01' };
+
+  it('adds each published post', () => {
+    const xml = buildSitemapXml([post]);
+    expect(xml).toContain('<loc>https://gosciniecuniejow.pl/blog/przyklad/</loc>');
+    expect(xml).toContain('<lastmod>2026-12-01</lastmod>');
+  });
+
+  it('has no post when none is published', () => {
+    expect(buildSitemapXml([])).not.toMatch(/\/blog\/[a-z]/);
+  });
+
+  it('leaves out the noindex legal pages', () => {
+    const xml = buildSitemapXml([]);
+    expect(xml).not.toContain('/regulamin/');
+    expect(xml).not.toContain('/polityka-prywatnosci/');
   });
 });
 
