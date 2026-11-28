@@ -2,6 +2,10 @@ import { defineConfig, devices } from '@playwright/test';
 
 const port = 4173;
 
+// WebKit is optional. The `e2e-a11y` job installs it and sets E2E_WEBKIT=1 (issue #83).
+// A machine without WebKit and its system libraries skips this project.
+const withWebkit = process.env['E2E_WEBKIT'] === '1';
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
@@ -30,5 +34,16 @@ export default defineConfig({
       name: 'chromium-desktop',
       use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 800 } },
     },
+    // WebKit layout differences. Static iPhone 13 profile (390x664): it does not emulate the
+    // dynamic Safari tool bar or the safe area. Only the scroll-time geometry spec runs here.
+    ...(withWebkit
+      ? [
+          {
+            name: 'webkit-mobile',
+            testMatch: /ux-flows\.spec\.ts/,
+            use: { ...devices['iPhone 13'] },
+          },
+        ]
+      : []),
   ],
 });
