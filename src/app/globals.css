@@ -818,9 +818,10 @@ p {
   background: linear-gradient(
     180deg,
     rgb(14 26 34 / 0.6) 0%,
-    rgb(14 26 34 / 0.25) 28%,
-    rgb(14 26 34 / 0.68) 55%,
-    rgb(14 26 34 / 0.92) 100%
+    rgb(14 26 34 / 0.5) 12%,
+    rgb(14 26 34 / 0.8) 30%,
+    rgb(14 26 34 / 0.86) 55%,
+    rgb(14 26 34 / 0.94) 100%
   );
 }
 
@@ -828,8 +829,9 @@ p {
   background: linear-gradient(
     180deg,
     rgb(8 18 26 / 0.6) 0%,
-    rgb(8 18 26 / 0.2) 30%,
-    rgb(8 18 26 / 0.6) 62%,
+    rgb(8 18 26 / 0.5) 12%,
+    rgb(8 18 26 / 0.82) 30%,
+    rgb(8 18 26 / 0.88) 55%,
     rgb(14 26 34 / 1) 100%
   );
 }
@@ -2601,6 +2603,7 @@ a:hover > .arr,
 /* Empty blog page: three equal cards. One column on mobile, one row from 640 px. */
 .blog-links {
   display: grid;
+  grid-auto-rows: 1fr;
   gap: 12px;
   margin: 24px 0 0;
   padding: 0;
@@ -2608,24 +2611,63 @@ a:hover > .arr,
 }
 
 .blog-links__card {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    'title arrow'
+    'desc arrow';
   align-items: center;
-  justify-content: center;
-  min-height: 64px;
+  column-gap: 12px;
+  row-gap: 4px;
+  height: 100%;
+  min-height: 88px;
   padding: 16px 20px;
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   background: var(--card);
   box-shadow: var(--shadow);
   color: var(--ink);
-  font-weight: 650;
-  text-align: center;
+  text-align: left;
   text-decoration: none;
+}
+
+.blog-links__title {
+  grid-area: title;
+  font-weight: 650;
+}
+
+.blog-links__desc {
+  grid-area: desc;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.blog-links__arrow {
+  grid-area: arrow;
+  color: var(--gold-text);
+  font-size: 24px;
+  line-height: 1;
+  transition: transform var(--base) var(--ease-out);
 }
 
 .blog-links__card:hover {
   border-color: var(--gold-text);
   box-shadow: var(--shadow-hover);
+}
+
+.blog-links__card:hover .blog-links__arrow {
+  transform: translateX(4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blog-links__arrow {
+    transition: none;
+  }
+
+  .blog-links__card:hover .blog-links__arrow {
+    transform: none;
+  }
 }
 
 @media (min-width: 640px) {
@@ -2787,6 +2829,44 @@ html[data-theme='dark'] #cc-main {
   }
 }
 
+/*
+ * Desktop: a floating card in the bottom-right corner. It does not cover the hero text.
+ * The hero text sits at the left and is at most 56 characters wide, so the right corner is free.
+ */
+@media (min-width: 1024px) {
+  #cc-main .cm.cm--bar.cm--bottom {
+    right: 16px;
+    bottom: 16px;
+    left: auto;
+    width: 380px;
+    max-width: calc(100vw - 32px);
+    margin: 0;
+    border: 1px solid var(--cc-separator-border-color);
+    border-radius: 12px;
+    box-shadow: var(--shadow-hover);
+  }
+
+  #cc-main .cm--bar .cm__body {
+    padding: 14px 16px 16px;
+  }
+
+  #cc-main .cm--bar .cm__btns {
+    flex-direction: column;
+    gap: 8px;
+    padding: 0;
+  }
+
+  #cc-main .cm--bar .cm__btn-group {
+    display: contents;
+  }
+
+  #cc-main .cm.cm--bar .cm__btn {
+    width: 100%;
+    margin: 0 !important;
+    padding: 8px 12px;
+  }
+}
+
 @media (max-width: 640px) {
   #cc-main .cm .cm__body {
     gap: 4px;
@@ -2825,9 +2905,9 @@ html[data-theme='dark'] #cc-main {
   #cc-main .cm .cm__btn {
     flex: 1 1 auto !important;
     min-width: 0;
-    min-height: 40px;
+    min-height: 36px;
     margin: 0 !important;
-    padding: 6px 8px;
+    padding: 4px 8px;
     font-size: 13px;
     line-height: 1.2;
   }

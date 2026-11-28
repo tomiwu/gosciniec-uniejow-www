@@ -117,8 +117,8 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(actionBox).not.toBeNull();
       // The banner ends where the action bar starts (1 px for rounding).
       expect(barBox!.y + barBox!.height).toBeLessThanOrEqual(actionBox!.y + 1);
-      // The banner stays low: less than a fifth of the first screen (issue #74).
-      expect(barBox!.height).toBeLessThanOrEqual(160);
+      // The banner and the action bar together use at most 180 px of the first screen (issue #81).
+      expect(barBox!.height + actionBox!.height).toBeLessThanOrEqual(180);
 
       // The action bar buttons are on top: nothing from the banner covers them.
       for (const name of ['Zadzwoń', 'Rezerwuj']) {
@@ -223,7 +223,7 @@ for (const scheme of ['light', 'dark'] as const) {
           panel: panel.backgroundColor,
         };
       });
-      expect(info.length).toBeLessThanOrEqual(120);
+      expect(info.length).toBeLessThanOrEqual(80);
       expect(info.size).toBeGreaterThanOrEqual(14);
       expect(contrast(parseRgb(info.color), parseRgb(info.panel))).toBeGreaterThanOrEqual(7);
     });
@@ -335,4 +335,90 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(results.violations).toEqual([]);
     });
   });
+}
+
+/* ---------- Hero contrast and desktop banner position (issue #81) ---------- */
+
+/** Worst-case (lightest) background luminance behind an element, text hidden. */
+async function lightestBackdrop(page: Page, target: Locator): Promise<number> {
+  await target.scrollIntoViewIfNeeded();
+  const box = (await target.boundingBox())!;
+  const restore = await target.evaluate((el) => {
+    const html = el as HTMLElement;
+    const old = html.style.color;
+    html.style.color = 'transparent';
+    return old;
+  });
+  // The banner and the action bar are not part of the hero photo. Hide them for the sample.
+  await page.addStyleTag({
+    content: '#cc-main, .action-bar { visibility: hidden !important; }',
+  });
+  const png = await page.screenshot({ clip: box, animations: 'disabled' });
+  await target.evaluate((el, old) => ((el as HTMLElement).style.color = old), restore);
+  return page.evaluate(async (b64) => {
+    const img = new Image();
+    img.src = 'data:image/png;base64,' + b64;
+    await img.decode();
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext('2d')!;
+    ctx.drawImage(img, 0, 0);
+    const data = ctx.getImageData(0, 0, img.width, img.height).data;
+    const channel = (v: number) => {
+      const c = v / 255;
+      return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    };
+    let max = 0;
+    for (let i = 0; i < data.length; i += 4) {
+      const l =
+        0.2126 * channel(data[i]!) +
+        0.7152 * channel(data[i + 1]!) +
+        0.0722 * channel(data[i + 2]!);
+      if (l > max) max = l;
+    }
+    return max;
+  }, png.toString('base64'));
+}
+
+for (const scheme of ['light', 'dark'] as const) {
+  for (const viewport of [
+    { width: 390, height: 844 },
+    { width: 1280, height: 800 },
+  ]) {
+    test.describe(`hero at ${viewport.width} px, ${scheme} theme`, () => {
+      test.use({ colorScheme: scheme, viewport });
+
+      test('hero paragraph keeps 4.5:1 contrast on the photo', async ({ page }) => {
+        await page.goto('/');
+        await expect(page.locator('html')).toHaveAttribute('data-theme', scheme);
+        await waitForConsentBar(page);
+        const lead = page.locator('.hero__lead');
+        const text = parseRgb(await lead.evaluate((el) => getComputedStyle(el).color));
+        const textLum = luminance(text);
+        const bgLum = await lightestBackdrop(page, lead);
+        expect((textLum + 0.05) / (bgLum + 0.05)).toBeGreaterThanOrEqual(4.5);
+      });
+
+      test('banner does not cover the hero text', async ({ page }) => {
+        test.skip(viewport.width < 1024, 'desktop only');
+        await page.goto('/');
+        const bar = await waitForConsentBar(page);
+        const barBox = (await bar.boundingBox())!;
+        for (const selector of ['.hero .eyebrow', '.hero h1', '.hero__lead', '.hero__former']) {
+          const el = page.locator(selector);
+          if ((await el.count()) === 0) continue;
+          const box = (await el.first().boundingBox())!;
+          const overlaps =
+            box.x < barBox.x + barBox.width &&
+            box.x + box.width > barBox.x &&
+            box.y < barBox.y + barBox.height &&
+            box.y + box.height > barBox.y;
+          expect(overlaps, `${selector} is covered by the banner`).toBe(false);
+        }
+        // A floating card in a corner, not a bar over the full width.
+        expect(barBox.width).toBeLessThanOrEqual(480);
+      });
+    });
+  }
 }

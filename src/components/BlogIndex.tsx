@@ -14,17 +14,29 @@ export function BlogIndex({ posts }: { posts: readonly BlogPost[] }) {
           <ul className="blog-links" aria-label="Oferta hotelu">
             <li>
               <Link className="blog-links__card" href="/pakiety/">
-                Pakiety i oferty
+                <span className="blog-links__title">Pakiety i oferty</span>
+                <span className="blog-links__desc">Aktualne pakiety i oferty hotelu.</span>
+                <span className="blog-links__arrow" aria-hidden="true">
+                  →
+                </span>
               </Link>
             </li>
             <li>
               <Link className="blog-links__card" href="/pokoje/">
-                Pokoje
+                <span className="blog-links__title">Pokoje</span>
+                <span className="blog-links__desc">Zobacz pokoje i ich wyposażenie.</span>
+                <span className="blog-links__arrow" aria-hidden="true">
+                  →
+                </span>
               </Link>
             </li>
             <li>
               <Link className="blog-links__card" href="/rezerwacja/">
-                Rezerwacja
+                <span className="blog-links__title">Rezerwacja</span>
+                <span className="blog-links__desc">Wyślij zapytanie albo zadzwoń do recepcji.</span>
+                <span className="blog-links__arrow" aria-hidden="true">
+                  →
+                </span>
               </Link>
             </li>
           </ul>
