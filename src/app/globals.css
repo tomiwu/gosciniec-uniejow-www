@@ -2676,18 +2676,20 @@ a:hover > .arr,
   --cc-bg: var(--card);
   --cc-primary-color: var(--ink);
   --cc-secondary-color: var(--muted);
-  --cc-btn-primary-bg: var(--gold);
-  --cc-btn-primary-color: var(--on-gold);
-  --cc-btn-primary-border-color: var(--gold);
-  --cc-btn-primary-hover-bg: #c49214;
-  --cc-btn-primary-hover-color: var(--on-gold);
-  --cc-btn-primary-hover-border-color: #c49214;
-  --cc-btn-secondary-bg: var(--card);
+  /* Accept and reject share one style. It is not the gold of the "Rezerwuj" button. */
+  --cc-btn-primary-bg: var(--ink);
+  --cc-btn-primary-color: var(--card);
+  --cc-btn-primary-border-color: var(--ink);
+  --cc-btn-primary-hover-bg: var(--muted);
+  --cc-btn-primary-hover-color: var(--card);
+  --cc-btn-primary-hover-border-color: var(--muted);
+  /* "Ustawienia": outline button. The border has at least 3:1 contrast on the panel. */
+  --cc-btn-secondary-bg: var(--cc-bg);
   --cc-btn-secondary-color: var(--ink);
-  --cc-btn-secondary-border-color: var(--line);
+  --cc-btn-secondary-border-color: var(--muted);
   --cc-btn-secondary-hover-bg: var(--surface);
   --cc-btn-secondary-hover-color: var(--ink);
-  --cc-btn-secondary-hover-border-color: var(--line);
+  --cc-btn-secondary-hover-border-color: var(--ink);
   --cc-separator-border-color: var(--line);
   --cc-toggle-on-bg: var(--gold);
   --cc-font-family: inherit;
@@ -2705,14 +2707,80 @@ html[data-theme='dark'] #cc-main {
   --cc-bg: var(--night-2);
   --cc-primary-color: var(--night-text);
   --cc-secondary-color: var(--night-muted);
-  --cc-btn-primary-bg: var(--night-gold);
+  --cc-btn-primary-bg: var(--night-text);
   --cc-btn-primary-color: var(--night);
-  --cc-btn-primary-hover-bg: #f0c24a;
+  --cc-btn-primary-border-color: var(--night-text);
+  --cc-btn-primary-hover-bg: var(--night-muted);
   --cc-btn-primary-hover-color: var(--night);
-  --cc-btn-secondary-bg: var(--night);
+  --cc-btn-primary-hover-border-color: var(--night-muted);
+  --cc-btn-secondary-bg: transparent;
   --cc-btn-secondary-color: var(--night-text);
-  --cc-btn-secondary-border-color: var(--night-line);
-  --cc-btn-secondary-hover-bg: var(--night-2);
+  --cc-btn-secondary-border-color: var(--night-muted);
+  --cc-btn-secondary-hover-bg: var(--night);
   --cc-btn-secondary-hover-color: var(--night-text);
+  --cc-btn-secondary-hover-border-color: var(--night-text);
   --cc-separator-border-color: var(--night-line);
+}
+
+/*
+ * Mobile: a low banner above the fixed action bar. The library forces a column layout
+ * below 640 px with !important rules, so these rules use the same weight.
+ */
+@media (max-width: 1023px) {
+  #cc-main .cm--bar.cm--bottom {
+    bottom: calc(var(--bar-h) + env(safe-area-inset-bottom));
+  }
+
+  /* The library adds this class to <html> while the banner is open. */
+  html.show--consent {
+    scroll-padding-bottom: calc(var(--bar-h) + 200px);
+  }
+}
+
+@media (max-width: 640px) {
+  #cc-main .cm .cm__body {
+    gap: 6px;
+    padding: 10px 0 !important;
+  }
+
+  #cc-main .cm .cm__title {
+    margin: 0;
+    padding-top: 0;
+    font-size: 15px;
+    line-height: 1.3;
+  }
+
+  #cc-main .cm .cm__desc {
+    margin: 2px 0 0;
+    padding-bottom: 0;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  #cc-main .cm .cm__btns {
+    flex-direction: row !important;
+    gap: 6px;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    border-top: none !important;
+  }
+
+  /* Both button groups dissolve, so the three buttons share one row. */
+  #cc-main .cm .cm__btn-group {
+    display: contents !important;
+  }
+
+  #cc-main .cm .cm__btn {
+    flex: 1 1 auto !important;
+    min-width: 0;
+    min-height: 40px;
+    margin: 0 !important;
+    padding: 6px 8px;
+    font-size: 13px;
+    line-height: 1.2;
+  }
+
+  #cc-main .cm .cm__btn[data-role='all'] {
+    flex-grow: 1.6 !important;
+  }
 }
