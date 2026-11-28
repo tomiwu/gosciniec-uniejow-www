@@ -4,6 +4,12 @@
 
 Branch protection requires 9 jobs: `format`, `lint`, `typecheck`, `test`, `build`, `redirects`, `schema`, `e2e-a11y`, `lighthouse` (PRD PS6). `build` runs `npm run build`. This is a non-production build: it may use sample data (`src/content/placeholders.ts`) when each page that shows it has the badge "Dane testowe". `lighthouse` runs Lighthouse CI on that export (`lighthouserc.json`: mobile preset, 3 runs, median LCP ≤ 2500 ms on `/`, `/pokoje/`, `/pakiety/` and `/blog/`).
 
+## LCP of `/pokoje/` (issue #87)
+
+The LCP element on a phone is the first room photo (`img-3729`). The Lighthouse slow-4G model counts bytes and round trips. A phone with a 412 px wide viewport picks `img-3729-720.avif`. A file that fits in the first TCP window (about 14 KB with the headers) saves one round trip, so the file is encoded at AVIF quality 40 (11 KB, was 17 KB). `src/lib/images.test.ts` keeps it at 12 KB or less. The photo already has a preload with `fetchpriority="high"`, `loading="eager"` and the right `sizes`.
+
+Local Lighthouse (5 runs, median, this container): 2473 ms before, 2309 ms after. CI runs faster than this container, so compare only builds on the same machine.
+
 ## Scroll-time layout checks (`e2e/ux-flows.spec.ts`)
 
 The `e2e-a11y` job checks the real boxes of the mobile action bar and the cookie banner while the page moves (issue #83). The `visual-review` job only reports. It does not run these checks.

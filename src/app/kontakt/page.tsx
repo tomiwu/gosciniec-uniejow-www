@@ -24,16 +24,18 @@ export default function Page() {
           <Link href="/pakiety/">pakiety</Link>, <Link href="/konferencje/">konferencje</Link> i{' '}
           <Link href="/przyjecia/">przyjęcia</Link>.
         </p>
-        <p>
-          Zapytania o wydarzenia, konferencje i przyjęcia:{' '}
-          <a href={`mailto:${salesEmail}`}>{salesEmail}</a>
-        </p>
-        <NapBlock />
-        <p>
-          <a className="button" href={`tel:${nap.phoneE164}`}>
-            Zadzwoń: {nap.phoneDisplay}
-          </a>
-        </p>
+        <div className="contact-items">
+          <p data-contact-item>
+            Zapytania o wydarzenia, konferencje i przyjęcia:{' '}
+            <a href={`mailto:${salesEmail}`}>{salesEmail}</a>
+          </p>
+          <NapBlock stacked />
+          <div data-contact-item>
+            <a className="button" href={`tel:${nap.phoneE164}`}>
+              Zadzwoń: {nap.phoneDisplay}
+            </a>
+          </div>
+        </div>
       </section>
 
       <section aria-labelledby="dojazd">
