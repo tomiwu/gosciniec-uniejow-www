@@ -280,7 +280,7 @@ for (const scheme of ['light', 'dark'] as const) {
       const bar = await waitForConsentBar(page);
       const colours = await bar.getByRole('button', { name: 'Ustawienia' }).evaluate((el) => {
         const s = getComputedStyle(el);
-        const panel = getComputedStyle((el.closest('.cm') ?? el) as Element);
+        const panel = getComputedStyle(el.closest('.cm') as Element);
         return {
           border: s.borderTopColor,
           borderWidth: parseFloat(s.borderTopWidth),
@@ -297,7 +297,7 @@ for (const scheme of ['light', 'dark'] as const) {
       const bar = await waitForConsentBar(page);
       const info = await bar.locator('.cm__desc').evaluate((el) => {
         const s = getComputedStyle(el);
-        const panel = getComputedStyle((el.closest('.cm') ?? el) as Element);
+        const panel = getComputedStyle(el.closest('.cm') as Element);
         return {
           length: (el.textContent ?? '').trim().length,
           size: parseFloat(s.fontSize),
