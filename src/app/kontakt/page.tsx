@@ -19,6 +19,11 @@ export default function Page() {
 
       <section aria-labelledby="dane-kontaktowe">
         <h2 id="dane-kontaktowe">Dane kontaktowe</h2>
+        <p>
+          Chcesz zapytać o pobyt? <Link href="/rezerwacja/">Przejdź do rezerwacji</Link>. Zobacz też{' '}
+          <Link href="/pakiety/">pakiety</Link>, <Link href="/konferencje/">konferencje</Link> i{' '}
+          <Link href="/przyjecia/">przyjęcia</Link>.
+        </p>
         <NapBlock />
         <p>
           <a className="button" href={`tel:${nap.phoneE164}`}>
@@ -28,11 +33,6 @@ export default function Page() {
         <p>
           Zapytania o wydarzenia, konferencje i przyjęcia:{' '}
           <a href={`mailto:${salesEmail}`}>{salesEmail}</a>
-        </p>
-        <p>
-          Chcesz zapytać o pobyt? <Link href="/rezerwacja/">Przejdź do rezerwacji</Link>. Zobacz też{' '}
-          <Link href="/pakiety/">pakiety</Link>, <Link href="/konferencje/">konferencje</Link> i{' '}
-          <Link href="/przyjecia/">przyjęcia</Link>.
         </p>
       </section>
 
