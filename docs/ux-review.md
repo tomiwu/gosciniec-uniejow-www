@@ -6,8 +6,11 @@ Issue #26. Tomasz asked for a UI/UX expert review after each PR (2026-11-27).
 
 1. **Workflow `Visual review`** (`.github/workflows/visual-review.yml`), on each PR:
    - builds the base (`main`) and the PR head;
-   - takes full-page and first-screen shots of `/`, `/pokoje/`, `/kontakt/`, `/rezerwacja/`,
-     `/faq/` at 390 px and 1280 px, light and dark theme (`e2e-visual/`, `playwright.visual.config.ts`);
+   - takes full-page and first-screen shots of the routes in `VISUAL_ROUTES` (`e2e-visual/routes.ts`:
+     home, rooms, contact, reservation, FAQ, packages, the Sylwester offer, blog index, terms and
+     privacy policy) at 390 px and 1280 px, light and dark theme (`e2e-visual/`,
+     `playwright.visual.config.ts`). Add each published blog article to the list;
+     `scripts/visual-routes.test.ts` fails when one is missing;
    - compares the PR shots with the base shots (Playwright pixel diff, noise limit 0.1 %);
    - writes a table to the job summary and uploads the artifact `visual-review`
      (`baseline/`, `current/`, `current/fold/`, `test-results/**-diff.png`, `visual-report.json`).
