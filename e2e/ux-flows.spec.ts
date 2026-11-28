@@ -253,16 +253,12 @@ for (const scheme of ['light', 'dark'] as const) {
       await page.goto('/pokoje/');
       const banner = await waitForBanner(page);
       const bar = page.locator('.action-bar');
-      for (const [state, y] of [
-        ['open', 0],
-        ['open, scrolled', 600],
-      ] as const) {
+      for (const y of [0, 600]) {
         await scrollTo(page, y);
         for (const name of ['Zadzwoń', 'Rezerwuj']) {
           // A trial click runs the hit-target check without the click.
           await bar.getByRole('link', { name }).click({ trial: true });
         }
-        expect(state).toBeTruthy();
       }
       await banner.getByRole('button', { name: 'Odrzucam' }).click();
       await expect(banner).toBeHidden();

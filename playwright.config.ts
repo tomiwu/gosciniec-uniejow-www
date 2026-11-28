@@ -2,8 +2,8 @@ import { defineConfig, devices } from '@playwright/test';
 
 const port = 4173;
 
-// WebKit is optional. The `e2e-a11y` job installs it and sets E2E_WEBKIT=1 (issue #83).
-// A machine without WebKit and its system libraries skips this project.
+// WebKit is optional (issue #83). Set E2E_WEBKIT=1 to add the project.
+// The machine needs WebKit and its system libraries.
 const withWebkit = process.env['E2E_WEBKIT'] === '1';
 
 export default defineConfig({
