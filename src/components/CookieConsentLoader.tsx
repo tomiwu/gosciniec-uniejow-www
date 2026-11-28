@@ -5,14 +5,20 @@ import * as CookieConsent from 'vanilla-cookieconsent';
 import 'vanilla-cookieconsent/dist/cookieconsent.css';
 import { buildCookieConsentConfig, CONSENT_COOKIE_NAME } from '@/lib/consent/config';
 
-const WATCH_MS = 2000;
+const WATCH_MS = 4000;
 const INPUT_WINDOW_MS = 50;
 
 function watchFocusTheft() {
   let lastInput = -Infinity;
   let lastFocus: HTMLElement | null = null;
-  const onInput = () => {
+  const onKey = () => {
     lastInput = performance.now();
+  };
+  // A pointer press counts as input for the banner only when it lands on the banner.
+  const onPointer = (event: Event) => {
+    if (event.target instanceof Element && event.target.closest('.cm')) {
+      lastInput = performance.now();
+    }
   };
   const onFocusIn = (event: FocusEvent) => {
     const target = event.target;
@@ -27,12 +33,12 @@ function watchFocusTheft() {
   if (document.activeElement instanceof HTMLElement && document.activeElement !== document.body) {
     lastFocus = document.activeElement;
   }
-  document.addEventListener('keydown', onInput, true);
-  document.addEventListener('pointerdown', onInput, true);
+  document.addEventListener('keydown', onKey, true);
+  document.addEventListener('pointerdown', onPointer, true);
   document.addEventListener('focusin', onFocusIn, true);
   window.setTimeout(() => {
-    document.removeEventListener('keydown', onInput, true);
-    document.removeEventListener('pointerdown', onInput, true);
+    document.removeEventListener('keydown', onKey, true);
+    document.removeEventListener('pointerdown', onPointer, true);
     document.removeEventListener('focusin', onFocusIn, true);
   }, WATCH_MS);
 }
