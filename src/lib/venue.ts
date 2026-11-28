@@ -51,6 +51,9 @@ export const sylwester = {
   djPhotoAlt: 'DJ Letsky przy konsoli – muzyka na balu sylwestrowym w Gościńcu Uniejów',
 } as const;
 
+/** Place text with a capital first letter. Use it at the start of a sentence. */
+export const sylwesterPlaceSentence = `${sylwester.place.charAt(0).toLocaleUpperCase('pl-PL')}${sylwester.place.slice(1)}`;
+
 export const contact = {
   email: salesEmail,
   mailto: `mailto:${salesEmail}`,

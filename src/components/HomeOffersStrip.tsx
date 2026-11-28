@@ -5,7 +5,7 @@ import { cheapestRoomFromPrice, placeholderPackages } from '@/content/placeholde
 import { nap } from '@/lib/nap';
 import { cardPictureSizes } from '@/lib/picture-sizes';
 import { offers } from '@/lib/offers';
-import { sylwester } from '@/lib/venue';
+import { sylwester, sylwesterPlaceSentence } from '@/lib/venue';
 
 /** Home offers row after the hero (#40, #43). Sylwester first; no Offer JSON-LD on `/`. */
 export function HomeOffersStrip() {
@@ -38,9 +38,10 @@ export function HomeOffersStrip() {
                 <p className="eyebrow">Oferta sezonowa</p>
                 <h3 id="home-offer-sylwester">{sylwesterOffer.name}</h3>
                 <p>
-                  <time dateTime={sylwester.dateIso}>{sylwester.dateText}</time>. {sylwester.place},{' '}
-                  {nap.street}, {nap.city}. Muzyka: {sylwester.dj}. Chcesz zostać na noc?
-                  Zapraszamy! Łatwy dojazd z autostrady A2 i drogi S8. Nocleg i menu: na zapytanie.
+                  <time dateTime={sylwester.dateIso}>{sylwester.dateText}</time>.{' '}
+                  {sylwesterPlaceSentence}, {nap.street}, {nap.city}. Muzyka: {sylwester.dj}. Chcesz
+                  zostać na noc? Zapraszamy! Łatwy dojazd z autostrady A2 i drogi S8. Nocleg i menu:
+                  na zapytanie.
                 </p>
                 <p className="home-offer__price">
                   <strong>{sylwesterOffer.price} zł za parę</strong> (bal)
