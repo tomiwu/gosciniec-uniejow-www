@@ -106,6 +106,8 @@ export function RequestForm({ kind }: { kind: FormKind }) {
     if (!form) return;
     // Native validation works without JavaScript. With JavaScript we show our own messages.
     form.noValidate = true;
+    // Tests can wait for this marker. Before it, the form is not interactive.
+    form.dataset.ready = 'true';
     const params = new URLSearchParams(window.location.search);
     const setValue = (name: string, value: string) => {
       const control = form.elements.namedItem(name);
