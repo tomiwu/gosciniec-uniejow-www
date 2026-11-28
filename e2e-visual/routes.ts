@@ -1,5 +1,17 @@
 /** Key routes, screen sizes and themes of the visual review (issue #26). */
-export const VISUAL_ROUTES = ['/', '/pokoje/', '/kontakt/', '/rezerwacja/', '/faq/'] as const;
+export const VISUAL_ROUTES = [
+  '/',
+  '/pokoje/',
+  '/kontakt/',
+  '/rezerwacja/',
+  '/faq/',
+  '/pakiety/',
+  '/pakiety/sylwester-2026-2027/',
+  '/blog/',
+  '/regulamin/',
+  '/polityka-prywatnosci/',
+  // Add the path of each published blog article here. Draft articles stay out.
+] as const;
 
 export const VISUAL_VIEWPORTS = [
   { name: 'mobile', width: 390, height: 844 },
