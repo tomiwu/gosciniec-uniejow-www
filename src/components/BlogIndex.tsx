@@ -11,23 +11,23 @@ export function BlogIndex({ posts }: { posts: readonly BlogPost[] }) {
         <>
           <p>Wkrótce pierwsze wpisy.</p>
           <p>Tymczasem zobacz, co oferuje hotel:</p>
-          <ul>
+          <ul className="blog-links" aria-label="Oferta hotelu">
             <li>
-              <Link className="text-link" href="/pakiety/">
+              <Link className="blog-links__card" href="/pakiety/">
                 Pakiety i oferty
               </Link>
             </li>
             <li>
-              <Link className="text-link" href="/pokoje/">
+              <Link className="blog-links__card" href="/pokoje/">
                 Pokoje
               </Link>
             </li>
+            <li>
+              <Link className="blog-links__card" href="/rezerwacja/">
+                Rezerwacja
+              </Link>
+            </li>
           </ul>
-          <p>
-            <Link className="button" href="/rezerwacja/">
-              Rezerwuj
-            </Link>
-          </p>
         </>
       ) : (
         <ul className="blog-list">

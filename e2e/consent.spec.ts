@@ -258,6 +258,73 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(box.y + box.height).toBeLessThanOrEqual(barBox.y + 1);
     });
 
+    test('action bar is fully opaque and nothing shows between it and the banner', async ({
+      page,
+    }) => {
+      for (const route of ['/kontakt/', '/pokoje/', '/pakiety/', '/rezerwacja/']) {
+        await page.goto(route);
+        const bar = await waitForConsentBar(page);
+        const style = await page.locator('.action-bar').evaluate((el) => {
+          const s = getComputedStyle(el);
+          return { bg: s.backgroundColor, filter: s.backdropFilter };
+        });
+        // "rgb(...)" has no alpha. "rgba(..., 1)" is opaque too.
+        expect(style.bg, route).toMatch(/^rgb\(|^rgba\(\d+, \d+, \d+, 1\)$/);
+        expect(style.filter, route).toBe('none');
+
+        const barBox = (await bar.boundingBox())!;
+        const actionBox = (await page.locator('.action-bar').boundingBox())!;
+        // The banner overlaps the bar or touches it. No gap.
+        expect(barBox.y + barBox.height, route).toBeGreaterThanOrEqual(actionBox.y - 0.01);
+        // Every point from the banner to the bottom of the screen is the banner or the bar.
+        const stray = await page.evaluate(
+          ({ from, to }) => {
+            const hits: string[] = [];
+            for (let y = Math.floor(from); y < to; y += 1) {
+              for (const x of [100, 195, 290]) {
+                const el = document.elementFromPoint(x, y);
+                if (!el?.closest('#cc-main') && !el?.closest('.action-bar')) {
+                  hits.push(`${x},${y}:${el?.tagName}`);
+                }
+              }
+            }
+            return hits;
+          },
+          { from: barBox.y + barBox.height - 4, to: 844 },
+        );
+        expect(stray, route).toEqual([]);
+      }
+    });
+
+    test('hero buttons stay clear of the banner and are fully visible after it closes', async ({
+      page,
+    }) => {
+      await page.goto('/');
+      const bar = await waitForConsentBar(page);
+      const buttons = page.locator('.hero__actions a');
+      await expect(buttons).toHaveCount(2);
+      const barTop = (await bar.boundingBox())!.y;
+      for (const i of [0, 1]) {
+        const box = (await buttons.nth(i).boundingBox())!;
+        expect(box.y + box.height, `button ${i} above the banner`).toBeLessThanOrEqual(barTop);
+      }
+      await bar.getByRole('button', { name: 'Odrzucam' }).click();
+      await expect(page.locator('#cc-main .cm')).toBeHidden();
+      const actionTop = (await page.locator('.action-bar').boundingBox())!.y;
+      for (const i of [0, 1]) {
+        await expect(buttons.nth(i)).toBeInViewport({ ratio: 1 });
+        const box = (await buttons.nth(i).boundingBox())!;
+        expect(box.y + box.height, `button ${i} above the action bar`).toBeLessThanOrEqual(
+          actionTop,
+        );
+        const onTop = await page.evaluate(
+          ({ x, y }) => !!document.elementFromPoint(x, y)?.closest('.hero__actions'),
+          { x: box.x + box.width / 2, y: box.y + box.height / 2 },
+        );
+        expect(onTop).toBe(true);
+      }
+    });
+
     test('banner has no axe violations', async ({ page }) => {
       await page.goto('/rezerwacja/');
       await waitForConsentBar(page);
