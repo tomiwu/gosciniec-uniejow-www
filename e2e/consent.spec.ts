@@ -117,8 +117,8 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(actionBox).not.toBeNull();
       // The banner ends where the action bar starts (1 px for rounding).
       expect(barBox!.y + barBox!.height).toBeLessThanOrEqual(actionBox!.y + 1);
-      // The banner stays low.
-      expect(barBox!.height).toBeLessThanOrEqual(230);
+      // The banner stays low: less than a fifth of the first screen (issue #74).
+      expect(barBox!.height).toBeLessThanOrEqual(160);
 
       // The action bar buttons are on top: nothing from the banner covers them.
       for (const name of ['Zadzwoń', 'Rezerwuj']) {
@@ -208,6 +208,54 @@ for (const scheme of ['light', 'dark'] as const) {
       });
       expect(colours.borderWidth).toBeGreaterThanOrEqual(1);
       expect(contrast(parseRgb(colours.border), parseRgb(colours.panel))).toBeGreaterThanOrEqual(3);
+    });
+
+    test('banner text is short, readable and in the main text colour', async ({ page }) => {
+      await page.goto('/');
+      const bar = await waitForConsentBar(page);
+      const info = await bar.locator('.cm__desc').evaluate((el) => {
+        const s = getComputedStyle(el);
+        const panel = getComputedStyle(el.closest('.cm') as Element);
+        return {
+          length: (el.textContent ?? '').trim().length,
+          size: parseFloat(s.fontSize),
+          color: s.color,
+          panel: panel.backgroundColor,
+        };
+      });
+      expect(info.length).toBeLessThanOrEqual(120);
+      expect(info.size).toBeGreaterThanOrEqual(14);
+      expect(contrast(parseRgb(info.color), parseRgb(info.panel))).toBeGreaterThanOrEqual(7);
+    });
+
+    test('banner and action bar look like two separate layers', async ({ page }) => {
+      await page.goto('/rezerwacja/');
+      const bar = await waitForConsentBar(page);
+      const actionBox = (await page.locator('.action-bar').boundingBox())!;
+      const barBox = (await bar.boundingBox())!;
+      const style = await bar.evaluate((el) => {
+        const s = getComputedStyle(el);
+        return { shadow: s.boxShadow, border: parseFloat(s.borderBottomWidth) };
+      });
+      // A top shadow and a visible line tell the layers apart.
+      expect(style.shadow).not.toBe('none');
+      expect(style.border).toBeGreaterThanOrEqual(1);
+      // Nothing from the page shows between the banner and the action bar.
+      expect(actionBox.y - (barBox.y + barBox.height)).toBeLessThanOrEqual(1);
+      const probe = await page.evaluate((y) => {
+        const el = document.elementFromPoint(20, y);
+        return !!el?.closest('#cc-main') || !!el?.closest('.action-bar');
+      }, actionBox.y - 1);
+      expect(probe).toBe(true);
+    });
+
+    test('banner does not hide the hero booking button', async ({ page }) => {
+      await page.goto('/');
+      const bar = await waitForConsentBar(page);
+      const barBox = (await bar.boundingBox())!;
+      const hero = page.locator('main').getByRole('link', { name: 'Rezerwuj' }).first();
+      const box = (await hero.boundingBox())!;
+      expect(box.y + box.height).toBeLessThanOrEqual(barBox.y + 1);
     });
 
     test('banner has no axe violations', async ({ page }) => {

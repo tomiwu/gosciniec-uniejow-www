@@ -11,7 +11,7 @@ const POLISH: CookieConsentConfig['language'] = {
       consentModal: {
         title: 'Szanujemy Twoją prywatność',
         description:
-          'Używamy plików cookie, aby strona działała poprawnie. Opcjonalne cookie analityczne pomagają nam zrozumieć, jak korzystacie ze strony. Możecie zaakceptować wszystkie, odrzucić opcjonalne lub otworzyć ustawienia.',
+          'Używamy plików cookie, by strona działała. Cookie analityczne włączamy tylko za Twoją zgodą.',
         acceptAllBtn: 'Akceptuję wszystkie',
         acceptNecessaryBtn: 'Odrzucam',
         showPreferencesBtn: 'Ustawienia',

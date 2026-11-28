@@ -24,6 +24,7 @@ async function fillGuest(page: Page) {
 test.describe('/rezerwacja/', () => {
   test('has the heading, a phone link and the form', async ({ page }) => {
     await page.goto('/rezerwacja/');
+    await page.locator('form[data-ready="true"]').waitFor();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(
       'Rezerwacja – zapytanie o pobyt',
     );
@@ -76,6 +77,7 @@ test.describe('/rezerwacja/', () => {
   test('shows errors next to the fields and moves focus to the first error', async ({ page }) => {
     const bodies = await fakeEndpoint(page, 200, { ok: true });
     await page.goto('/rezerwacja/');
+    await page.locator('form[data-ready="true"]').waitFor();
     await page.getByRole('button', { name: 'Wyślij zapytanie' }).click();
 
     const arrival = page.getByLabel('Data przyjazdu');
@@ -96,6 +98,7 @@ test.describe('/rezerwacja/', () => {
   test('rejects a departure date that is not after arrival', async ({ page }) => {
     const bodies = await fakeEndpoint(page, 200, { ok: true });
     await page.goto('/rezerwacja/');
+    await page.locator('form[data-ready="true"]').waitFor();
     await page.getByLabel('Data przyjazdu').fill('2027-03-10');
     await page.getByLabel('Data wyjazdu').fill('2027-03-10');
     await fillGuest(page);
@@ -108,6 +111,7 @@ test.describe('/rezerwacja/', () => {
   test('posts to the endpoint and shows the thank-you page', async ({ page }) => {
     const bodies = await fakeEndpoint(page, 200, { ok: true });
     await page.goto('/rezerwacja/');
+    await page.locator('form[data-ready="true"]').waitFor();
     await page.getByLabel('Data przyjazdu').fill('2027-03-10');
     await page.getByLabel('Data wyjazdu').fill('2027-03-12');
     await fillGuest(page);
@@ -124,6 +128,7 @@ test.describe('/rezerwacja/', () => {
   test('shows the errors that the server returns', async ({ page }) => {
     await fakeEndpoint(page, 422, { ok: false, errors: { email: 'Podaj poprawny adres e-mail.' } });
     await page.goto('/rezerwacja/');
+    await page.locator('form[data-ready="true"]').waitFor();
     await page.getByLabel('Data przyjazdu').fill('2027-03-10');
     await page.getByLabel('Data wyjazdu').fill('2027-03-12');
     await fillGuest(page);
@@ -136,6 +141,7 @@ test.describe('/rezerwacja/', () => {
   test('shows a general error when the endpoint is not available', async ({ page }) => {
     await page.route(ENDPOINT, (route) => route.abort());
     await page.goto('/rezerwacja/');
+    await page.locator('form[data-ready="true"]').waitFor();
     await dismissConsentBar(page);
     await page.getByLabel('Data przyjazdu').fill('2027-03-10');
     await page.getByLabel('Data wyjazdu').fill('2027-03-12');
@@ -148,11 +154,13 @@ test.describe('/rezerwacja/', () => {
 
   test('preselects the room from ?pokoj=', async ({ page }) => {
     await page.goto('/rezerwacja/?pokoj=apartament-rodzinny');
+    await page.locator('form[data-ready="true"]').waitFor();
     await expect(page.getByLabel('Typ pokoju')).toHaveValue('Apartament rodzinny');
   });
 
   test('preselects Sylwester from ?pakiet= and names the offer in the page', async ({ page }) => {
     await page.goto('/rezerwacja/?pakiet=sylwester-2026-2027');
+    await page.locator('form[data-ready="true"]').waitFor();
     await expect(page.getByLabel('Oferta lub pakiet')).toHaveValue('sylwester-2026-2027');
     await expect(page.getByText(/Formularz dotyczy oferty:/)).toContainText('Sylwester 2026/2027');
     await expect(page.locator('#rezerwacja-oferta .test-badge')).toHaveCount(0);
@@ -160,6 +168,7 @@ test.describe('/rezerwacja/', () => {
 
   test('shows the sample package with the badge and no test price', async ({ page }) => {
     await page.goto('/rezerwacja/?pakiet=pakiet-testowy');
+    await page.locator('form[data-ready="true"]').waitFor();
     await expect(page.getByLabel('Oferta lub pakiet')).toHaveValue('pakiet-testowy');
     await expect(page.locator('#rezerwacja-oferta')).toContainText('Dane testowe');
     await expect(page.locator('form')).not.toContainText('719');
@@ -168,12 +177,14 @@ test.describe('/rezerwacja/', () => {
 
   test('leaves the package field empty for an unknown ?pakiet=', async ({ page }) => {
     await page.goto('/rezerwacja/?pakiet=pakiet-kobiecy-weekend');
+    await page.locator('form[data-ready="true"]').waitFor();
     await expect(page.getByLabel('Oferta lub pakiet')).toHaveValue('');
     await expect(page.getByText(/Formularz dotyczy oferty:/)).toHaveCount(0);
   });
 
   test('keeps the honeypot out of sight and out of the tab order', async ({ page }) => {
     await page.goto('/rezerwacja/');
+    await page.locator('form[data-ready="true"]').waitFor();
     const trap = page.locator('input[name="website"]');
     await expect(trap).toHaveAttribute('tabindex', '-1');
     await expect(trap).toHaveAttribute('autocomplete', 'off');
@@ -194,6 +205,7 @@ test.describe('/rezerwacja/', () => {
 test.describe('/kontakt/', () => {
   test('shows the address, links and directions without a map iframe', async ({ page }) => {
     await page.goto('/kontakt/');
+    await page.locator('form[data-ready="true"]').waitFor();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Kontakt');
     const address = page.locator('main address');
     await expect(address).toContainText('ul. Sienkiewicza 137');
@@ -215,6 +227,7 @@ test.describe('/kontakt/', () => {
 
   test('has the form with a subject and without dates and room', async ({ page }) => {
     await page.goto('/kontakt/');
+    await page.locator('form[data-ready="true"]').waitFor();
     await expect(page.getByLabel('Temat')).toBeVisible();
     await expect(page.getByLabel('Data przyjazdu')).toHaveCount(0);
     await expect(page.getByLabel('Typ pokoju')).toHaveCount(0);
@@ -223,17 +236,20 @@ test.describe('/kontakt/', () => {
 
   test('preselects the subject from ?temat=', async ({ page }) => {
     await page.goto('/kontakt/?temat=konferencje');
+    await page.locator('form[data-ready="true"]').waitFor();
     await expect(page.getByLabel('Temat')).toHaveValue('Konferencje i szkolenia');
   });
 
   test('ignores an unknown ?temat=', async ({ page }) => {
     await page.goto('/kontakt/?temat=nie-ma');
+    await page.locator('form[data-ready="true"]').waitFor();
     await expect(page.getByLabel('Temat')).toHaveValue('');
   });
 
   test('shows errors and moves focus to the first one', async ({ page }) => {
     const bodies = await fakeEndpoint(page, 200, { ok: true });
     await page.goto('/kontakt/');
+    await page.locator('form[data-ready="true"]').waitFor();
     await page.getByRole('button', { name: 'Wyślij wiadomość' }).click();
     await expect(page.getByLabel('Temat')).toBeFocused();
     await expect(page.locator('#field-subject-error')).toContainText('Wybierz temat');
@@ -244,6 +260,7 @@ test.describe('/kontakt/', () => {
   test('posts to the endpoint and shows the thank-you page', async ({ page }) => {
     const bodies = await fakeEndpoint(page, 200, { ok: true });
     await page.goto('/kontakt/?temat=przyjecia');
+    await page.locator('form[data-ready="true"]').waitFor();
     await fillGuest(page);
     await page.getByLabel('Wiadomość').fill('Pytam o termin.');
     await page.getByRole('button', { name: 'Wyślij wiadomość' }).click();
