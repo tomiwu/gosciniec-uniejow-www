@@ -32,6 +32,12 @@ describe('HomeOffersStrip (#43)', () => {
     expect(firstArticle).not.toContain(PLACEHOLDER_BADGE);
   });
 
+  it('starts the sentence after the date with a capital letter (#66)', () => {
+    const firstArticle = html.match(/<article class="home-offer[\s\S]*?<\/article>/)?.[0] ?? '';
+    expect(firstArticle).toContain('</time>. Odnowiona sala balowa');
+    expect(firstArticle).not.toContain('</time>. odnowiona');
+  });
+
   it('shows the DJ portrait with Polish alt text and without high fetch priority', () => {
     expect(html).toContain('dj-letsky');
     expect(html).toMatch(
