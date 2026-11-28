@@ -46,6 +46,17 @@ describe('BlogIndex', () => {
     ]);
   });
 
+  it('gives each card a title, a short description and an arrow', () => {
+    const html = renderToStaticMarkup(<BlogIndex posts={[]} />);
+    const cards = [...html.matchAll(/<a class="blog-links__card"[^>]*>(.*?)<\/a>/g)];
+    expect(cards).toHaveLength(3);
+    for (const card of cards) {
+      expect(card[1]).toMatch(/<span class="blog-links__title">[^<]+<\/span>/);
+      expect(card[1]).toMatch(/<span class="blog-links__desc">[^<]{10,}<\/span>/);
+      expect(card[1]).toMatch(/<span class="blog-links__arrow" aria-hidden="true">→<\/span>/);
+    }
+  });
+
   it('lists the published posts with a link, a date and the description', () => {
     const html = renderToStaticMarkup(<BlogIndex posts={[post]} />);
     expect(html).not.toContain('Wkrótce pierwsze wpisy.');
