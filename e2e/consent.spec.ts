@@ -117,10 +117,11 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(actionBox).not.toBeNull();
       // The banner ends where the action bar starts (1 px for rounding).
       expect(barBox!.y + barBox!.height).toBeLessThanOrEqual(actionBox!.y + 1);
-      // The banner and the action bar together use at most 190 px of the first screen.
-      // Issue #81 set 180 px. Issue #85 needs 44 px tap targets: the button row grows by
-      // 8 px, so the limit is 190 px. It stays below the 200 px ceiling of issue #85.
-      expect(barBox!.height + actionBox!.height).toBeLessThanOrEqual(190);
+      // The banner and the action bar together use at most 220 px of the first screen.
+      // Issue #81 set 180 px. Issue #85 raised that to 190 px for 44 px tap targets.
+      // Issue #86 puts "Akceptuję wszystkie" on its own row so the label is not cut.
+      // The second button row adds about 50 px, so the limit is 220 px.
+      expect(barBox!.height + actionBox!.height).toBeLessThanOrEqual(220);
 
       // The action bar buttons are on top: nothing from the banner covers them.
       for (const name of ['Zadzwoń', 'Rezerwuj']) {
@@ -180,18 +181,27 @@ for (const scheme of ['light', 'dark'] as const) {
       expect(accept.bg).not.toBe('rgba(0, 0, 0, 0)');
     });
 
-    test('three buttons fit in one row', async ({ page }) => {
+    test('accept sits on its own row and reject stays as large as settings', async ({ page }) => {
       await page.goto('/');
       const bar = await waitForConsentBar(page);
-      const tops: number[] = [];
+      const boxes: Record<string, { x: number; y: number; width: number; height: number }> = {};
       for (const name of ['Akceptuję wszystkie', 'Odrzucam', 'Ustawienia']) {
         const box = await bar.getByRole('button', { name }).boundingBox();
-        tops.push(Math.round(box!.y));
+        expect(box, name).not.toBeNull();
+        boxes[name] = box!;
         // 44 px tap target (issue #85).
-        expect(box!.height).toBeGreaterThanOrEqual(44);
-        expect(box!.width).toBeGreaterThanOrEqual(44);
+        expect(box!.height, name).toBeGreaterThanOrEqual(44);
+        expect(box!.width, name).toBeGreaterThanOrEqual(44);
       }
-      expect(new Set(tops).size).toBe(1);
+      const accept = boxes['Akceptuję wszystkie']!;
+      const reject = boxes['Odrzucam']!;
+      const settings = boxes['Ustawienia']!;
+      // Accept is on the first row and uses the full button row width.
+      expect(accept.y + accept.height).toBeLessThanOrEqual(reject.y + 1);
+      expect(Math.abs(reject.y - settings.y)).toBeLessThanOrEqual(1);
+      // Reject stays at least as wide as settings (equal prominence).
+      expect(reject.width).toBeGreaterThanOrEqual(settings.width - 1);
+      expect(accept.width).toBeGreaterThan(reject.width);
     });
 
     // Phone fonts are wider than the test font, so 320 px stands in for "390 px on a real phone".
@@ -459,6 +469,37 @@ for (const scheme of ['light', 'dark'] as const) {
   }
 }
 
+/* ---------- Button labels are not cut (issue #86) ---------- */
+
+for (const scheme of ['light', 'dark'] as const) {
+  for (const viewport of [
+    { width: 390, height: 844 },
+    { width: 1280, height: 800 },
+  ]) {
+    test.describe(`banner labels at ${viewport.width} px, ${scheme} theme`, () => {
+      test.use({ colorScheme: scheme, viewport });
+
+      test('every banner button keeps its full label inside the button', async ({ page }) => {
+        await page.goto('/');
+        await expect(page.locator('html')).toHaveAttribute('data-theme', scheme);
+        const bar = await waitForConsentBar(page);
+        for (const name of ['Akceptuję wszystkie', 'Odrzucam', 'Ustawienia']) {
+          const btn = bar.getByRole('button', { name });
+          await expect(btn).toBeVisible();
+          const sizes = await btn.evaluate((el) => ({
+            scrollWidth: el.scrollWidth,
+            clientWidth: el.clientWidth,
+          }));
+          expect(
+            sizes.scrollWidth,
+            `"${name}" is cut (${sizes.scrollWidth} > ${sizes.clientWidth})`,
+          ).toBeLessThanOrEqual(sizes.clientWidth);
+        }
+      });
+    });
+  }
+}
+
 /* ---------- Desktop card (issue #85) ---------- */
 
 test.describe('1280 px viewport: the banner card stays off links and buttons', () => {
@@ -493,7 +534,7 @@ test.describe('1280 px viewport: the banner card stays off links and buttons', (
     });
   }
 
-  for (const route of ['/pokoje/', '/pakiety/', '/kontakt/']) {
+  for (const route of ['/pokoje/', '/pakiety/', '/kontakt/', '/rezerwacja/']) {
     test(`${route}: card is small and covers no control at the top or the bottom`, async ({
       page,
     }) => {
