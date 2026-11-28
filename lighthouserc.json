@@ -2,7 +2,7 @@
   "ci": {
     "collect": {
       "staticDistDir": "./out",
-      "url": ["/", "/pokoje/"],
+      "url": ["/", "/pokoje/", "/pakiety/", "/blog/"],
       "numberOfRuns": 3
     },
     "assert": {

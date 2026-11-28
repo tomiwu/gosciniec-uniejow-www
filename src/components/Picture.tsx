@@ -1,3 +1,4 @@
+import { preload } from 'react-dom';
 import { images, type ImageSlug } from '@/lib/images';
 import { withBase } from '@/lib/preview';
 
@@ -35,10 +36,23 @@ export function Picture({
     );
   }
   const largest = image.widths[image.widths.length - 1];
+  const avifSrcSet = srcSet(slug, image.widths, 'avif');
+
+  if (priority) {
+    // The browser finds the LCP photo in the head, before it parses the body. The type attribute
+    // makes browsers without AVIF skip this hint. They then use the img element as before.
+    preload(withBase(`/img/${slug}-${largest}.avif`), {
+      as: 'image',
+      type: 'image/avif',
+      imageSrcSet: avifSrcSet,
+      imageSizes: sizes,
+      fetchPriority: 'high',
+    });
+  }
 
   return (
     <picture>
-      <source type="image/avif" srcSet={srcSet(slug, image.widths, 'avif')} sizes={sizes} />
+      <source type="image/avif" srcSet={avifSrcSet} sizes={sizes} />
       <source type="image/webp" srcSet={srcSet(slug, image.widths, 'webp')} sizes={sizes} />
       {/* The rule @next/next/no-img-element allows an img inside a picture element. */}
       <img

@@ -28,9 +28,17 @@ describe('BlogIndex', () => {
     expect(renderToStaticMarkup(<BlogIndex posts={[]} />)).toContain('Wkrótce pierwsze wpisy.');
   });
 
+  it('links to the offer, the rooms and the booking page without posts', () => {
+    const html = renderToStaticMarkup(<BlogIndex posts={[]} />);
+    expect(html).toMatch(/<a [^>]*href="\/pakiety\/?"/);
+    expect(html).toMatch(/<a [^>]*href="\/pokoje\/?"/);
+    expect(html).toMatch(/<a [^>]*href="\/rezerwacja\/?"/);
+  });
+
   it('lists the published posts with a link, a date and the description', () => {
     const html = renderToStaticMarkup(<BlogIndex posts={[post]} />);
     expect(html).not.toContain('Wkrótce pierwsze wpisy.');
+    expect(html).not.toMatch(/href="\/pakiety/);
     expect(html).toMatch(/href="\/blog\/przyklad\/?"/);
     expect(html).toContain('Weekend w Uniejowie');
     expect(html).toContain('Opis testowy.');
