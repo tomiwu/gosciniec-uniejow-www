@@ -150,6 +150,8 @@ test('every page has a title, description and canonical URL from the route list'
 });
 
 test('all requests go to the same origin', async ({ page, baseURL }) => {
+  // The test visits every route and waits for network idle on each one.
+  test.slow();
   const origin = new URL(baseURL ?? '').origin;
   const foreign: string[] = [];
   page.on('request', (request) => {
