@@ -7,6 +7,8 @@ export type Route = {
   metaTitle: string;
   /** Polish meta description. 140 to 160 characters. A unit test checks this. */
   description: string;
+  /** True when search engines must not index the page. The sitemap leaves it out. */
+  noindex?: boolean;
 };
 
 export const routes: readonly Route[] = [
@@ -121,6 +123,7 @@ export const routes: readonly Route[] = [
     metaTitle: 'Regulamin hotelu',
     description:
       'Regulamin hotelu Gościniec Uniejów: zasady rezerwacji, pobytu i korzystania z usług hotelu. Pełny tekst regulaminu pojawi się wkrótce na tej stronie.',
+    noindex: true,
   },
   {
     path: '/polityka-prywatnosci/',
@@ -128,6 +131,7 @@ export const routes: readonly Route[] = [
     metaTitle: 'Polityka prywatności',
     description:
       'Polityka prywatności hotelu Gościniec Uniejów: jak przetwarzamy dane osobowe z formularzy i plików cookie. Pełny tekst pojawi się wkrótce na tej stronie.',
+    noindex: true,
   },
 ];
 

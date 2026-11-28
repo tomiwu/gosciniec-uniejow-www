@@ -1,10 +1,11 @@
-import { StubPage } from '@/components/StubPage';
+import { LegalPlaceholder } from '@/components/LegalPlaceholder';
 import { routeMetadata } from '@/lib/metadata';
 
 const path = '/polityka-prywatnosci/';
 
+// A lawyer has not written the text yet. Remove `noindex` from routes.ts when the text exists.
 export const metadata = routeMetadata(path);
 
 export default function Page() {
-  return <StubPage path={path} />;
+  return <LegalPlaceholder path={path} />;
 }

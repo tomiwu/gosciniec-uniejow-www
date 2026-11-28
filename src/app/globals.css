@@ -2591,3 +2591,40 @@ a:hover > .arr,
 .from-price {
   font-size: 1.125rem;
 }
+
+/* ---------- Blog ---------- */
+.blog-meta {
+  color: var(--muted);
+}
+
+.blog-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.blog-list__item {
+  padding-block: var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.blog-list__item h2 {
+  margin-top: 0;
+}
+
+.blog-article__body h2,
+.blog-article__body h3 {
+  margin-top: 1.6em;
+}
+
+.blog-cta {
+  margin-top: 48px;
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.blog-cta h2 {
+  margin-top: 0;
+}

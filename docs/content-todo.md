@@ -99,3 +99,9 @@ Source conflict (no visible TODO, the FAQ avoids the number; see also the sectio
 - TODO: Parking. Is it on site, free or paid, how many spaces? `/kontakt/` shows a visible `TODO` marker. No placeholder block, no schema. Write the facts in `src/app/kontakt/page.tsx` after the owner confirms.
 - TODO: Reception, check-in and check-out hours. Same marker. Add them to `src/lib/faq.ts` too.
 - Owner decisions (2026-11-27): no person name, no promo phones (63 28 88 410, 602 260 965), no MojeKonferencje badge. `sprzedaz@gosciniecuniejow.pl` is allowed as a sales address.
+
+## Blog and legal pages (issue #13)
+
+- TODO (Tomasz): Write the first blog articles. Put each one in `content/blog/<slug>.md` with front matter `title`, `description`, `date` (`YYYY-MM-DD`) and `draft`. `draft: true` keeps the article out of the build. The only file now, `content/blog/przykladowy-wpis.md`, is a draft sample. Delete it when the first real article exists. `/blog/` shows "Wkrótce pierwsze wpisy." until one article is published.
+- TODO (lawyer): Text of `/regulamin/` and `/polityka-prywatnosci/`. The pages show "Treść przygotowuje prawnik." and the NAP. They are `noindex` and not in `sitemap.xml`. When the text exists, replace `LegalPlaceholder` in the page and remove `noindex: true` from the route in `src/lib/routes.ts`.
+- The static export needs one blog slug. While no article is published, `generateStaticParams` returns the dummy slug `_`. `scripts/blog-output.ts` deletes its folder from `out/` and fails the build when a draft article has a page there.
