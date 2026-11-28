@@ -35,6 +35,17 @@ describe('BlogIndex', () => {
     expect(html).toMatch(/<a [^>]*href="\/rezerwacja\/?"/);
   });
 
+  it('shows the three links as equal cards in one named list', () => {
+    const html = renderToStaticMarkup(<BlogIndex posts={[]} />);
+    expect(html).toMatch(/<ul class="blog-links"[^>]*aria-label="[^"]+"/);
+    const cards = [...html.matchAll(/<a class="blog-links__card"[^>]*href="([^"]+)"/g)];
+    expect(cards.map((m) => m[1]?.replace(/\/$/, ''))).toEqual([
+      '/pakiety',
+      '/pokoje',
+      '/rezerwacja',
+    ]);
+  });
+
   it('lists the published posts with a link, a date and the description', () => {
     const html = renderToStaticMarkup(<BlogIndex posts={[post]} />);
     expect(html).not.toContain('Wkrótce pierwsze wpisy.');

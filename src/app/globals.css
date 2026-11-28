@@ -24,7 +24,7 @@
   --control: #7d705b;
   --tag-bg: #f3ebdd;
   --header-bg: rgb(251 247 239 / 0.88);
-  --bar-bg: rgb(255 255 255 / 0.97);
+  --bar-bg: #fff;
   --shadow: 0 8px 24px rgb(31 26 20 / 0.1);
   --shadow-hover: 0 16px 40px rgb(31 26 20 / 0.16);
   --page-glow: none;
@@ -89,7 +89,7 @@
   --control: #5e727d;
   --tag-bg: #1d323c;
   --header-bg: rgb(14 26 34 / 0.9);
-  --bar-bg: rgb(14 26 34 / 0.97);
+  --bar-bg: #0e1a22;
   --shadow: 0 10px 30px rgb(0 0 0 / 0.45);
   --shadow-hover: 0 16px 40px rgb(0 0 0 / 0.5), 0 0 0 1px rgb(227 179 65 / 0.5);
   --night: #08121a;
@@ -116,7 +116,7 @@
     --control: #5e727d;
     --tag-bg: #1d323c;
     --header-bg: rgb(14 26 34 / 0.9);
-    --bar-bg: rgb(14 26 34 / 0.97);
+    --bar-bg: #0e1a22;
     --night: #08121a;
   }
 }
@@ -670,8 +670,6 @@ p {
   gap: 10px;
   padding: 10px var(--gutter) calc(10px + env(safe-area-inset-bottom));
   background: var(--bar-bg);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
   box-shadow: 0 -6px 24px rgb(31 26 20 / 0.12);
   view-transition-name: action-bar;
 }
@@ -841,9 +839,12 @@ p {
 }
 
 @media (max-width: 1023.98px) {
-  /* The fixed action bar covers the bottom of the screen: keep the chips above it. */
+  /*
+   * The fixed action bar covers the bottom of the screen: keep the chips above it.
+   * The extra 40 px keep both buttons above the cookie banner (about 132 px high).
+   */
   .hero__text {
-    padding-bottom: calc(var(--bar-h) + 24px);
+    padding-bottom: calc(var(--bar-h) + 64px);
   }
 }
 
@@ -2597,6 +2598,42 @@ a:hover > .arr,
   color: var(--muted);
 }
 
+/* Empty blog page: three equal cards. One column on mobile, one row from 640 px. */
+.blog-links {
+  display: grid;
+  gap: 12px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.blog-links__card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 64px;
+  padding: 16px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  color: var(--ink);
+  font-weight: 650;
+  text-align: center;
+  text-decoration: none;
+}
+
+.blog-links__card:hover {
+  border-color: var(--gold-text);
+  box-shadow: var(--shadow-hover);
+}
+
+@media (min-width: 640px) {
+  .blog-links {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 .blog-list {
   margin: 0;
   padding: 0;
@@ -2728,7 +2765,8 @@ html[data-theme='dark'] #cc-main {
  */
 @media (max-width: 1023.98px) {
   #cc-main .cm--bar.cm--bottom {
-    bottom: calc(var(--bar-h) + env(safe-area-inset-bottom));
+    /* The banner overlaps the action bar by 1 px: a rounding error cannot open a gap. */
+    bottom: calc(var(--bar-h) + env(safe-area-inset-bottom) - 1px);
   }
 
   /*
