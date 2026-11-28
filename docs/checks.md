@@ -4,6 +4,16 @@
 
 Branch protection requires 9 jobs: `format`, `lint`, `typecheck`, `test`, `build`, `redirects`, `schema`, `e2e-a11y`, `lighthouse` (PRD PS6). `build` runs `npm run build`. This is a non-production build: it may use sample data (`src/content/placeholders.ts`) when each page that shows it has the badge "Dane testowe". `lighthouse` runs Lighthouse CI on that export (`lighthouserc.json`: mobile preset, 3 runs, median LCP ≤ 2500 ms on `/`, `/pokoje/`, `/pakiety/` and `/blog/`).
 
+## Scroll-time layout checks (`e2e/ux-flows.spec.ts`)
+
+The `e2e-a11y` job checks the real boxes of the mobile action bar and the cookie banner while the page moves (issue #83). The `visual-review` job only reports. It does not run these checks.
+
+- Viewports: 390 px (light and dark) and 1280 px. The routes are `/`, `/pokoje/`, `/kontakt/`, `/pakiety/` and `/rezerwacja/`.
+- Steps: slow scroll down and up with the banner open, after Akceptuję, after Odrzucam, after Ustawienia, and after a turn to landscape and back. The Zadzwoń and Rezerwuj targets must be tappable.
+- Rules at each scroll stop: the bar is at the viewport bottom (±1 px) and fully visible. Its height is `--bar-h` plus `env(safe-area-inset-bottom)` and does not change. The banner ends at the top of the bar (1 px overlap by design). Nothing shows between the two layers. At 1280 px the bar stays hidden.
+- WebKit: set `E2E_WEBKIT=1` to add the `webkit-mobile` project (iPhone 13 profile). It runs only this spec. It needs `npx playwright install --with-deps webkit`. Without the variable the project is not part of the run.
+- Limit: Playwright on Linux has no iOS Safari tool bar and no non-zero safe area. These checks do not replace a test on a real iPhone.
+
 ## Local loop checks (`.sandcastle/checks.json`)
 
 The Sandcastle loop runs these commands in its container before it opens a PR. They are the same commands as the GitHub jobs, so the loop does not fail on a check that CI passes.
