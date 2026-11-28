@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
 const AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 const GTM = 'googletagmanager.com';
@@ -15,7 +15,7 @@ test.beforeEach(async ({ context }) => {
   });
 });
 
-async function waitForConsentBar(page: import('@playwright/test').Page) {
+async function waitForConsentBar(page: Page) {
   const bar = page.locator('#cc-main .cm');
   await expect(bar).toBeVisible({ timeout: 20_000 });
   return bar;
@@ -155,7 +155,7 @@ for (const scheme of ['light', 'dark'] as const) {
     }) => {
       await page.goto('/');
       const bar = await waitForConsentBar(page);
-      const style = (locator: import('@playwright/test').Locator) =>
+      const style = (locator: Locator) =>
         locator.evaluate((el) => {
           const s = getComputedStyle(el);
           return {

@@ -2726,7 +2726,7 @@ html[data-theme='dark'] #cc-main {
  * Mobile: a low banner above the fixed action bar. The library forces a column layout
  * below 640 px with !important rules, so these rules use the same weight.
  */
-@media (max-width: 1023px) {
+@media (max-width: 1023.98px) {
   #cc-main .cm--bar.cm--bottom {
     bottom: calc(var(--bar-h) + env(safe-area-inset-bottom));
   }
